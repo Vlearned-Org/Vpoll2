@@ -1,0 +1,310 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="grid">
+      <div class="col-6">
+        <label class="title">Shareholders</label>
+      </div>
+      <div class="col-6" style="display: flex; justify-content: end">
+        <button
+          pButton
+          pRipple
+          label="Download Template"
+          class="p-button-secondary p-button-outlined mr-2"
+          (click)="downloadTemplate()"
+        ></button>
+
+        <button
+          pButton
+          pRipple
+          label="Create"
+          class="p-button-primary p-button-outlined mr-2"
+          (click)="triggerCreateShareholderModal()"
+        ></button>
+
+        <button
+          pButton
+          pRipple
+          label="Import"
+          class="p-button-primary mr-2"
+          (click)="importShareholders()"
+        ></button>
+
+        <p-confirmDialog
+          header="Confirmation"
+          key="confirmClear"
+          icon="pi pi-exclamation-triangle"
+          [style]="{ width: '350px' }"
+          acceptButtonStyleClass="p-button-text"
+          rejectButtonStyleClass="p-button-text"
+        ></p-confirmDialog>
+        <button
+          pButton
+          pRipple
+          label="Delete All"
+          class="p-button-danger mr-2"
+          (click)="triggerClearShareholderModel()"
+        ></button>
+      </div>
+
+      <div class="col-12 mt-3">
+        <div>
+          <b>Total Number of Shareholders: </b
+          >{{ shareholders.length | number: "1.0-0" }}
+        </div>
+        <div>
+          <b>Total Number of Shares: </b
+          >{{ totalNumberOfShares | number: "1.0-0" }}
+        </div>
+      </div>
+
+      <div class="col-12" *ngIf="shareholders.length && !loading">
+        <p-table
+          #dt1
+          [value]="shareholders"
+          dataKey="cds"
+          [rows]="10"
+          [loading]="loading"
+          [rowHover]="true"
+          styleClass="p-datatable-gridlines"
+          [paginator]="true"
+          [globalFilterFields]="['name', 'cds', 'identityNumber' , 'userStatus']"
+          responsiveLayout="scroll"
+        >
+          <ng-template pTemplate="caption">
+            <div class="flex justify-content-between flex-column sm:flex-row">
+              <span class="p-input-icon-left mb-2">
+                <i class="pi pi-search"></i>
+                <input
+                  pInputText
+                  type="text"
+                  #filter
+                  (input)="dt1.filterGlobal($event.target.value, 'contains')"
+                  placeholder="Search Keyword"
+                  class="w-full"
+                />
+              </span>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th pFrozenColumn>
+                <div class="flex justify-content-between align-items-center">
+                  NRIC/PASSPORT
+                </div>
+              </th>
+              <th>
+                <div class="flex justify-content-between align-items-center">
+                  Name
+                </div>
+              </th>
+              <th>
+                <div class="flex justify-content-between align-items-center">
+                  CDS
+                </div>
+              </th>
+              <th>
+                <div class="flex justify-content-between align-items-center">
+                  Number of Shares
+                </div>
+              </th>
+              <th>
+                <div class="flex justify-content-between align-items-center">
+                  Large Shareholder
+                </div>
+              </th>
+              <th>
+                <div class="flex justify-content-between align-items-center">
+                  Role
+                </div>
+              </th>
+              <th>
+                <div class="flex justify-content-between align-items-center">
+                  Number of Proxies
+                </div>
+              </th>
+              <th>
+                <div class="flex justify-content-between align-items-center">
+                  Has Account
+                </div>
+              </th>
+
+              <th pFrozenColumn alignFrozen="right">
+                <div class="flex justify-content-between align-items-center">
+                  Actions
+                </div>
+              </th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-shareholder let-expanded="expanded">
+            <tr [pRowToggler]="shareholder">
+              <td style="min-width: 6rem" pFrozenColumn>
+                <i
+                  *ngIf="getProxyNumber(shareholder._id).length && expanded"
+                  class="pi pi-chevron-down"
+                ></i>
+                <i
+                  *ngIf="getProxyNumber(shareholder._id).length && !expanded"
+                  class="pi pi-chevron-right"
+                ></i>
+
+                {{ shareholder.identityNumber }}
+              </td>
+              <td style="min-width: 15rem">{{ shareholder.name }}</td>
+              <td style="min-width: 8rem">{{ shareholder.cds }}</td>
+              <td style="min-width: 8rem">
+                {{ shareholder.numberOfShares | number: "1.0-0" }}
+              </td>
+              <td style="min-width: 8rem">
+                {{ shareholder.isLargeShareholder ? "Yes" : "No" }}
+              </td>
+              <td style="min-width: 8rem">
+                {{ shareholder.shareholderType | titlecase }}
+              </td>
+              <td>
+                {{ getProxyNumber(shareholder._id).length }}
+              </td>
+                <!-- New column to show hasAccount -->
+                <td style="min-width: 8rem">
+                  {{ shareholder.hasUserAccount ? shareholder.userStatus : "No Account" }}
+                </td>
+              <td pFrozenColumn alignFrozen="right">
+                <p-menu
+                  #shareholderActionMenu
+                  [popup]="true"
+                  [model]="shareholderActionMenuItem"
+                  appendTo="body"
+                ></p-menu>
+
+                <button
+                  type="button"
+                  pButton
+                  icon="pi pi-ellipsis-v"
+                  label="Actions"
+                  class="p-button-sm p-button-primary mr-2"
+                  (click)="triggerActionMenu($event, shareholder)"
+                  style="width: auto"
+                ></button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="rowexpansion" let-shareholder>
+            <tr *ngIf="getProxyNumber(shareholder._id).length">
+              <td colspan="8" style="background-color: #e8e7f8">
+                <div>
+                  <p-table
+                    [value]="getProxyNumber(shareholder._id)"
+                    dataKey="name"
+                  >
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th pFrozenColumn>
+                          <div
+                            class="flex justify-content-between align-items-center"
+                          >
+                            Proxy Name
+                          </div>
+                        </th>
+                        <th>
+                          <div
+                            class="flex justify-content-between align-items-center"
+                          >
+                            Proxy NRIC
+                          </div>
+                        </th>
+                        <th>
+                          <div
+                            class="flex justify-content-between align-items-center"
+                          >
+                            Shareholder NRIC
+                          </div>
+                        </th>
+                        <th>
+                          <div
+                            class="flex justify-content-between align-items-center"
+                          >
+                            Shareholder CDS
+                          </div>
+                        </th>
+                        <th>
+                          <div
+                            class="flex justify-content-between align-items-center"
+                          >
+                            Number of Shares Allocated
+                          </div>
+                        </th>
+                        <th>
+                          <div
+                            class="flex justify-content-between align-items-center"
+                          >
+                            Voting Privilege
+                          </div>
+                        </th>
+                        <th>
+                          <div
+                            class="flex justify-content-between align-items-center"
+                          >
+                            Is Pre-Vote
+                          </div>
+                        </th>
+                        <th pFrozenColumn alignFrozen="right">
+                          <div
+                            class="flex justify-content-between align-items-center"
+                          >
+                            Actions
+                          </div>
+                        </th>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-proxy>
+                      <tr>
+                        <td style="min-width: 6rem" pFrozenColumn>
+                          {{ proxy.name }}
+                        </td>
+                        <td style="min-width: 15rem">
+                          {{ proxy.identityNumber }}
+                        </td>
+                        <td style="min-width: 8rem">
+                          {{ proxy.shareholderId.identityNumber }}
+                        </td>
+                        <td style="min-width: 8rem">
+                          {{ proxy.shareholderId.cds }}
+                        </td>
+                        <td style="min-width: 8rem">
+                          {{ proxy.allocatedShares | number: "1.0-0" }}
+                        </td>
+                        <td style="min-width: 8rem"></td>
+                        <td>
+                          {{ proxy.voteSetting.isPreVote ? "Yes" : "No" }}
+                        </td>
+                        <td pFrozenColumn alignFrozen="right">
+                          <button
+                            pButton
+                            pRipple
+                            label="View"
+                            class="p-button-sm p-button-primary mr-2"
+                            (click)="editProxy(proxy)"
+                          ></button>
+                        </td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7">No shareholders.</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="loadingbody">
+            <tr>
+              <td colspan="7">Loading shareholder list. Please wait.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,158 @@
+<head>
+  <link
+    href="https://fonts.googleapis.com/css?family=Bebas Neue"
+    rel="stylesheet"
+  />
+</head>
+<p-toast key="toast"></p-toast>
+<p-message></p-message>
+
+<div class="flex min-h-screen">
+  <!-- Cover Image -->
+  <div class="cover-image">
+    <img
+      src="assets/layout/images/landing.png"
+      alt="Background"
+      style="width: 100%; height: 100%; position: sticky; top: 0"
+    />
+  </div>
+
+  <div class="content-area">
+    <div
+      style="
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 10px;
+        display: flex;
+        justify-content: end;
+      "
+    >
+      <img
+        src="assets/layout/images/vpoll.png"
+        alt="Logo 1"
+        style="max-height: 50px; margin-right: 10px"
+      />
+    </div>
+
+    <h1
+      style="
+        font-family: 'Bebas Neue';
+        color: rgb(255, 150, 64);
+        text-align: center;
+        padding-top: 5%;
+        padding-bottom: 1%;
+        font-size: 110px;
+        padding-right: 0%;
+        line-height: 110px;
+      "
+    >
+      YOUR<br />
+      VOTES<br />
+      MATTER
+    </h1>
+
+    <!-- Button and Instructions Container -->
+    <div style="display: flex; flex-direction: column; align-items: center">
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 10px;
+        "
+      >
+        <img
+          src="assets/layout/images/button-01.gif"
+          alt="Sign In Button"
+          style="width: 50%; cursor: pointer"
+          (click)="router.navigate(['login'])"
+        />
+        <p
+          style="
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            font-style: italic;
+          "
+        >
+          For shareholders , proxy , invitees login
+        </p>
+      </div>
+
+      <!-- Admin Login Button with Instructions -->
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <button 
+        (click)="router.navigate(['admin/login'])" 
+        style="width: 50%; cursor: pointer; background-color: #FF5E00; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; font-weight: bold;">
+       Admin Login
+      </button>
+        <p
+          style="
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            font-style: italic;
+          "
+        >
+          Administrator login
+        </p>
+      </div>
+    </div>
+
+    <!-- Contact Info and Enquiry Section -->
+    <div
+      style="
+        padding: 4% 10%;
+        display: flex;
+        flex-direction: column;
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: 2% 10%;
+      "
+    >
+      <!-- Contact Info -->
+      <div style="width: 100%">
+        <h2
+          style="font-family: 'Bebas Neue'; font-size: 24px; margin-bottom: 0px"
+        >
+          Contact Info:
+        </h2>
+
+        <p><strong>Phone:</strong> +6017-770 0887</p>
+        <p><strong>Email:</strong> davidcheng@aismartuallearning.com</p>
+        <p>
+          <strong>Address:</strong> AI Smartual Learning Sdn. Bhd. 23-5 Menara
+          Bangkok Bank, Berjaya Central Park, Jalan Ampang, 50450 Kuala Lumpur,
+          Malaysia
+        </p>
+      </div>
+
+      <!-- Enquiry Button -->
+      <div
+        style="
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        "
+      >
+        <a
+          href="#"
+          (click)="enquiry()"
+          style="
+            text-decoration: none;
+            font-family: 'Bebas Neue';
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px 20px;
+            border: 2px solid black;
+            text-align: center;
+            display: block;
+          "
+        >
+          Enquiry
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

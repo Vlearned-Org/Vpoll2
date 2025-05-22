@@ -1,0 +1,71 @@
+<div class="p-fluid p-formgrid grid" [formGroup]="form">
+  <div class="col-12 md:col-6">
+    <label htmlFor="resolutionIndex">Resolution Number</label>
+    <p-inputNumber
+      id="resolutionIndex"
+      [showButtons]="true"
+      [min]="1"
+      [max]="30"
+      formControlName="index"
+    >
+    </p-inputNumber>
+  </div>
+
+  <div class="col-12 md:col-6">
+    <label htmlFor="resolutionType">Resolution Type</label>
+    <p-dropdown
+      id="resolutionType"
+      [options]="resolutionTypeOptions"
+      formControlName="type"
+      appendTo="body"
+    ></p-dropdown>
+  </div>
+
+  <div class="col-12">
+    <label htmlFor="resolutionTitle">Resolution Name</label>
+    <textarea
+      pInputTextarea
+      id="resolutionTitle"
+      autoResize
+      rows="3"
+      cols="30"
+      formControlName="title"
+    ></textarea>
+  </div>
+
+  <div class="col-12">
+    <label htmlFor="abstainCDS">Abstain CDS</label>
+    <p-multiSelect
+      id="abstainCDS"
+      [options]="shareholderList"
+      [virtualScroll]="true"
+      formControlName="abstainCDS"
+      appendTo="body"
+    ></p-multiSelect>
+
+    <app-cds-abstain-table
+      [cdsAbstainList]="abstainCDS()"
+      [shareholders]="shareholders"
+    ></app-cds-abstain-table>
+  </div>
+</div>
+
+<button
+  *ngIf="operation === ModalOperationEnum.CREATE"
+  pButton
+  pRipple
+  [disabled]="this.form.invalid"
+  label="Create"
+  class="p-button-raised p-button-primary mr-2 mb-2"
+  (click)="createResolution()"
+></button>
+
+<button
+  *ngIf="operation === ModalOperationEnum.UPDATE"
+  pButton
+  pRipple
+  [disabled]="this.form.invalid"
+  label="Update"
+  class="p-button-raised p-button-primary mr-2 mb-2"
+  (click)="updateResolution()"
+></button>

@@ -1,0 +1,36 @@
+<p-toast key="toast" [baseZIndex]="99999"></p-toast>
+<p-confirmDialog
+  header="Confirmation"
+  key="confirmDelete"
+  icon="pi pi-exclamation-triangle"
+  [style]="{ width: '550px' }"
+  acceptButtonStyleClass="p-button-text"
+  rejectButtonStyleClass="p-button-text"
+></p-confirmDialog>
+
+<div
+  class="layout-wrapper"
+  [ngClass]="{
+    'layout-overlay': isOverlay(),
+    'layout-static': isStatic(),
+    'layout-theme-light': !config.dark,
+    'layout-theme-dark': config.dark,
+    'layout-overlay-sidebar-active': overlayMenuActive,
+    'layout-static-sidebar-inactive': staticMenuInactive,
+    'layout-mobile-sidebar-active': menuActiveMobile,
+    'p-ripple-disabled': !config.ripple,
+    'p-input-filled': config.inputStyle === 'filled'
+  }"
+>
+  <app-topbar></app-topbar>
+  <div class="layout-sidebar">
+    <app-menu></app-menu>
+  </div>
+  <div class="layout-main-container">
+    <div class="layout-main">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+  <!-- <app-config></app-config> -->
+  <div *ngIf="menuActiveMobile" class="layout-mask p-component-overlay"></div>
+</div>

@@ -1,0 +1,15 @@
+.shareholder-info {
+    background-color: aqua;
+}
+
+::ng-deep {
+    .fullscreen {
+        max-height: 100%;
+        .p-dialog-content {
+            // padding: 0 !important;
+        }
+    }
+
+    
+}
+

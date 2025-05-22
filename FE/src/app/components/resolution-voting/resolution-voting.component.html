@@ -1,0 +1,103 @@
+<p-toast></p-toast>
+<p-message></p-message>
+<ul style="min-height: 70vh; list-style-type: none; padding: 0px; margin: 0px">
+  <li *ngFor="let resolution of filteredevent.resolutions; let i = index">
+    <div
+      class="card grid"
+      style="padding: 8px"
+      *ngIf="getResolutionVoting(resolution.index-1) as resolutionVoting"
+    >
+      <div class="col-8">
+        <label style="font-size: 1.5rem"
+          >{{ resolution.type | titlecase }} Resolution
+          {{ resolution.index }}</label
+        >
+        <div>{{ resolution.title }}</div>
+
+        <!-- Show if proxy is NOT in the operation -->
+        <div *ngIf="operation !== VotingOperation.PROXY_VOTE && resolutionVoting.isAbstain !==true" class="shares-container">
+          Shares :
+          <button class="share-button" (click)="sharesInput.value = sharesInput.value - 1">-</button>
+          <input 
+              #sharesInput
+              class="shares-input"
+              type="number" 
+              [value]="resolutionVoting.numberOfShares"
+              (change)="updateNumberOfShares(resolution.index-1, sharesInput.value)" 
+              [max]="resolutionVoting.numberOfShares"
+              [min]="0"
+          >
+          <button class="share-button" (click)="sharesInput.value = sharesInput.value * 1 + 1" [disabled]="sharesInput.value >= resolutionVoting.numberOfShares">+</button>
+        </div>
+        
+        <!-- Show if proxy IS in the operation -->
+        <div *ngIf="operation === VotingOperation.PROXY_VOTE || resolutionVoting.isAbstain ===true">
+          Shares {{ resolutionVoting.numberOfShares | number: "1.0-0" }}
+        </div>
+      </div>
+
+      <div class="col-4">
+        <div class="flex">
+          <div
+            class="card vote-box"
+            [ngClass]="
+              resolutionVoting.response === VotingResponseEnum.FOR
+                ? 'active'
+                : 'inactive'
+            "
+            style="color: #22c55e"
+            (click)="updateResponse(resolution.index-1, VotingResponseEnum.FOR)"
+          >
+            <div>For</div>
+            <i class="pi pi-thumbs-up mt-2" style="font-size: 1.5rem"></i>
+          </div>
+          <div
+            class="card vote-box"
+            [ngClass]="
+              resolutionVoting.response === VotingResponseEnum.AGAINST
+                ? 'active'
+                : 'inactive'
+            "
+            style="color: #3b82f6"
+            (click)="updateResponse(resolution.index-1, VotingResponseEnum.AGAINST)"
+          >
+            <div>Against</div>
+            <i class="pi pi-thumbs-down mt-2" style="font-size: 1.5rem"></i>
+          </div>
+          <div
+            class="card vote-box"
+            [ngClass]="
+              resolutionVoting.response === VotingResponseEnum.ABSTAIN
+                ? 'active'
+                : 'inactive'
+            "
+            style="color: #ef4444"
+            (click)="updateResponse(resolution.index-1, VotingResponseEnum.ABSTAIN)"
+          >
+            <div>Abstain</div>
+            <i class="pi pi-ban mt-2" style="font-size: 1.5rem"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </li>
+</ul>
+
+<div style="text-align: center">
+  <button
+    *ngIf="voteButtonEnable"
+    pButton
+    pRipple
+    [disabled]="this.votingForm.invalid"
+    [label]="voteLabel"
+    class="p-button-raised p-button-primary p-button-rounded mr-2 mb-2"
+    style="width: 50%"
+    (click)="onVote()"
+  ></button>
+  <div
+  *ngIf="!voteButtonEnable"
+  style="font-size: 1rem;color:red;"
+  >
+  Polling hasn't started yet.
+  </div>
+</div>

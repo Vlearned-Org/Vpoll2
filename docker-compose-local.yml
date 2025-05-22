@@ -1,0 +1,126 @@
+version: "3"
+
+services:
+  mongo-seeding:
+    image: node:14.18.1
+    container_name: vpoll_mongo_seeding
+    #add the MONGODB ENV VARIABLES HERE
+    environment:
+      VPOLL_MONGODB_URI: "mongodb://mongodb:27017/vpoll"
+    #You can add the mount volume here, since we are not building the container, we need to mount the desired seed folders
+    volumes:
+      - "./shared:/usr/src/shared"
+      - "./shared:/usr/shared"
+      - "./backend:/usr/src/app/backend"
+    depends_on:
+      - mongodb
+    #Here is the command we use to initiate the mongodb seeding
+    command: >
+      sh -c " cd /usr/src/shared && npm i
+      && npm install -g mongo-seeding-cli@latest
+      && cd /usr/src/app/backend/seed && npm i && seed -u 'mongodb://mongodb:27017/vpoll' --drop-database /usr/src/app/backend/seed/data"
+    networks:
+      - vpoll-network
+
+  mongodb:
+    image: mongo:4.0.13
+    container_name: vpoll_mongodb
+    volumes:
+      - "./scripts:/scripts"
+    logging:
+      driver: none
+    networks:
+      - vpoll-network
+    ports:
+      - "27017:27017"
+
+  maildev:
+    image: maildev/maildev
+    container_name: vpoll_maildev
+    networks:
+      - vpoll-network
+    ports:
+      - "1080:80"
+
+  backend:
+    image: node:14.18.1
+    container_name: vpoll_backend
+    restart: unless-stopped
+    environment:
+      ENV: local
+      APP_URL: "http://localhost"
+      API_URL: "http://localhost:8001"
+      SYSTEM_PASSWORD: "vpoll"
+      MONGODB_URI: "mongodb://mongodb/vpoll"
+      JWT_KEY: "ThisKeyIsRandomAndPersonal_OK?"
+      JWT_TTL: 900
+      STORAGE_LOCAL_DIR: "/data"
+      MAIL_DOMAIN: "vpoll.com"
+      MAIL_HOST: "mail.vpoll.com.my"
+      MAIL_USERNAME: "mailer@vpoll.com.my"
+      MAIL_PASSWORD: "seUzcPEqokf8bt9"
+      TWILIO_ACCOUNT_SID: "ACfa7759de401f38bcfd497a411041286c"
+      TWILIO_AUTH_TOKEN: "003eb24b0371785b9cfcfdf7fa33ed63"
+      TWILIO_VERIFICATION_SERVICE_SID: "VA443d67b304729825c991ba18ca4e96e1"
+    networks:
+      - vpoll-network
+    working_dir: /usr/src/app
+    ports:
+      - "8001:8001"
+    volumes:
+      - "./backend:/usr/src/app"
+      - "./shared:/usr/src/shared"
+      - "/usr/src/files:/data"
+      - "/root/.npm"
+    command: bash -c "npm run docker:dev"
+
+  frontend:
+    image: node:14.18.1
+    container_name: vpoll_frontend
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - vpoll-network
+    working_dir: /usr/src/app
+    depends_on:
+      - backend
+    ports:
+      - "4200:4200"
+    volumes:
+      - "./frontend:/usr/src/app"
+      - "./shared:/usr/src/shared"
+    command: bash -c "npm run docker:start"
+
+  webserver:
+    image: nginx:1.15-alpine
+    container_name: vpoll_webserver
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - frontend
+    volumes:
+      # - ./frontend/dist/sakai:/var/www/app
+      - ./webserver/nginx-local:/etc/nginx/conf.d
+      - ./webserver/certbot/conf:/etc/letsencrypt
+      - ./webserver/certbot/www:/var/www/certbot
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - vpoll-network
+    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+
+  # certbot:
+  #   image: certbot/certbot
+  #   container_name: vpoll_certbot
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./webserver/certbot/conf:/etc/letsencrypt
+  #     - ./webserver/certbot/www:/var/www/certbot
+  #   networks:
+  #     - vpoll-network
+  #   entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+networks:
+  vpoll-network:
+    driver: bridge

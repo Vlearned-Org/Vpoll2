@@ -1,0 +1,57 @@
+Attaching to vpoll_webserver, vpoll_frontend, vpoll_backend, vpoll_maildev, vpoll_certbot
+[36mvpoll_backend |[0m 
+[36mvpoll_backend |[0m > vpoll-backend@1.0.0 docker:dev /usr/src/app
+[36mvpoll_backend |[0m > npm install && rimraf dist && nest build && npm run copy-templates && nest start --watch
+[36mvpoll_backend |[0m 
+[33mvpoll_certbot |[0m Saving debug log to /var/log/letsencrypt/letsencrypt.log
+[33mvpoll_certbot |[0m 
+[33mvpoll_certbot |[0m - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+[33mvpoll_certbot |[0m Processing /etc/letsencrypt/renewal/vpoll.com.my.conf
+[33mvpoll_certbot |[0m - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+[32mvpoll_frontend |[0m 
+[32mvpoll_frontend |[0m > sakai-ng@13.1.1 docker:start /usr/src/app
+[32mvpoll_frontend |[0m > npm install && ng serve --poll 500 --host 0.0.0.0 --disableHostCheck true
+[32mvpoll_frontend |[0m 
+[33mvpoll_certbot |[0m Certificate not yet due for renewal
+[33mvpoll_certbot |[0m 
+[33mvpoll_certbot |[0m - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+[33mvpoll_certbot |[0m The following certificates are not due for renewal yet:
+[33mvpoll_certbot |[0m   /etc/letsencrypt/live/vpoll.com.my/fullchain.pem expires on 2025-01-16 (skipped)
+[33mvpoll_certbot |[0m No renewals were attempted.
+[33mvpoll_certbot |[0m - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+[35mvpoll_maildev |[0m MailDev using directory /tmp/maildev-1
+[35mvpoll_maildev |[0m MailDev webapp running at http://0.0.0.0:1080/
+[35mvpoll_maildev |[0m MailDev SMTP Server running at 0.0.0.0:1025
+[36mvpoll_backend |[0m npm WARN @babel/helper-module-transforms@7.25.7 requires a peer of @babel/core@^7.0.0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-async-generators@7.8.4 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-bigint@7.8.3 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-class-properties@7.12.13 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-class-static-block@7.14.5 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-import-attributes@7.25.7 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-import-meta@7.10.4 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-json-strings@7.8.3 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-logical-assignment-operators@7.10.4 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-nullish-coalescing-operator@7.8.3 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-numeric-separator@7.10.4 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-object-rest-spread@7.8.3 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-optional-catch-binding@7.8.3 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-optional-chaining@7.8.3 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-private-property-in-object@7.14.5 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-top-level-await@7.14.5 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @babel/plugin-syntax-typescript@7.25.7 requires a peer of @babel/core@^7.0.0-0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN @nestjs/mongoose@7.2.4 requires a peer of mongoose@^5.11.15 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN babel-jest@27.5.1 requires a peer of @babel/core@^7.8.0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN babel-preset-current-node-syntax@1.1.0 requires a peer of @babel/core@^7.0.0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN babel-preset-jest@27.5.1 requires a peer of @babel/core@^7.0.0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN terser-webpack-plugin@5.3.10 requires a peer of webpack@^5.1.0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN ts-loader@9.2.8 requires a peer of webpack@^5.0.0 but none is installed. You must install peer dependencies yourself.
+[36mvpoll_backend |[0m npm WARN optional SKIPPING OPTIONAL DEPENDENCY: fsevents@2.3.3 (node_modules/fsevents):
+[36mvpoll_backend |[0m npm WARN notsup SKIPPING OPTIONAL DEPENDENCY: Unsupported platform for fsevents@2.3.3: wanted {"os":"darwin","arch":"any"} (current: {"os":"linux","arch":"x64"})
+[36mvpoll_backend |[0m 
+[36mvpoll_backend |[0m audited 1167 packages in 7.11s
+[36mvpoll_backend |[0m 
+[36mvpoll_backend |[0m 124 packages are looking for funding
+[36mvpoll_backend |[0m   run `npm fund` for details
+[36mvpoll_backend |[0m 
+[36mvpoll_backend |[0m found 89 vulnerabilities (6 low, 41 moderate, 35 high, 7 critical)
+[36mvpoll_backend |[0m   run `npm audit fix` to fix them, or `npm audit` for details

@@ -1,0 +1,87 @@
+version: "3"
+
+services:
+  mongo-seeding:
+    image: node:14.18.1
+    container_name: vpoll_mongo_seeding
+    #add the MONGODB ENV VARIABLES HERE
+    environment:
+      VPOLL_MONGODB_URI: "mongodb://mongodb:27017/vpoll"
+    #You can add the mount volume here, since we are not building the container, we need to mount the desired seed folders
+    volumes:
+      - "./shared:/usr/src/shared"
+      - "./shared:/usr/shared"
+      - "./backend:/usr/src/app/backend"
+    depends_on:
+      - mongodb
+    #Here is the command we use to initiate the mongodb seeding
+    command: >
+      sh -c " cd /usr/src/shared && npm i
+      && npm install -g mongo-seeding-cli
+      && cd /usr/src/app/backend/seed && npm i && seed -u 'mongodb://mongodb:27017/vpoll' --drop-database /usr/src/app/backend/seed/data"
+    networks:
+      - vpoll-network
+
+  mongodb:
+    image: mongo:4.0.13
+    container_name: vpoll_mongodb
+    volumes:
+      - "./scripts:/scripts"
+    logging:
+      driver: none
+    networks:
+      - vpoll-network
+    ports:
+      - "27017:27017"
+
+  maildev:
+    image: maildev/maildev
+    container_name: vpoll_maildev
+    networks:
+      - vpoll-network
+    ports:
+      - "1080:80"
+
+  backend:
+    image: node:14.18.1
+    container_name: vpoll_backend
+    environment:
+      ENV: local
+      MONGO_DATABASE: "${MONGO_DATABASE:-vpoll}"
+      URL_MONGODB: "${URL_MONGODB:-mongodb://mongodb:27017/vpoll}"
+    env_file:
+      - ./backend/.env
+    networks:
+      - vpoll-network
+    working_dir: /usr/src/app
+    depends_on:
+      - mongodb
+    ports:
+      - "8001:8001"
+    volumes:
+      - "./backend:/usr/src/app"
+      - "./shared:/usr/src/shared"
+      - "/home/wayne/Pictures/filemanager-data:/data"
+      - "/root/.npm"
+    command: bash -c "npm run docker:dev"
+
+  frontend:
+    image: node:14.18.1
+    container_name: vpoll_frontend
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - vpoll-network
+    working_dir: /usr/src/app
+    depends_on:
+      - backend
+    ports:
+      - "4200:4200"
+    volumes:
+      - "./frontend:/usr/src/app"
+      - "./shared:/usr/src/shared"
+    command: bash -c "npm run docker:start"
+
+networks:
+  vpoll-network:
+    driver: bridge

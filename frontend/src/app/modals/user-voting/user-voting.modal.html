@@ -1,0 +1,35 @@
+<div *ngIf="loaded">
+  <ng-container *ngIf="operation === VotingOperation.SHAREHOLDER_VOTE">
+    <app-resolution-voting
+      [operation]="VotingOperation.SHAREHOLDER_VOTE"
+      [event]="event"
+      [shareholder]="shareholder"
+      [voting]="voting"
+      (onVoteEvent)="onShareholderVote($event)"
+    ></app-resolution-voting>
+  </ng-container>
+  <ng-container
+    *ngIf="operation === VotingOperation.PROXY_VOTE || operation === VotingOperation.CHAIRMAN_VOTE_AS_PROXY || operation === VotingOperation.CHAIRMAN_VOTE_AS_SECOND_PROXY"
+  >
+    <app-resolution-voting
+      [operation]="VotingOperation.PROXY_VOTE"
+      [event]="event"
+      [proxy]="proxy"
+      [voting]="voting"
+      (onVoteEvent)="onProxyVote($event)"
+    ></app-resolution-voting>
+  </ng-container>
+
+
+  <ng-container
+    *ngIf="operation === VotingOperation.SHAREHOLDER_REVOTE_FOR_OWN_PROXY"
+  >
+    <app-resolution-voting
+      [operation]="VotingOperation.SHAREHOLDER_REVOTE_FOR_OWN_PROXY"
+      [event]="event"
+      [proxy]="proxy"
+      [voting]="voting"
+      (onVoteEvent)="onShareholderVoteForAssignedProxy($event)"
+    ></app-resolution-voting>
+  </ng-container>
+</div>

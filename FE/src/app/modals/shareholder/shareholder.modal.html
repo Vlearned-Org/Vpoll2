@@ -1,0 +1,97 @@
+<div class="p-fluid p-formgrid grid" [formGroup]="form">
+  <div class="field col-12 md:col-6">
+    <label htmlFor="resolutionType">Shareholder Type</label>
+    <p-dropdown
+      id="resolutionType"
+      [options]="shareholderTypeOptions"
+      formControlName="shareholderType"
+      appendTo="body"
+    ></p-dropdown>
+  </div>
+
+  <div class="field col-12 md:col-6">
+    <label htmlFor="isLargeShareholder">Is Large Shareholder</label>
+    <div>
+      <p-inputSwitch
+        id="isLargeShareholder"
+        formControlName="isLargeShareholder"
+      ></p-inputSwitch>
+    </div>
+  </div>
+
+  <div class="field col-12">
+    <label htmlFor="shareholderName">Name</label>
+    <input pInputText id="shareholderName" type="text" formControlName="name" />
+  </div>
+
+  <div class="field col-12 md:col-6">
+    <label htmlFor="identityNumber">NRIC/Passport</label>
+    <input
+      pInputText
+      id="identityNumber"
+      type="text"
+      formControlName="identityNumber"
+    />
+  </div>
+
+  <div class="field col-12 md:col-6">
+    <label htmlFor="cds">CDS</label>
+    <input pInputText id="cds" type="text" formControlName="cds" />
+  </div>
+
+  <div class="field col-12 md:col-6">
+    <label htmlFor="shares">Number of Shares</label>
+    <p-inputNumber
+      id="shares"
+      [showButtons]="true"
+      [min]="0"
+      formControlName="numberOfShares"
+    >
+    </p-inputNumber>
+  </div>
+
+  <div class="field col-12 md:col-6">
+    <label htmlFor="nationality">Nationality</label>
+    <input
+      pInputText
+      id="nationality"
+      type="text"
+      formControlName="nationality"
+    />
+  </div>
+
+  <div class="field col-12 md:col-6">
+    <label htmlFor="oldIC">Old NRIC</label>
+    <input pInputText id="oldIC" type="text" formControlName="oldIC" />
+  </div>
+
+  <div class="field col-12 md:col-6">
+    <label htmlFor="pc">PC</label>
+    <input pInputText id="pc" type="text" formControlName="pc" />
+  </div>
+
+  <div class="field col-12 md:col-6">
+    <label htmlFor="pbc">PBC</label>
+    <input pInputText id="pbc" type="text" formControlName="pbc" />
+  </div>
+</div>
+
+<button
+  *ngIf="operation === ModalOperationEnum.CREATE"
+  pButton
+  pRipple
+  [disabled]="this.form.invalid"
+  label="Create"
+  class="p-button-raised p-button-primary mr-2 mb-2"
+  (click)="createShareholder()"
+></button>
+
+<button
+  *ngIf="operation === ModalOperationEnum.UPDATE"
+  pButton
+  pRipple
+  [disabled]="this.form.invalid"
+  label="Update"
+  class="p-button-raised p-button-primary mr-2 mb-2"
+  (click)="updateShareholder()"
+></button>

@@ -1,0 +1,112 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+      <h5>Events</h5>
+
+      <p-table
+        #dt1
+        [value]="events"
+        dataKey="id"
+        [rows]="10"
+        [loading]="loading"
+        [rowHover]="true"
+        styleClass="p-datatable-gridlines"
+        [paginator]="true"
+        [globalFilterFields]="['name']"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button *ngIf="isActive"
+              pButton
+              pRipple
+              icon="pi pi-plus"
+              label="Create Event"
+              class="mr-2 mb-2"
+              (click)="createEvent()"
+            ></button>
+
+            <span class="p-input-icon-left mb-2">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="text"
+                #filter
+                (input)="dt1.filterGlobal($event.target.value, 'contains')"
+                placeholder="Search Keyword"
+                class="w-full"
+              />
+            </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th>
+              <div class="flex justify-content-between align-items-center">
+                Event
+              </div>
+            </th>
+
+            <th>
+              <div class="flex justify-content-between align-items-center">
+                Start Time
+              </div>
+            </th>
+            <th>
+              <div class="flex justify-content-between align-items-center">
+                End Time
+              </div>
+            </th>
+
+            <th>
+              <div class="flex justify-content-between align-items-center">
+                Actions
+              </div>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-event>
+          <tr>
+            <td style="min-width: 12rem">
+              {{ event.name }}
+            </td>
+
+            <td style="min-width: 14rem">
+              {{ event.startAt | date: "medium" }}
+            </td>
+            <td style="min-width: 10rem">
+              {{ event.endAt | date: "medium" }}
+            </td>
+
+            <td style="min-width: 10rem">
+              <button
+                pButton
+                pRipple
+                label="View Details"
+                class="p-button-raised p-button-primary mr-2 mb-2"
+                (click)="eventDetails(event)"
+              ></button>
+              <button
+                pButton
+                pRipple
+                icon="pi pi-trash"
+                class="p-button-raised p-button-rounded p-button-danger mr-2 mb-2"
+                (click)="deleteEventConfirmation(event)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7">No events found.</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="7">Loading events data. Please wait.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

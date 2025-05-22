@@ -1,0 +1,165 @@
+<div class="reports grid">
+  <div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0" (click)="generateQuestionReport()">
+      <div class="flex justify-content-between mb-3">
+        <h5>Questions</h5>
+        <div
+        *ngIf="isResultPublished()"
+          class="flex align-items-center justify-content-center bg-green-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-comment text-green-500 text-xl"></i>
+        </div>
+
+        <div
+        *ngIf="isnotResultPublished()"
+          class="flex align-items-center justify-content-center bg-blue-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-comment text-blue-500 text-xl"></i>
+        </div>
+
+      </div>
+      <span class="text-500">Description</span>
+    </div>
+  </div>
+  <div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0" (click)="generateAttendanceReport()">
+      <div class="flex justify-content-between mb-3">
+        <h5>Attendance</h5>
+        <div
+        *ngIf="isResultPublished()"
+          class="flex align-items-center justify-content-center bg-green-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-users text-green-500 text-xl"></i>
+        </div>
+
+        <div
+        *ngIf="isnotResultPublished()"
+          class="flex align-items-center justify-content-center bg-blue-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-users text-blue-500 text-xl"></i>
+        </div>
+
+
+      </div>
+      <span class="text-500">Description</span>
+    </div>
+  </div>
+  <div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0" (click)="generateQuorumReport()">
+      <div class="flex justify-content-between mb-3">
+        <h5>Quorum</h5>
+
+        <div
+        *ngIf="isResultPublished()"
+          class="flex align-items-center justify-content-center bg-green-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-users text-green-500 text-xl"></i>
+        </div>
+        <div
+        *ngIf="isnotResultPublished()"
+          class="flex align-items-center justify-content-center bg-blue-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-users text-blue-500 text-xl"></i>
+        </div>
+
+      </div>
+      <span class="text-500">Description</span>
+    </div>
+  </div>
+  <div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0" (click)="generateFinalResult()">
+      <div class="flex justify-content-between mb-3">
+        <h5>AGM Result</h5>
+
+        <div
+        *ngIf="isResultPublished()"
+          class="flex align-items-center justify-content-center bg-green-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-inbox text-green-500 text-xl"></i>
+        </div>
+
+        <div
+        *ngIf="isnotResultPublished()"
+          class="flex align-items-center justify-content-center bg-blue-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-inbox text-blue-500 text-xl"></i>
+        </div>
+      </div>
+      <span class="text-500">Description</span>
+    </div>
+  </div>
+  <!-- <div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0">
+      <div class="flex justify-content-between mb-3">
+        <h5>Scrutineers</h5>
+
+        <div
+          class="flex align-items-center justify-content-center bg-blue-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-check-square text-blue-500 text-xl"></i>
+        </div>
+      </div>
+      <span class="text-500">Description</span>
+    </div>
+  </div> -->
+  <div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0" (click)="generateProxyVotingReport()">
+      <div class="flex justify-content-between mb-3">
+        <h5>Proxy Voting Report</h5>
+
+        <div
+        *ngIf="isResultPublished()"
+          class="flex align-items-center justify-content-center bg-green-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-inbox text-green-500 text-xl"></i>
+        </div>
+
+        <div
+        *ngIf="isnotResultPublished()"
+          class="flex align-items-center justify-content-center bg-blue-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-inbox text-blue-500 text-xl"></i>
+        </div>
+
+      </div>
+      <span class="text-500">Description</span>
+    </div>
+  </div>
+  <div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0" (click)="generateProxyConsolidatedReport()">
+      <div class="flex justify-content-between mb-3">
+        <h5>Proxy Consolidated Report</h5>
+
+        <div
+        *ngIf="isResultPublished()"
+          class="flex align-items-center justify-content-center bg-green-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-inbox text-green-500 text-xl"></i>
+        </div>
+
+
+        <div
+        *ngIf="isnotResultPublished()"
+          class="flex align-items-center justify-content-center bg-blue-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-inbox text-blue-500 text-xl"></i>
+        </div>
+
+      </div>
+      <span class="text-500">Description</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,111 @@
+version: "3"
+
+services:
+  maildev:
+    image: maildev/maildev
+    container_name: vpoll_maildev
+    networks:
+      - vpoll-network
+    ports:
+      - "1080:80"
+
+  mongodb:
+    image: mongo:4.4
+    container_name: vpoll_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: 26xWjcFwPZSwtKgX3jSx
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - vpoll-network
+    ports:
+      - "127.0.0.1:27017:27017"
+    command: ["--auth"]
+
+  backend:
+    image: node:14.18.1
+    container_name: vpoll_backend
+    restart: unless-stopped
+    environment:
+      ENV: dev
+      APP_URL: "https://www.vpoll.com.my"
+      API_URL: "https://www.vpoll.com.my"
+      SYSTEM_PASSWORD: "vpoll"
+      MONGODB_URI: "mongodb://admin:26xWjcFwPZSwtKgX3jSx@mongodb:27017/vpoll?authSource=admin&directConnection=true"
+      JWT_KEY: "707f0450-0cbd-11f0-8cf9-e1b29d7287ab"
+      JWT_TTL: 86400
+      STORAGE_LOCAL_DIR: "/data"
+      MAIL_DOMAIN: "vpoll.com.my"
+      MAIL_HOST: "mail.7globalconnect.com"
+      MAIL_USERNAME: "admin@vpoll.com.my"
+      MAIL_PASSWORD: "110905zyClc@"
+      TWILIO_ACCOUNT_SID: "ACe8e15eeb2f46a7c36bf9871aa90e718b"
+      TWILIO_AUTH_TOKEN: "59c0804d84f53be912ec0f11d0637795"
+      TWILIO_VERIFICATION_SERVICE_SID: "VAab7eeb34e43be77bcfa99f1c7a7b772e"
+    networks:
+      - vpoll-network
+    working_dir: /usr/src/app
+    ports:
+      - "8001:8001"
+    volumes:
+      - "./backend:/usr/src/app"
+      - "./shared:/usr/src/shared"
+      - "/usr/src/files:/data"
+      - "/root/.npm"
+    command: bash -c "npm run docker:dev"
+
+  frontend:
+    image: node:14.18.1
+    container_name: vpoll_frontend
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - vpoll-network
+    working_dir: /usr/src/app
+    depends_on:
+      - backend
+    ports:
+      - "4200:4200"
+    volumes:
+      - "./frontend:/usr/src/app"
+      - "./shared:/usr/src/shared"
+    command: bash -c "npm run docker:start"    
+
+  webserver:
+    image: nginx:1.15-alpine
+    container_name: vpoll_webserver
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - frontend
+    volumes:
+      - ./frontend/dist/sakai:/var/www/app
+      - ./webserver/nginx:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt 
+      - ./webserver/certbot/www:/var/www/certbot
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - vpoll-network
+    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+
+  certbot:
+    image: certbot/certbot
+    container_name: vpoll_certbot
+    restart: unless-stopped
+    volumes:
+      - ./webserver/certbot/conf:/etc/letsencrypt
+      - ./webserver/certbot/www:/var/www/certbot
+    networks:
+      - vpoll-network
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+networks:
+  vpoll-network:
+    driver: bridge
+
+volumes:
+  mongo_data:

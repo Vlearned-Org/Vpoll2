@@ -1,0 +1,43 @@
+<div class="grid">
+  <div class="col-12 flex">
+    <button
+      pButton
+      pRipple
+      class="p-button-primary mr-2"
+      label="+ Browse File"
+      (click)="fileSelect.click()"
+    ></button>
+
+    <input
+      type="file"
+      #fileSelect
+      style="display: none"
+      accept=".xls, .xlsx"
+      (change)="onFileSelect($event)"
+    />
+
+    <button
+      [disabled]="!file"
+      pButton
+      pRipple
+      class="p-button-primary mr-2"
+      label="Upload"
+      (click)="uploadFile()"
+    ></button>
+  </div>
+
+  <div class="col-12" *ngIf="file">
+    <div class="frame">
+      <p>File: {{ file.name }} ({{ formatBytes(file.size, 2) }})</p>
+      <p>Status:</p>
+      <ul>
+        <li *ngFor="let status of statuses">{{ status | titlecase }}</li>
+      </ul>
+      <p>Progress:</p>
+      <p-progressBar
+        [value]="uploadProgress"
+        [showValue]="true"
+      ></p-progressBar>
+    </div>
+  </div>
+</div>

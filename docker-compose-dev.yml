@@ -1,0 +1,85 @@
+version: "3"
+
+services:
+  backend:
+    image: node:14.18.1
+    container_name: vpoll_backend
+    restart: unless-stopped
+    environment:
+      ENV: dev
+      APP_URL: "https://dev.vpoll.com.my"
+      API_URL: "https://dev.vpoll.com.my"
+      SYSTEM_PASSWORD: "vpoll"
+      MONGODB_URI: "mongodb://vpoll-dev:vpoLL@192.168.60.158:27017/vpoll_dev?retryWrites=true&w=majority"
+      JWT_KEY: "ThisKeyIsRandomAndPersonal_OK?"
+      JWT_TTL: 900
+      STORAGE_LOCAL_DIR: "/data"
+      MAIL_DOMAIN: "vpoll.com"
+      MAIL_HOST: "mail.vpoll.com.my"
+      MAIL_USERNAME: "mailer@vpoll.com.my"
+      MAIL_PASSWORD: "seUzcPEqokf8bt9"
+      TWILIO_ACCOUNT_SID: "ACe8e15eeb2f46a7c36bf9871aa90e718b"
+      TWILIO_AUTH_TOKEN: "59c0804d84f53be912ec0f11d0637795"
+      TWILIO_VERIFICATION_SERVICE_SID: "VAab7eeb34e43be77bcfa99f1c7a7b772e"
+    networks:
+      - vpoll-network
+    working_dir: /usr/src/app
+    ports:
+      - "8001:8001"
+    volumes:
+      - "./backend:/usr/src/app"
+      - "./shared:/usr/src/shared"
+      - "/usr/src/files:/data"
+      - "/root/.npm"
+    command: bash -c "npm install && npm run docker:dev"
+
+  frontend:
+    image: node:14.18.1
+    container_name: vpoll_frontend
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - vpoll-network
+    working_dir: /usr/src/app
+    depends_on:
+      - backend
+    ports:
+      - "4200:4200"
+    volumes:
+      - "./frontend:/usr/src/app"
+      - "./shared:/usr/src/shared"
+    command: bash -c "npm install && npm run docker:start"    
+
+  webserver:
+    image: nginx:1.15-alpine
+    container_name: vpoll_webserver
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - frontend
+    volumes:
+      #- ./frontend/dist/sakai:/var/www/app
+      - ./webserver/nginx:/etc/nginx/conf.d
+      - ./webserver/certbot/conf:/etc/letsencrypt
+      - ./webserver/certbot/www:/var/www/certbot
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - vpoll-network
+    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+
+  certbot:
+    image: certbot/certbot
+    container_name: vpoll_certbot
+    restart: unless-stopped
+    volumes:
+      - ./webserver/certbot/conf:/etc/letsencrypt
+      - ./webserver/certbot/www:/var/www/certbot
+    networks:
+      - vpoll-network
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+networks:
+  vpoll-network:
+    driver: bridge

@@ -1,0 +1,20 @@
+<div *ngIf="loaded" class="grid" style="margin-top: 0px">
+  <div class="col-5">
+    <app-file-uploader
+      description="Update Authorization Letter"
+      [file]="authorizationLetter"
+      [canEdit]="true"
+      (fileUploaded)="addAuthorizationForm($event)"
+    ></app-file-uploader>
+  </div>
+  <div class="col-7">
+    <app-resolution-voting
+      [operation]="VotingOperation.CHAIRMAN_VOTE_ON_BEHALF"
+      [event]="event"
+      [shareholder]="shareholder"
+      [voting]="voting"
+      [file]="authorizationLetter"
+      (onVoteEvent)="onVote($event)"
+    ></app-resolution-voting>
+  </div>
+</div>

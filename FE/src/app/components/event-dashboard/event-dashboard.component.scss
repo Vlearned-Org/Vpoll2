@@ -1,0 +1,30 @@
+::ng-deep .process-cards {
+    .p-card {
+        background: #f0f0f0;
+
+        .p-card-content {
+            padding: 0;
+        }
+    }
+
+    .p-badge {
+        background: #f5821f
+    }
+}
+
+
+.title {
+    font-weight: 700;
+    font-size: x-large;
+    margin: auto 0;
+}
+
+.action-text {
+    text-align: right;
+    font-weight: bolder;
+    color: #6366F1;
+}
+
+.cursor {
+    cursor: pointer;
+}

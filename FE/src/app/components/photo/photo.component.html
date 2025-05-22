@@ -1,0 +1,49 @@
+<ng-container *ngIf="photoUrl; else addPhotoTemplate">
+  <div
+    class="frame photo"
+    (mouseenter)="setDisplayDelete(true)"
+    (mouseleave)="setDisplayDelete(false)"
+  >
+    <img
+      alt="gallery image"
+      [src]="photoUrl | storage | async"
+      (click)="photoClicked.emit(true)"
+    />
+
+    <ng-container>
+      <div class="overlay" *ngIf="displayDelete">
+        <div class="overlay-text" (click)="setOpenConfirmDelete(true)">
+          <fa-icon [icon]="['far', 'trash-alt']"></fa-icon>
+
+          <small>{{ "DELETE" }}</small>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>
+
+<ng-template #addPhotoTemplate>
+  <label for="addPhoto">
+    <div class="frame add-photo">
+      <i class="pi pi-image"></i>
+      <small>&#43; {{ "ADD_PHOTO" }}</small>
+    </div>
+  </label>
+
+  <input
+    type="file"
+    id="addPhoto"
+    [hidden]="true"
+    accept=".jpeg, .jpg, .png"
+    (change)="uploadPhoto($event)"
+  />
+</ng-template>
+
+<p-confirmDialog
+  header="Delete Confirmation"
+  key="openConfirmDelete"
+  icon="pi pi-exclamation-triangle"
+  [style]="{ width: '350px' }"
+  acceptButtonStyleClass="p-button-text"
+  rejectButtonStyleClass="p-button-text"
+></p-confirmDialog>

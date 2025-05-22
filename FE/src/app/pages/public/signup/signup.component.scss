@@ -1,0 +1,63 @@
+:host ::ng-deep {
+  .custom-inputgroup {
+    display: flex;
+
+    .country-item {
+      display: flex;
+    }
+
+    input {
+      border-radius: 0px;
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+
+    p-dropdown .p-dropdown {
+      height: 100%;
+      border-radius: 0px;
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+
+    }
+  }
+
+  p-password{
+    width: 100% !important;
+
+    &.password-no-feedback {
+      div {
+        width: 100% !important;
+        display: inline-flex;
+        position: relative;
+  
+        input {
+          width: 100% !important;
+          margin-bottom: 1rem;
+          padding-right: 2.5rem;
+        }
+  
+        i {
+          right: 0.65rem;
+          position: absolute;
+          top: 40%;
+          margin-top: -0.5rem;
+        }
+  
+        .pi-eye {
+          transform: scale(1.6);
+          margin-right: 1rem;
+          color: var(--primary-color) !important;
+        }
+  
+        .pi-eye-slash {
+          transform: scale(1.6);
+          margin-right: 1rem;
+          color: var(--primary-color) !important;
+        }
+      }
+    } 
+  }
+
+
+}
+  

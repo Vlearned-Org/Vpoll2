@@ -1,0 +1,108 @@
+<p-toast></p-toast>
+<p-dialog
+  header="Rejection Reason"
+  [(visible)]="rejectDialogDisplay"
+  modal="modal"
+  showEffect="fade"
+  [style]="{width: '30vw'}"
+  [breakpoints]="{'960px': '75vw'}"
+>
+  <textarea
+    pInputTextarea
+    placeholder="Your Message"
+    autoResize
+    rows="4"
+    cols="45"
+    [(ngModel)]="reason"
+  ></textarea>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      (click)="cancelReject()"
+      label="Cancel"
+      class="p-button-outlined"
+    ></button>
+    <button pButton (click)="reject()" label="Submit" class="p-button"></button>
+  </ng-template>
+</p-dialog>
+
+<div class="grid">
+  <div class="col-12">
+    <div class="flex justify-content-end">
+      <button
+        pButton
+        pRipple
+        label="Approve"
+        class="p-button-success mr-2 mb-2"
+        (click)="approve()"
+      ></button>
+      <button
+        pButton
+        pRipple
+        label="Reject"
+        class="p-button-danger mr-2 mb-2"
+        (click)="rejectDialogDisplay=true"
+      ></button>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="field grid">
+      <label for="name" class="col-fixed w-18rem">Full Name</label>
+      <div class="col">
+        <input
+          [disabled]="true"
+          type="text"
+          pInputText
+          placeholder="Name"
+          label="name"
+          [(ngModel)]="user.name"
+          class="mr-2"
+        />
+      </div>
+    </div>
+
+
+
+    <div class="field grid">
+      <label for="email" class="col-fixed w-18rem">Email</label>
+      <div class="col">
+        <input
+          [disabled]="true"
+          type="text"
+          pInputText
+          placeholder="Email"
+          label="email"
+          [(ngModel)]="user.email"
+          class="mr-2"
+        />
+      </div>
+    </div>
+
+    <div class="field grid">
+      <label for="identity" class="col-fixed w-18rem">NRIC/Passport</label>
+      <div class="col">
+        <input
+          [disabled]="true"
+          id="identity"
+          type="text"
+          pInputText
+          [(ngModel)]="user.nric"
+          class="mr-2"
+        />
+        <p-message severity="info" text="Only Alphanumeric"></p-message>
+      </div>
+    </div>
+
+    <div class="field grid">
+      <label class="col-fixed w-18rem">NRIC/Passport document</label>
+      <div class="w-full">
+        <app-file-uploader
+          [file]="user.nricRef"
+          [canEdit]="false"
+          [enableDisplay]="true"
+        ></app-file-uploader>
+      </div>
+    </div>
+  </div>
+</div>

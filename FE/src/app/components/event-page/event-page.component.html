@@ -1,0 +1,54 @@
+<p-card *ngIf="isLoaded" [ngClass]="isFullScreen ? 'fullscreen' : null">
+  <ng-template pTemplate="title">
+    {{ event.name }}
+    <span *ngIf="!isFullScreen" (click)="isFullScreen = true">
+      <i class="pi pi-window-maximize"></i>
+    </span>
+    <span
+      *ngIf="isFullScreen"
+      style="float: right"
+      class="clickable"
+      (click)="isFullScreen = false"
+    >
+      <i class="pi pi-window-minimize"></i>
+    </span>
+  </ng-template>
+
+  <p-tabView [(activeIndex)]="tabIndex" (onChange)="onTabChange($event)">
+    <p-tabPanel header="Dashboard">
+      <app-event-dashboard
+        (tabTriggerEvent)="changeTabIndex($event)"
+      ></app-event-dashboard>
+    </p-tabPanel>
+    <p-tabPanel header="Shareholders">
+      <app-shareholder-table></app-shareholder-table>
+    </p-tabPanel>
+    <p-tabPanel header="Directors">
+      <app-director-table></app-director-table>
+    </p-tabPanel>
+    <p-tabPanel header="Resolutions">
+      <app-resolution-table></app-resolution-table>
+    </p-tabPanel>
+    <p-tabPanel header="Proxies">
+      <app-proxy-table></app-proxy-table>
+    </p-tabPanel>
+    <p-tabPanel header="Proxy Voting">
+      <app-proxy-voting></app-proxy-voting>
+    </p-tabPanel>
+    <p-tabPanel header="Corporate Representative">
+      <app-corporate-table #corporateTable></app-corporate-table>
+    </p-tabPanel>
+    <p-tabPanel header="Invitees">
+      <app-invitee-table></app-invitee-table>
+    </p-tabPanel>
+    <p-tabPanel header="Result and Reports">
+      <app-event-reports></app-event-reports>
+    </p-tabPanel>
+    <p-tabPanel header="Questions">
+      <app-question-list></app-question-list>
+    </p-tabPanel>
+    <p-tabPanel header="Audit Logs">
+      <app-audit-log></app-audit-log>
+    </p-tabPanel>
+  </p-tabView>
+</p-card>
