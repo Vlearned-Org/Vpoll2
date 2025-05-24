@@ -36,8 +36,8 @@ export class RequestResetPasswordWithEmailDto implements RequestResetPasswordWit
 // User
 
 export class UserLoginDto extends LoginDto implements UserLoginDtoContract {
-  @IsMobilePhone("ms-MY")
-  public mobile: string;
+  @IsEmail()
+  public email: string;
 }
 
 export class RequestResetPasswordWithMobileDto implements RequestResetPasswordWithMobileDtoContract {
@@ -59,6 +59,14 @@ export class ResetPasswordDto implements ResetPasswordDtoContract {
   public token: string;
 }
 
+export class EmailValidationDto {
+  @IsEmail()
+  public email: string;
+
+  @IsBoolean()
+  public isNewUser: boolean;
+}
+
 export class MobileValidationDto implements MobileValidationDtoContract {
   @IsMobilePhone("ms-MY")
   public mobile: string;
@@ -68,8 +76,12 @@ export class MobileValidationDto implements MobileValidationDtoContract {
 }
 
 export class UserSignUpDto implements UserSignUpDtoContract {
+  @IsEmail()
+  public email: string;
+
+  @IsOptional()
   @IsMobilePhone("ms-MY")
-  public mobile: string;
+  public mobile?: string;
   
   @IsString()
   public name: string;
@@ -79,9 +91,6 @@ export class UserSignUpDto implements UserSignUpDtoContract {
 
   @IsString()
   public otp: string;
-
-  @IsEmail()
-  public email: string;  // Added email field
 
   @IsString()
   public password: string;

@@ -3,14 +3,12 @@ import { Injectable } from '@angular/core';
 import { environment } from '@environments/environment';
 import {
   AdminLoginDto,
+  EmailValidationDto,
+  EmailValidationResponse,
   LoginResponse,
-  MobileValidationDto,
-  MobileValidationResponse,
   PublicEvent,
   RequestResetPasswordWithEmailDto,
   RequestResetPasswordWithEmailResponse,
-  RequestResetPasswordWithMobileDto,
-  RequestResetPasswordWithMobileResponse,
   ResetPasswordDto,
   User,
   UserLoginDto,
@@ -69,11 +67,11 @@ export class AuthHttpService {
     );
   }
 
-  public mobileOtpValidation(
-    payload: MobileValidationDto
-  ): Observable<MobileValidationResponse> {
-    return this.http.post<MobileValidationResponse>(
-      `${environment.API_URL}/otp-validation`,
+  public emailOtpValidation(
+    payload: EmailValidationDto 
+  ): Observable<EmailValidationResponse> {
+    return this.http.post<EmailValidationResponse>(
+      `${environment.API_URL}/email-validation`,
       payload
     );
   }
@@ -83,9 +81,9 @@ export class AuthHttpService {
   }
 
   public userForgetPassword(
-    payload: RequestResetPasswordWithMobileDto
-  ): Observable<RequestResetPasswordWithMobileResponse> {
-    return this.http.post<any>(
+    payload: RequestResetPasswordWithEmailDto 
+  ): Observable<RequestResetPasswordWithEmailResponse> {
+    return this.http.post<RequestResetPasswordWithEmailResponse>(
       `${environment.API_URL}/request-change-password`,
       payload
     );

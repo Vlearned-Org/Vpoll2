@@ -1,13 +1,13 @@
-import { MobileValidationDto, RequestResetPasswordWithMobileDto, ResetPasswordDto, UserLoginDto, UserSignUpDto } from "@app/api/dtos/user.dto";
+import { EmailValidationDto, RequestResetPasswordWithEmailDto, ResetPasswordDto, UserLoginDto, UserSignUpDto } from "@app/api/dtos/user.dto";
 import { AuthManager } from "@app/core/auth/managers/auth.manager";
 import { PasswordManager } from "@app/core/auth/managers/password-manager";
 import { RoleManager } from "@app/core/auth/managers/role.manager";
-import { MobileAuthGuard } from "@app/core/auth/strategies/mobile.strategy";
+import { LocalAuthGuard } from "@app/core/auth/strategies/local.strategy";
 import { StorageManager } from "@app/core/storage/storage.manager";
 import { User } from "@app/data/model";
 import { CompanyRepository, EventRepository, UserRepository } from "@app/data/repositories";
 import { Body, Controller, Get, Post, Request, UseGuards } from "@nestjs/common";
-import { LoginResponse, MobileValidationResponse, PublicEvent, RequestResetPasswordWithMobileResponse } from "@vpoll-shared/contract";
+import { LoginResponse, EmailValidationResponse, PublicEvent, RequestResetPasswordWithMobileResponse, RequestResetPasswordWithEmailResponse } from "@vpoll-shared/contract";
 import { UserTokenEnum } from "@vpoll-shared/enum";
 import { DataException } from "@vpoll-shared/errors/global-exception.filter";
 
@@ -46,7 +46,7 @@ export class UserAuthController {
     );
   }
 
-  @UseGuards(MobileAuthGuard)
+  @UseGuards(LocalAuthGuard)
   @Post("login")
   public async userVerification(@Request() req, @Body() body: UserLoginDto): Promise<LoginResponse> {
     return this.auth.userLogin(req.user, body);
@@ -59,9 +59,9 @@ export class UserAuthController {
     return this.auth.refreshusertoken(body);
   }
 
-  @Post("otp-validation")
-  public async signUpMobileVerification(@Body() body: MobileValidationDto): Promise<MobileValidationResponse> {
-    return this.auth.userValidateMobile(body.mobile, body.isNewUser);
+  @Post("email-validation")
+  public async signUpEmailValidation(@Body() body: EmailValidationDto): Promise<EmailValidationResponse> {
+    return this.auth.userValidateEmail(body.email, body.isNewUser);
   }
 
   @Post("signup")
@@ -69,12 +69,12 @@ export class UserAuthController {
     if (body.password !== body.confirmPassword) {
       throw new DataException({ message: "Password and confirm password unmatch" });
     }
-    return this.auth.validateOtpAndCreateUser(body.mobile,body.email,body.name,body.nric, body.otp, body.password);
+    return this.auth.validateOtpAndCreateUser(body);
   }
 
   @Post("request-change-password")
-  public async requestPasswordWithMobile(@Body() body: RequestResetPasswordWithMobileDto): Promise<RequestResetPasswordWithMobileResponse> {
-    return this.password.requestChangePasswordWithMobile(body);
+  public async requestPasswordReset(@Body() body: RequestResetPasswordWithEmailDto): Promise<RequestResetPasswordWithEmailResponse> {
+    return this.password.requestChangePasswordWithEmail(body);
   }
 
   @Post("reset-password")
@@ -82,6 +82,6 @@ export class UserAuthController {
     if (body.password !== body.confirmPassword) {
       throw new DataException({ message: "Password and confirm password unmatch" });
     }
-    return this.password.reset(body, UserTokenEnum.MOBILE);
+    return this.password.reset(body, UserTokenEnum.EMAIL);
   }
 }

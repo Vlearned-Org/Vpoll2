@@ -21,6 +21,10 @@ export class UserHomepageComponent implements OnInit {
   public rejectMessage: string;
   public AccountVerificationStatusEnum = AccountVerificationStatusEnum;
 
+  public get isNricVerified(): boolean {
+    return this.status === AccountVerificationStatusEnum.APPROVED;
+  }
+
   constructor(private me: MeHttpService, private messageSvc: MessageService) {}
 
   ngOnInit(): void {
@@ -71,6 +75,14 @@ public isNumericString(value: string): boolean {
 }
 
   public submitForVerification() {
+    if (!this.identityDocument || !this.identityDocument._id) {
+      this.messageSvc.add({
+        key: 'toast',
+        severity: 'error',
+        detail: 'NRIC/Passport document is required for verification.',
+      });
+      return; 
+    }
 
     if (this.isValidEmail(this.email) && this.isNumericString(this.identity)){
       this.me
@@ -97,7 +109,6 @@ public isNumericString(value: string): boolean {
           severity: 'error',
           detail: `Wrong Email Format`,
         });
-        this.ngOnInit();
         
       }
       else if(!this.isNumericString(this.identity)){
@@ -107,7 +118,6 @@ public isNumericString(value: string): boolean {
           severity: 'error',
           detail: `Wrong NRIC/Passport Format`,
         });
-        this.ngOnInit();
       }
 
 

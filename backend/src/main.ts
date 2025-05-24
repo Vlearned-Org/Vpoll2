@@ -22,7 +22,7 @@ async function bootstrap() {
   const tokensManager = app.get<TokensManager>(TokensManager);
   app.useGlobalFilters(new BrioExceptionFilter("backend"), new TokenExpiredExceptionListener(httpAdapter, tokensManager));
   app.enableCors({
-    origin: ['https://vpoll.com.my','https://localhost:4200'], // Replace with your frontend domain
+    origin: ['https://vpoll.com.my','https://localhost:4200', 'http://localhost:4200', 'http://localhost:8080'], // Replace with your frontend domain
     methods: ['GET', 'POST', 'PUT', 'PATCH','DELETE', 'OPTIONS'], // Allowed HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true // Allow cookies or credentials

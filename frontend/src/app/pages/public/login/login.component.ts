@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthHttpService } from '@app/shared/http-services/auth-http.service';
-import { CountryMobileCodes } from '@app/shared/mobile-country-code';
 import { IdentityService } from '@app/shared/security/services/identity.service';
 import { AuthSourceEnum } from '@vpoll-shared/enum';
 import { Subscription } from 'rxjs';
@@ -16,9 +15,6 @@ import { MessageService } from 'primeng/api';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit, OnDestroy {
-  public countryMobileCode = CountryMobileCodes;
-  public selectedCountryMobileCode = this.countryMobileCode[0];
-
   public form: FormGroup;
 
   valCheck: string[] = ['remember'];
@@ -43,7 +39,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.config = config;
     });
     this.form = this.fb.group({
-      mobile: [null, [Validators.required, Validators.pattern('[0-9]{9,10}')]],
+      email: [null, [Validators.required, Validators.email]],
       password: [null, Validators.required],
       rememberMe: [false, Validators.required],
       source: [AuthSourceEnum.web, Validators.required],
@@ -67,12 +63,10 @@ export class LoginComponent implements OnInit, OnDestroy {
 
 
   public signin() {
-
-    const { mobile, ...rest } = this.form.value;
+    const { email, password, rememberMe, source } = this.form.value;
     this.auth
-      .userLogin({ ...rest, mobile: this.mobile })
+      .userLogin({ email, password, rememberMe, source })
       .subscribe(async (result) => {
-
         await this.identity.setup(result.token).toPromise();
         if (this.identity.isCommonUser) {
           this.router.navigate(['home']);
@@ -81,13 +75,5 @@ export class LoginComponent implements OnInit, OnDestroy {
           console.log("Oii");
         }
       });
-      
-  }
-
-  public get mobile() {
-    return `${this.selectedCountryMobileCode.name}${this.form.value.mobile}`.replace(
-      /\D/g,
-      ''
-    );
   }
 }

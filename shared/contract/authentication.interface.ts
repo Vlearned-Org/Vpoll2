@@ -12,17 +12,22 @@ export interface AdminLoginDto extends LoginDto {
 }
 
 export interface UserLoginDto extends LoginDto {
-  mobile: string;
+  email: string;
 }
+
 export interface LoginResponse {
   user: User;
   token: string;
 }
 
 export interface UserSignUpDto {
-  mobile: string;
+  email: string;
+  name: string;
+  nric: string;
   otp: string;
   password: string;
+  confirmPassword: string;
+  mobile?: string;
 }
 
 export interface RequestResetPasswordWithEmailDto {
@@ -62,16 +67,18 @@ export interface MobileValidationResponse {
   mobile: string;
 }
 
-export interface UserSignUpDto {
-  mobile: string;
-  otp: string;
-  password: string;
-  confirmPassword: string;
-}
-
 export interface CreateCompanyAdminDto {
   name: string;
   email: string;
   companyId?: string;
   password?: string;
+}
+
+export interface EmailValidationDto {
+  email: string;
+  isNewUser: boolean;
+}
+
+export interface EmailValidationResponse {
+  email: string;
 }

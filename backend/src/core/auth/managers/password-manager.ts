@@ -8,13 +8,12 @@ import { User } from "src/data/model";
 import { UserRepository } from "src/data/repositories";
 import { v1 as uuid } from "uuid";
 import { PasswordUtils } from "./password.utils";
-import SmsService from "./sms.manager";
 import { TokensManager } from "./tokens.manager";
 import moment = require("moment");
 
 @Injectable()
 export class PasswordManager {
-  constructor(private user: UserRepository, private notification: NotificationManager, private tokens: TokensManager, private sms: SmsService) {}
+  constructor(private user: UserRepository, private notification: NotificationManager, private tokens: TokensManager) {}
 
   public async requestChangePasswordWithEmail(request: RequestResetPasswordWithEmailDto): Promise<RequestResetPasswordWithEmailResponse> {
     const { email } = request;
@@ -27,18 +26,6 @@ export class PasswordManager {
     await this.sendResetPasswordEmail(user, token);
 
     return { email: user.email };
-  }
-
-  public async requestChangePasswordWithMobile({ mobile, otp }: RequestResetPasswordWithMobileDto): Promise<RequestResetPasswordWithMobileResponse> {
-    await this.sms.validatePhoneNumberOwnership(mobile, otp);
-
-    const user = await this.user.getOneBy("mobile", mobile);
-    if (!user) {
-      throw new UnauthorizedException("User does not exist.", "request-password");
-    }
-    const token = await this.setResetPasswordToken(user._id, UserTokenEnum.MOBILE);
-
-    return { token };
   }
 
   public async reset(request: ResetPasswordDto, tokenType: UserTokenEnum): Promise<LoginResponse> {
@@ -72,11 +59,11 @@ export class PasswordManager {
       subject: "Your password request",
       content: `Hello, <br /><br> You recently requested to reset your password for your Vpoll account.<br>Click the button below to reset it.
         <br /><br>
-        <a style="padding:10px 15px; border-radius: 5px;background-color:#7B95A3;text-decoration:none;margin:10px auto;color:#fff;font-size:16px;" href="${process.env.APP_URL}/signin/reset-password?token=${token}">RESET NOW</a><br><br>
+        <a style="padding:10px 15px; border-radius: 5px;background-color:#7B95A3;text-decoration:none;margin:10px auto;color:#fff;font-size:16px;" href="${process.env.APP_URL}/#/signin/reset-password?token=${token}">RESET NOW</a><br><br>
           Please change your password within 1 hour, or this link will become inactive.<br>
           You will have to request a new password after this delay.
-        <br /> <br />If you did not request a password reset, please ignore this email.<br><br> Best regards. <br />BrioHR team.<br><br>
-        <small>If you’re having trouble clicking the password reset button, please copy & paste this url in your browser:<br> ${process.env.APP_URL}/signin/reset-password?token=${token}</small>`
+        <br /> <br />If you did not request a password reset, please ignore this email.<br><br> Best regards. <br />The Vpoll Team.<br><br>
+        <small>If you're having trouble clicking the password reset button, please copy & paste this url in your browser:<br> ${process.env.APP_URL}/#/signin/reset-password?token=${token}</small>`
     });
   }
 

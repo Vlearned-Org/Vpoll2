@@ -23,89 +23,54 @@
             (click)="router.navigate(['/'])"
           />
           <div class="text-900 text-3xl font-medium mb-3">Register</div>
-          <span *ngIf="step === 'request-otp'" class="text-600 font-medium"
-            >Enter the mobile number associated with your account and request
-            for OTP to verify you are the owner of the mobile number.</span
+          <span *ngIf="step === 'request-email-otp'" class="text-600 font-medium"
+            >Enter the email address associated with your account and request
+            for OTP to verify you are the owner of the email address.</span
           >
           <span
-            *ngIf="step === 'verify-otp-register'"
+            *ngIf="step === 'verify-email-otp-register'"
             class="text-600 font-medium"
-            >Enter the OTP you received via mobile to verify you are the owner
-            of the mobile and set your login password.
+            >Enter the OTP you received via email to verify you are the owner
+            of the email and set your login password.
           </span>
           <p-messages [value]="messages"></p-messages>
         </div>
 
         <div class="w-full md:w-10 mx-auto">
-          <ng-container *ngIf="step === 'request-otp'">
-            <label for="email1" class="block text-900 text-xl font-medium mb-2"
-              >Mobile No.</label
+          <ng-container *ngIf="step === 'request-email-otp'">
+            <label for="emailAddress" class="block text-900 text-xl font-medium mb-2"
+              >Email Address</label
             >
-            <div class="custom-inputgroup mb-3">
-              <div>
-                <p-dropdown
-                  [options]="countryMobileCode"
-                  [(ngModel)]="selectedCountryMobileCode"
-                  optionLabel="name"
-                >
-                  <ng-template pTemplate="selectedItem">
-                    <div
-                      class="country-item country-item-value"
-                      *ngIf="selectedCountryMobileCode"
-                    >
-                      <img
-                        src="assets/demo/flags/flag_placeholder.png"
-                        [class]="
-                          'flag flag-' +
-                          selectedCountryMobileCode.code.toLowerCase()
-                        "
-                      />
-                      <div>{{ selectedCountryMobileCode.name }}</div>
-                    </div>
-                  </ng-template>
-                  <ng-template let-country pTemplate="item">
-                    <div class="country-item">
-                      <img
-                        src="assets/demo/flags/flag_placeholder.png"
-                        [class]="'flag flag-' + country.code.toLowerCase()"
-                      />
-                      <div>{{ country.name }}</div>
-                    </div>
-                  </ng-template>
-                </p-dropdown>
-              </div>
-              <div style="flex-basis: 100%">
                 <input
-                  type="text"
+              type="email"
                   pInputText
-                  [(ngModel)]="mobileNumber"
-                  placeholder="121234567"
-                  class="w-full"
+              [(ngModel)]="emailAddress"
+              placeholder="your@email.com"
+              class="w-full mb-3"
                   style="padding: 1rem"
+              id="emailAddress"
                 />
-              </div>
-            </div>
 
             <button
-              [disabled]="!isValidMobile"
+              [disabled]="!emailAddress"
               pButton
               pRipple
               label="Get OTP"
-              (click)="requestOTP()"
+              (click)="requestEmailOTP()"
               class="w-full p-3 text-xl"
             ></button>
           </ng-container>
-          <ng-container *ngIf="step === 'verify-otp-register'">
-            <label for="email1" class="block text-900 text-xl font-medium mb-2"
-              >Mobile No.</label
+          <ng-container *ngIf="step === 'verify-email-otp-register'">
+            <label for="internalEmail" class="block text-900 text-xl font-medium mb-2"
+              >Email Address</label
             >
             <input
               pInputText
               [disabled]="true"
-              id="email1"
+              id="internalEmail"
               class="w-full mb-3"
               type="text"
-              [(ngModel)]="internalMobile"
+              [(ngModel)]="internalEmail"
             />
 
             <ng-container [formGroup]="signUpForm">
@@ -134,9 +99,13 @@
               type="text"
               formControlName="nric"
             />
+            <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+              <li>Do not add any spaces</li>
+              <li>Do not include the dash (-) in the NRIC</li>
+            </ul>
 
             <label for="email" class="block text-900 font-medium text-xl mb-2"
-            >Email</label
+            >Email (from verification)</label
           >
             <input
               pInputText
@@ -146,6 +115,38 @@
               formControlName="email"
               required
             />
+
+            <label for="mobileNumber" class="block text-900 font-medium text-xl mb-2">Mobile No. (Optional)</label>
+            <div class="w-full mb-3 flex">
+              <p-dropdown 
+                [options]="countryCodes" 
+                formControlName="countryCode" 
+                optionLabel="code" 
+                optionValue="code" 
+                [showClear]="false"
+                styleClass="country-code-dropdown"
+              >
+                <ng-template let-country pTemplate="item">
+                  <div class="country-item flex align-items-center">
+                    <span class="mr-2">{{country.flag}}</span> <!-- Placeholder flag -->
+                    <span>{{country.name}} ({{country.code}})</span>
+                  </div>
+                </ng-template>
+                <ng-template let-country pTemplate="selectedItem">
+                  <div class="country-item flex align-items-center">
+                    <span class="mr-2">{{country.flag}}</span>
+                    <span>{{country.code}}</span>
+                  </div>
+                </ng-template>
+              </p-dropdown>
+              <input 
+                type="text" 
+                pInputText 
+                id="mobileNumber" 
+                formControlName="mobileNumber" 
+                placeholder="Enter mobile number"
+              />
+            </div>
 
               <label
                 for="password1"
@@ -201,11 +202,11 @@
                 class="w-full p-3 text-xl mb-3"
               ></button>
               <button
-                [disabled]="!isValidMobile"
+                [disabled]="false"
                 pButton
                 pRipple
                 label="Resend OTP"
-                (click)="requestOTP()"
+                (click)="requestEmailOTP()"
                 class="w-full p-3 text-xl p-button-outlined"
               ></button>
             </ng-container>

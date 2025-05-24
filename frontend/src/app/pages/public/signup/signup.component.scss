@@ -58,6 +58,62 @@
     } 
   }
 
+  .p-inputgroup {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    overflow: hidden;
 
+    .country-code-dropdown.p-dropdown {
+      flex: 0 0 auto;
+      position: relative;
+      z-index: 2;
+      border: none;
+      
+      .p-dropdown-label {
+        padding: 0.5rem 0.75rem;
+        width: 100%;
+        display: flex;
+        align-items: center;
+      }
+      .p-inputwrapper-filled, .p-inputwrapper-focus {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+      &.p-dropdown {
+         border-top-left-radius: inherit;
+         border-bottom-left-radius: inherit;
+         border-top-right-radius: 0;
+         border-bottom-right-radius: 0;
+      }
+    }
+
+    input[pInputText][formControlName="mobileNumber"] {
+      flex: 1 1 auto;
+      width: 100%;
+      min-width: 0;
+      border: none;
+      padding: 0.5rem 0.75rem;
+      position: relative;
+      z-index: 1;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-top-right-radius: inherit;
+      border-bottom-right-radius: inherit;
+    }
+  }
+
+  .country-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.25rem 0;
+    span.mr-2 {
+      font-size: 1.2rem;
+      line-height: 1;
+      margin-right: 0.5rem;
+    }
+  }
 }
   

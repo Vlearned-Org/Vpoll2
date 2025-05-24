@@ -55,6 +55,7 @@ import { ForgetPasswordComponent } from './pages/public/forget-password/forget-p
 import { LandingComponent } from './pages/public/landing/landing.component';
 import { LoginComponent } from './pages/public/login/login.component';
 import { SignupComponent } from './pages/public/signup/signup.component';
+import { ResetPasswordComponent } from './pages/public/reset-password/reset-password.component';
 import { CompanyListComponent } from './pages/system/company-list/company-list.component';
 import { UserListComponent } from './pages/system/user-list/user-list.component';
 import { UserEventComponent } from './pages/user/user-event/user-event.component';
@@ -165,6 +166,7 @@ const MODALS = [
     ProxyVotingComponent,
     ForgetPasswordComponent,
     SignupComponent,
+    ResetPasswordComponent,
     AdminsAccessComponent,
     InviteeTableComponent,
     InviteeModal,

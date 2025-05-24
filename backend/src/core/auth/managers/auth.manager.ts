@@ -1,19 +1,26 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { LoginResponse, MobileValidationResponse } from "@vpoll-shared/contract";
+import { EmailValidationResponse, LoginResponse, UserSignUpDto } from "@vpoll-shared/contract";
 import { AdminLoginDto, LoginDto, UserLoginDto } from "src/api/dtos/user.dto";
 import { User } from "src/data/model/user.model";
 import { UserRepository } from "src/data/repositories";
+import { VpollNotifications } from "../../notification/vpoll.notification";
 import { MobileExistedException, UserNotFoundException } from "../exceptions/create-user.exception";
 import { FailedLoginException } from "../exceptions/failed-login.exception";
 import { PasswordUtils } from "./password.utils";
 import { RoleManager } from "./role.manager";
-import SmsService from "./sms.manager";
 import { TokensManager } from "./tokens.manager";
+import { EmailService } from './email.manager';
 
 @Injectable()
 export class AuthManager {
   // Create and Validate User
-  constructor(private userRepo: UserRepository, private tokensManager: TokensManager, private sms: SmsService, private roleManager: RoleManager) {}
+  constructor(
+    private userRepo: UserRepository, 
+    private tokensManager: TokensManager, 
+    private emailService: EmailService,
+    private roleManager: RoleManager,
+    private vpollNotifications: VpollNotifications
+  ) {}
 
   // Admin
   public async adminValidate(email: string, password: string): Promise<User> {
@@ -44,41 +51,44 @@ export class AuthManager {
   }
 
   // User
-  public async userValidateMobile(mobile: string, isNewUser: boolean): Promise<MobileValidationResponse> {
-    const user = await this.userRepo.getOneBy("mobile", mobile);
+  public async userValidateEmail(email: string, isNewUser: boolean): Promise<EmailValidationResponse> {
+    const user = await this.userRepo.getOneBy("email", email);
     if (isNewUser && user) {
-      throw new MobileExistedException({ message: "This mobile number is associated with one of the user. To login please go to login page." });
+      throw new MobileExistedException({ message: "This email address is associated with one of the user. To login please go to login page." });
     }
     if (!isNewUser && !user) {
       throw new UserNotFoundException({
-        message: "This mobile number is not registered with any associated user. To register as new user please go to register page."
+        message: "This email address is not registered with any associated user. To register as new user please go to register page."
       });
     }
-    await this.sms.initiatePhoneNumberVerification(mobile);
-    return { mobile };
+    await this.emailService.initiateEmailVerification(email);
+    return { email };
   }
 
-  public async validateOtpAndCreateUser(mobile: string,email: string, name: string,nric: string, otp: string, password: string): Promise<User> {
-    await this.sms.validatePhoneNumberOwnership(mobile, otp);
+  public async validateOtpAndCreateUser(payload: UserSignUpDto): Promise<User> {
+    await this.emailService.validateEmailOwnership(payload.email, payload.otp);
 
-    const mobileUser = await this.userRepo.getOneBy("mobile", mobile);
-    if (mobileUser) {
-      throw new MobileExistedException();
+    const emailUser = await this.userRepo.getOneBy("email", payload.email);
+    if (emailUser) {
+      throw new MobileExistedException({message: "This email is already registered."} );
     }
-    const hashedPassword = await PasswordUtils.hash(password);
-    const user = await this.userRepo.createBasicUser(mobile,email,name,nric, hashedPassword);
+    const hashedPassword = await PasswordUtils.hash(payload.password);
+    const user = await this.userRepo.createBasicUser(payload.email, hashedPassword, payload.name, payload.nric, payload.mobile);
+
+    // Send welcome email
+    await this.vpollNotifications.onUserSignedUp(user.email, { name: user.name });
 
     return user;
   }
 
-  public async userValidate(mobile: string, password: string): Promise<User> {
-    const user = await this.userRepo.getOneBy("mobile", mobile);
+  public async userValidate(email: string, password: string): Promise<User> {
+    const user = await this.userRepo.getOneBy("email", email);
 
     if (!user) {
       throw new FailedLoginException({
-        message: "Login mobile not found",
+        message: "Login email not found",
         metadata: {
-          mobile: mobile
+          email: email
         }
       });
     }
@@ -87,7 +97,7 @@ export class AuthManager {
       throw new FailedLoginException({
         message: "Login wrong password",
         metadata: {
-          mobile: mobile
+          email: email
         }
       });
     }

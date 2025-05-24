@@ -25,55 +25,18 @@
         USER LOGIN</h1>
       <div class="w-full md:w-10 mx-auto" [formGroup]="form">
         <label for="email1" class="block text-900 text-xl font-medium mb-2"
-          >Mobile No.</label
+          >Email</label
         >
 
-        <div class="custom-inputgroup mb-3">
-          <div>
-            <p-dropdown
-              [options]="countryMobileCode"
-              [(ngModel)]="selectedCountryMobileCode"
-              [ngModelOptions]="{ standalone: true }"
-              optionLabel="name"
-            >
-              <ng-template pTemplate="selectedItem">
-                <div
-                  class="country-item country-item-value"
-                  *ngIf="selectedCountryMobileCode"
-                >
-                  <img
-                    src="assets/demo/flags/flag_placeholder.png"
-                    [class]="
-                      'flag flag-' +
-                      selectedCountryMobileCode.code.toLowerCase()
-                    "
-                  />
-                  <div>{{ selectedCountryMobileCode.name }}</div>
-                </div>
-              </ng-template>
-              <ng-template let-country pTemplate="item">
-                <div class="country-item">
-                  <img
-                    src="assets/demo/flags/flag_placeholder.png"
-                    [class]="'flag flag-' + country.code.toLowerCase()"
-                  />
-                  <div>{{ country.name }}</div>
-                </div>
-              </ng-template>
-            </p-dropdown>
-          </div>
-          <div style="flex-basis: 100%">
             <input
-              type="text"
+          type="email" 
               pInputText
-              formControlName="mobile"
-              placeholder="121234567"
-              class="w-full"
+          formControlName="email" 
+          placeholder="your@email.com" 
+          class="w-full mb-3" 
               style="padding: 1rem"
               required
             />
-          </div>
-        </div>
 
         <label for="password1" class="block text-900 font-medium text-xl mb-2"
           >Password</label

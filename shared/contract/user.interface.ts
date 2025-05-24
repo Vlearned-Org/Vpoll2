@@ -36,7 +36,7 @@ export interface User {
   lastLoginAt?: Date;
 
   // Admin is Mandatory
-  email?: string;
+  email: string;
 
   // User is Mandatory
   mobile?: string;

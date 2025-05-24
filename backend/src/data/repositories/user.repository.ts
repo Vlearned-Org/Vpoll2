@@ -106,16 +106,16 @@ export class UserRepository extends AbstractRepository<User> {
     return this.model.create(user);
   }
 
-  public async createBasicUser(mobile: string,email: string, dataname: string, datanric: string, password: string): Promise<User> {
+  public async createBasicUser(email: string, password: string, dataname: string, datanric: string, mobile?: string): Promise<User> {
     const user: User = {
       isAdmin: false,
-      mobile,
       email,
       password,
       name:dataname,
       nric:datanric,
       status: UserStatusEnum.PENDING,
-      roles: []
+      roles: [],
+      mobile
     } as User;
     return this.model.create(user);
   }

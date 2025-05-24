@@ -96,14 +96,13 @@ export class User extends AbstractModel implements UserContract {
   @prop({ hide: true })
   public password: string;
 
-  // Admin is Mandatory
-  @ValidateIf(o => o.isAdmin)
+  // Email is Mandatory for all users now
   @IsEmail()
-  @prop({ trim: true, lowercase: true })
-  public email?: string;
+  @prop({ trim: true, lowercase: true, required: true, unique: true })
+  public email: string;
 
-  // User
-  @ValidateIf(o => !o.isAdmin)
+  // Mobile is now optional
+  @IsOptional()
   @IsString()
   @prop({ trim: true })
   public mobile?: string;

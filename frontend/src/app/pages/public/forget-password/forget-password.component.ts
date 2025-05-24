@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthHttpService } from '@app/shared/http-services/auth-http.service';
-import { CountryMobileCodes } from '@app/shared/mobile-country-code';
-import { isMobilePhone } from 'class-validator';
 import { Message, MessageService } from 'primeng/api';
 
 @Component({
@@ -12,17 +10,9 @@ import { Message, MessageService } from 'primeng/api';
   styleUrls: ['./forget-password.component.scss'],
 })
 export class ForgetPasswordComponent implements OnInit {
-  public step: 'request-otp' | 'verify-otp' | 'reset-password';
   public messages: Message[] = [];
-  // Step 1: Request for mobile otp
-  public countryMobileCode = CountryMobileCodes;
-  public selectedCountryMobileCode = this.countryMobileCode[0];
-  public mobileNumber: string = '';
-  // Step 2: Verify OTP
-  public internalMobile: string;
-  public otp: string;
-  // Step 3: Reset password
-  public resetPasswordForm: FormGroup;
+  public email: string = '';
+  public emailSent: boolean = false;
 
   constructor(
     public router: Router,
@@ -32,95 +22,38 @@ export class ForgetPasswordComponent implements OnInit {
   ) {}
 
   public ngOnInit(): void {
-    this.step = 'request-otp';
-    this.resetPasswordForm = this.fb.group({
-      password: [
-        null,
-        [
-          Validators.required,
-          Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}'),
-        ],
-      ],
-      confirmPassword: [
-        null,
-        [
-          Validators.required,
-          Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}'),
-        ],
-      ],
-      token: [null, Validators.required],
-    });
+    this.emailSent = false;
   }
 
-  public requestOTP(): void {
-    this.auth
-      .mobileOtpValidation({
-        mobile: this.mobile,
-        isNewUser: false,
-      })
-      .subscribe(
-        (response) => {
-          this.step = 'verify-otp';
-          this.internalMobile = response.mobile;
-        },
-        (err) => {
-          if (err.code === 'USER_NOT_FOUND') {
+  public requestPasswordResetLink(): void {
             this.messages = [];
-            this.messages.push({
-              severity: 'error',
-
-              detail: err.message,
-            });
-          }
-        }
-      );
+    if (!this.email) {
+      this.messages.push({ severity: 'warn', summary: 'Validation', detail: 'Email address is required.' });
+      return;
+  }
+    if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.email)) {
+        this.messages.push({ severity: 'error', summary: 'Invalid Email', detail: 'Please enter a valid email address.' });
+        return;
   }
 
-  public verifyOTP(): void {
-    this.auth
-      .userForgetPassword({
-        mobile: this.internalMobile,
-        otp: this.otp,
-      })
-      .subscribe(
-        (response) => {
-          this.step = 'reset-password';
-          this.resetPasswordForm.get('token').patchValue(response.token);
-        },
-        (err) => {}
-      );
-  }
-
-  public resetPassword(): void {
-    this.auth.userResetPassword(this.resetPasswordForm.value).subscribe(
+    this.auth.userForgetPassword({ email: this.email }).subscribe(
       (response) => {
+        this.emailSent = true;
         this.messageSvc.add({
           key: 'toast',
           severity: 'success',
-          summary: 'Password reset successful',
+          summary: 'Request Sent',
+          detail: 'If an account exists for this email, a password reset link has been sent.',
         });
-        this.router.navigate(['login']);
       },
-      (err) => {}
-    );
-  }
-
-  public isValidMobile() {
-    return isMobilePhone(this.mobile.replace(/\D/g, ''));
-  }
-
-  public get resetPasswordValid(): boolean {
-    return (
-      this.resetPasswordForm.valid &&
-      this.resetPasswordForm.get('password').value ===
-        this.resetPasswordForm.get('confirmPassword').value
-    );
-  }
-
-  public get mobile() {
-    return `${this.selectedCountryMobileCode.name}${this.mobileNumber}`.replace(
-      /\D/g,
-      ''
+      (err) => {
+        this.emailSent = false;
+        this.messages.push({
+          severity: 'error',
+          summary: 'Error',
+          detail: err.message || 'Failed to send password reset email. Please try again.',
+        });
+      }
     );
   }
 }

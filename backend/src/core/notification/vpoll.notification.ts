@@ -87,17 +87,36 @@ export class VpollNotifications {
     });
   }
 
+  public async onUserSignedUp(email: string, data: { name?: string }): Promise<void> {
+    await this.notification.process(email, NotificationType.simple, {
+      subject: "Welcome to Vpoll! Please Complete Your Account Verification",
+      content: `Dear ${data.name || 'User'}, 
+      <br/><br/> 
+      Welcome to Vpoll! Your account has been successfully created.<n      <br/><br/>
+      To fully activate your account and participate in events, you need to complete the verification process by submitting the required identity documents.
+      <br/><br/>
+      Please log in to your account to proceed with the verification.
+      <br/><br/>
+      <a style="padding:10px 15px; border-radius: 5px;background-color:#7B95A3;text-decoration:none;margin:10px auto;color:#fff;font-size:16px;" href="${process.env.APP_URL}/#/login">LOGIN TO VERIFY</a>
+      <br/><br/>
+      If you have any questions, please feel free to contact our support team.
+      <br/><br/>
+      Best regards, <br />The Vpoll Team.<br/><br/>
+      <small>If you're having trouble clicking the button, please copy & paste this URL in your browser:<br> ${process.env.APP_URL}/#/login</small>`
+    });
+  }
+
   public async onResetPassword(email: string, data: { token: string }): Promise<void> {
     await this.notification.process(email, NotificationType.simple, {
       subject: "Vpoll password request",
       content: `Dear, 
-      <br/><br> 
+      <br/><br/> 
       You recently requested to reset your password for your Vpoll account.<br>Click the button below to reset it.<br/><br>
-      <a style="padding:10px 15px; border-radius: 5px;background-color:#7B95A3;text-decoration:none;margin:10px auto;color:#fff;font-size:16px;" href="${process.env.APP_URL}/signin/reset-password?token=${data.token}">RESET NOW</a><br><br>
+      <a style="padding:10px 15px; border-radius: 5px;background-color:#7B95A3;text-decoration:none;margin:10px auto;color:#fff;font-size:16px;" href="${process.env.APP_URL}/#/signin/reset-password?token=${data.token}">RESET NOW</a><br><br>
                 Please change your password within 1 hour, or this link will become inactive.<br>
                 You will have to request a new password after this delay.
-              <br /> <br />If you did not request a password reset, please ignore this email.<br><br> Best regards. <br />BrioHR team.<br><br>
-              <small>If you’re having trouble clicking the password reset button, please copy & paste this url in your browser:<br> ${process.env.APP_URL}/signin/reset-password?token=${data.token}</small>`
+              <br /> <br />If you did not request a password reset, please ignore this email.<br><br> Best regards. <br />The Vpoll Team.<br><br>
+              <small>If you're having trouble clicking the password reset button, please copy & paste this url in your browser:<br> ${process.env.APP_URL}/#/signin/reset-password?token=${data.token}</small>`
     });
   }
 }
