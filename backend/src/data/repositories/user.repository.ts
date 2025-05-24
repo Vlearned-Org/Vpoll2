@@ -88,6 +88,7 @@ export class UserRepository extends AbstractRepository<User> {
       email: companyEmail,
       password,
       status: UserStatusEnum.ACTIVE,
+      accountVerificationStatus: AccountVerificationStatusEnum.APPROVED,
       roles: [{ role: RoleEnum.COMPANY_SYSTEM, companyId }]
     } as User;
     return this.model.create(user);
@@ -101,6 +102,7 @@ export class UserRepository extends AbstractRepository<User> {
       email,
       password,
       status: UserStatusEnum.ACTIVE,
+      accountVerificationStatus: AccountVerificationStatusEnum.APPROVED,
       roles: [{ role: RoleEnum.COMPANY_ADMIN, companyId }]
     } as User;
     return this.model.create(user);
@@ -113,7 +115,8 @@ export class UserRepository extends AbstractRepository<User> {
       password,
       name:dataname,
       nric:datanric,
-      status: UserStatusEnum.PENDING,
+      status: UserStatusEnum.ACTIVE,
+      accountVerificationStatus: AccountVerificationStatusEnum.APPROVED,
       roles: [],
       mobile
     } as User;
