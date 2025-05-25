@@ -1,4 +1,89 @@
-:host ::ng-deep {
+  :host ::ng-deep {
+    .w-full.mb-3.flex {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      overflow: hidden;
+
+      .country-code-dropdown.p-dropdown {
+        flex: 0 0 auto;
+        position: relative;
+        z-index: 2;
+        border: none;
+        min-width: 120px;
+      
+        .p-dropdown-label {
+          padding: 0.75rem;
+          width: 100%;
+          display: flex;
+          align-items: center;
+        }
+      
+        &.p-dropdown {
+           border-top-left-radius: inherit;
+           border-bottom-left-radius: inherit;
+           border-top-right-radius: 0;
+           border-bottom-right-radius: 0;
+        }
+      }
+
+      input[pInputText][formControlName="mobileNumber"] {
+        flex: 1 1 auto;
+        width: 100%;
+        min-width: 0;
+        border: none;
+        padding: 0.75rem;
+        position: relative;
+        z-index: 1;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-top-right-radius: inherit;
+        border-bottom-right-radius: inherit;
+      }
+    }
+
+    .country-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 0.25rem 0;
+    
+      span {
+        &:first-child {
+          font-size: 1.2rem;
+          line-height: 1;
+          margin-right: 0.5rem;
+        }
+      }
+    }
+
+    // Global dropdown panel styles to fix z-index and scrolling issues
+    .p-dropdown-panel {
+      z-index: 9999 !important;
+      min-width: 200px !important;
+      max-height: 200px !important;
+      overflow-y: auto !important;
+      border: 1px solid #ced4da !important;
+      border-radius: 6px !important;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    }
+  
+    .p-dropdown-items-wrapper {
+      max-height: 200px !important;
+      overflow-y: auto !important;
+    }
+  
+    .p-dropdown-item {
+      padding: 0.75rem !important;
+      white-space: nowrap !important;
+      cursor: pointer !important;
+    
+      &:hover {
+        background-color: #f8f9fa !important;
+      }
+    }
+
   .p-inputgroup {
     display: flex;
     align-items: stretch;
@@ -298,6 +383,7 @@
   }
 
   :host ::ng-deep {
+    .w-full.mb-3.flex,
     .p-inputgroup {
       flex-direction: column;
 

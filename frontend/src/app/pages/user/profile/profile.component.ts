@@ -62,7 +62,13 @@ export class ProfileComponent implements OnInit {
       { name: 'Thailand', code: '+66', flag: '🇹🇭' },
       { name: 'Philippines', code: '+63', flag: '🇵🇭' },
       { name: 'Vietnam', code: '+84', flag: '🇻🇳' },
+      { name: 'China', code: '+86', flag: '🇨🇳' },
+      { name: 'United States', code: '+1', flag: '🇺🇸' },
+      { name: 'United Kingdom', code: '+44', flag: '🇬🇧' },
     ];
+    
+    // Sort by code length (longest first) for better parsing
+    this.countryCodes.sort((a, b) => b.code.length - a.code.length);
   }
 
   private initializeForms(): void {
@@ -71,7 +77,7 @@ export class ProfileComponent implements OnInit {
       email: ['', [Validators.email]], // Remove required validator - email can be optional initially
       nric: [''], // Will be set conditionally based on admin status
       countryCode: ['+60', Validators.required],
-      mobileNumber: ['', [Validators.pattern(/^[0-9]+$/)]],
+      mobileNumber: [''],
     });
 
     this.passwordForm = this.fb.group({
@@ -118,13 +124,52 @@ export class ProfileComponent implements OnInit {
       let mobileNumber = '';
       
       if (user.mobile) {
-        const mobileMatch = user.mobile.match(/^(\+\d{2,3})(.*)$/);
-        if (mobileMatch) {
-          countryCode = mobileMatch[1];
-          mobileNumber = mobileMatch[2];
+        console.log('Parsing mobile number:', user.mobile);
+        
+        // First check if mobile starts with + prefix
+        if (user.mobile.startsWith('+')) {
+          const mobileMatch = user.mobile.match(/^(\+\d{1,4})(.*)$/);
+          if (mobileMatch) {
+            const parsedCountryCode = mobileMatch[1];
+            const parsedMobileNumber = mobileMatch[2];
+            
+            // Check if the parsed country code exists in our countryCodes array
+            const foundCountry = this.countryCodes.find(country => country.code === parsedCountryCode);
+            if (foundCountry) {
+              countryCode = parsedCountryCode;
+              mobileNumber = parsedMobileNumber;
+              console.log('Found country code with +:', countryCode, 'Number:', mobileNumber);
+            } else {
+              // If country code not found, treat entire mobile as number with default country code
+              mobileNumber = user.mobile.replace(/^\+/, '');
+              console.log('Country code not found, using default. Number:', mobileNumber);
+            }
+          }
         } else {
-          mobileNumber = user.mobile;
+          // Handle numbers without + prefix - try to extract country code
+          let foundCountryCode = null;
+          
+          // Check for country codes at the start of the number (sorted by length, longest first)
+          for (const country of this.countryCodes) {
+            const codeWithoutPlus = country.code.replace('+', '');
+            if (user.mobile.startsWith(codeWithoutPlus)) {
+              foundCountryCode = country.code;
+              mobileNumber = user.mobile.substring(codeWithoutPlus.length);
+              console.log('Found country code without +:', foundCountryCode, 'Number:', mobileNumber);
+              break;
+            }
+          }
+          
+          if (foundCountryCode) {
+            countryCode = foundCountryCode;
+          } else {
+            // If no country code found, treat entire mobile as number with default country code
+            mobileNumber = user.mobile;
+            console.log('No country code found, using default +60. Number:', mobileNumber);
+          }
         }
+        
+        console.log('Final parsed - Country Code:', countryCode, 'Mobile Number:', mobileNumber);
       }
 
       this.profileForm.patchValue({
@@ -134,6 +179,9 @@ export class ProfileComponent implements OnInit {
         countryCode: countryCode,
         mobileNumber: mobileNumber,
       });
+      
+      // Force update the form to ensure dropdown displays correctly
+      this.profileForm.updateValueAndValidity();
     });
   }
 
@@ -175,10 +223,13 @@ export class ProfileComponent implements OnInit {
   public updateProfile(): void {
     if (!this.profileForm.valid) {
       this.markFormGroupTouched(this.profileForm);
+      console.log('Form validation errors:', this.profileForm.errors);
+      console.log('Mobile field errors:', this.profileForm.get('mobileNumber')?.errors);
       return;
     }
 
     const formValue = this.profileForm.value;
+    console.log('Form values before update:', formValue);
     const hasSignificantChanges = this.hasSignificantChanges(formValue);
 
     if (hasSignificantChanges) {
@@ -194,11 +245,23 @@ export class ProfileComponent implements OnInit {
     // Check if NRIC or email changed (significant changes requiring verification)
     // Also consider it significant if user is adding an email for the first time
     // For admin users, NRIC changes are not considered significant
+    // Mobile-only changes don't require OTP verification
     const nricChanged = !this.user?.isAdmin && formValue.nric !== this.user.nric;
+    const emailChanged = formValue.email !== this.user.email;
+    const addingEmail = !this.user.email && formValue.email;
+    
+    console.log('Checking significant changes:', {
+      nricChanged,
+      emailChanged,
+      addingEmail,
+      oldEmail: this.user.email,
+      newEmail: formValue.email
+    });
+    
     return (
       nricChanged ||
-      formValue.email !== this.user.email ||
-      (!this.user.email && formValue.email) // Adding email for the first time
+      emailChanged ||
+      addingEmail // Adding email for the first time
     );
   }
 
@@ -270,7 +333,9 @@ export class ProfileComponent implements OnInit {
           detail: 'Your profile has been updated successfully.',
         });
         
-        this.loadUserData();
+        // Update the local user object instead of reloading to prevent form reset
+        this.user = user;
+        this.identityDocument = user.nricRef;
       },
       (error) => {
         this.otpLoading = false;
@@ -297,7 +362,9 @@ export class ProfileComponent implements OnInit {
           summary: 'Profile Updated',
           detail: 'Your profile has been updated successfully.',
         });
-        this.loadUserData();
+        // Update the local user object instead of reloading to prevent form reset
+        this.user = user;
+        this.identityDocument = user.nricRef;
       },
       (error) => {
         this.loading = false;
@@ -314,9 +381,27 @@ export class ProfileComponent implements OnInit {
   private prepareUpdateData(formValue: any): any {
     let fullMobileNumber: string | null = null;
 
+    console.log('Preparing update data with form value:', formValue);
+
     if (formValue.mobileNumber && formValue.countryCode) {
-      const nationalNumber = formValue.mobileNumber.replace(/^0+/, '');
-      fullMobileNumber = `${formValue.countryCode}${nationalNumber}`;
+      // Clean the mobile number: remove any leading zeros, spaces, and non-digits
+      const cleanMobileNumber = formValue.mobileNumber.replace(/^0+/, '').replace(/\D/g, '');
+      if (cleanMobileNumber) {
+        // Store without the + prefix to match database format
+        const countryCodeDigits = formValue.countryCode.replace('+', '');
+        fullMobileNumber = `${countryCodeDigits}${cleanMobileNumber}`;
+      }
+      console.log('Constructed mobile number:', fullMobileNumber);
+    } else if (formValue.mobileNumber && !formValue.countryCode) {
+      // If only mobile number provided, clean it
+      fullMobileNumber = formValue.mobileNumber.replace(/\D/g, '');
+      console.log('Mobile without country code:', fullMobileNumber);
+    } else if (!formValue.mobileNumber || formValue.mobileNumber.trim() === '') {
+      // User wants to clear mobile number
+      fullMobileNumber = null;
+      console.log('Clearing mobile number');
+    } else {
+      console.log('No mobile number provided or incomplete');
     }
 
     const updateData: any = {
@@ -331,6 +416,7 @@ export class ProfileComponent implements OnInit {
       updateData.identityDocument = this.identityDocument?._id;
     }
 
+    console.log('Final update data:', updateData);
     return updateData;
   }
 
@@ -471,7 +557,7 @@ export class ProfileComponent implements OnInit {
       if (field.errors['pattern']) {
         if (fieldName === 'nric') return 'NRIC should contain only letters and numbers';
         if (fieldName === 'newPassword') return 'Password must contain at least 8 characters with uppercase, lowercase, and number';
-        if (fieldName === 'mobileNumber') return 'Mobile number should contain only numbers';
+        if (fieldName === 'mobileNumber') return 'Mobile number format is invalid';
         if (fieldName === 'otp') return 'OTP must be 6 digits';
       }
       if (field.errors['minLength']) return `${fieldName} is too short`;
@@ -486,7 +572,8 @@ export class ProfileComponent implements OnInit {
     const nameValid = this.profileForm.get('name').valid;
     const nricValid = this.user?.isAdmin ? true : this.profileForm.get('nric').valid; // NRIC not required for admins
     const emailValid = !this.profileForm.get('email').value || this.profileForm.get('email').valid;
-    return nameValid && nricValid && emailValid;
+    const mobileValid = !this.profileForm.get('mobileNumber').value || this.profileForm.get('mobileNumber').valid;
+    return nameValid && nricValid && emailValid && mobileValid;
   }
 
   public get isPasswordFormValid(): boolean {

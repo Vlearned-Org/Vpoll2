@@ -247,7 +247,7 @@
         <div class="col-12 md:col-6">
           <div class="field">
             <label for="mobile" class="block font-medium mb-2">Mobile Number</label>
-            <div class="p-inputgroup">
+            <div class="w-full mb-3 flex">
               <p-dropdown 
                 [options]="countryCodes" 
                 formControlName="countryCode" 
@@ -257,20 +257,22 @@
                 styleClass="country-code-dropdown"
               >
                 <ng-template let-country pTemplate="item">
-                  <div class="flex align-items-center">
+                  <div class="country-item flex align-items-center">
                     <span class="mr-2">{{ country.flag }}</span>
                     <span>{{ country.name }} ({{ country.code }})</span>
                   </div>
                 </ng-template>
                 <ng-template let-country pTemplate="selectedItem">
-                  <div class="flex align-items-center">
+                  <div class="country-item flex align-items-center">
                     <span class="mr-2">{{ country.flag }}</span>
                     <span>{{ country.code }}</span>
                   </div>
                 </ng-template>
               </p-dropdown>
               <input 
+                type="text"
                 pInputText 
+                id="mobileNumber"
                 formControlName="mobileNumber" 
                 placeholder="Enter mobile number"
               />
