@@ -10,6 +10,21 @@ import { Body, Controller, Get, Post, Request, UseGuards } from "@nestjs/common"
 import { LoginResponse, EmailValidationResponse, PublicEvent, RequestResetPasswordWithMobileResponse, RequestResetPasswordWithEmailResponse } from "@vpoll-shared/contract";
 import { UserTokenEnum } from "@vpoll-shared/enum";
 import { DataException } from "@vpoll-shared/errors/global-exception.filter";
+import { VpollNotifications } from "@app/core/notification/vpoll.notification";
+
+export interface LegacyUserRequestDto {
+  name: string;
+  nric: string;
+  contactPersonName?: string;
+  contactPersonPhone?: string;
+  contactPersonEmail?: string;
+  contactPersonRelation?: string;
+  physicalAddress?: string;
+  preferredContactMethod: 'phone' | 'email' | 'postal';
+  requestType: 'new_account' | 'password_reset' | 'access_help' | 'other';
+  message: string;
+  eventName?: string;
+}
 
 @Controller("api")
 export class UserAuthController {
@@ -20,7 +35,8 @@ export class UserAuthController {
     private roleManager: RoleManager,
     private eventRepo: EventRepository,
     private companyRepo: CompanyRepository,
-    private storageManager: StorageManager
+    private storageManager: StorageManager,
+    private vpollNotifications: VpollNotifications
   ) {}
 
   @Get("upcoming-events")
@@ -83,5 +99,54 @@ export class UserAuthController {
       throw new DataException({ message: "Password and confirm password unmatch" });
     }
     return this.password.reset(body, UserTokenEnum.EMAIL);
+  }
+
+  @Post("legacy-user-request")
+  public async submitLegacyUserRequest(@Body() body: LegacyUserRequestDto): Promise<{ message: string }> {
+    // Send notification to admin team with the legacy user request
+    const adminEmailSubject = `Legacy User Request: ${body.requestType.replace('_', ' ').toUpperCase()}`;
+    const adminEmailBody = `
+      A legacy user has submitted a request for assistance.
+      
+      User Information:
+      - Name: ${body.name}
+      - NRIC: ${body.nric}
+      - Request Type: ${body.requestType.replace('_', ' ').toUpperCase()}
+      - Event Name: ${body.eventName || 'Not specified'}
+      
+      Contact Information:
+      - Preferred Contact Method: ${body.preferredContactMethod.toUpperCase()}
+      ${body.contactPersonName ? `- Contact Person: ${body.contactPersonName} (${body.contactPersonRelation || 'Relationship not specified'})` : ''}
+      ${body.contactPersonPhone ? `- Contact Phone: ${body.contactPersonPhone}` : ''}
+      ${body.contactPersonEmail ? `- Contact Email: ${body.contactPersonEmail}` : ''}
+      ${body.physicalAddress ? `- Physical Address: ${body.physicalAddress}` : ''}
+      
+      IMPORTANT: All OTP and authentication processes will be conducted via EMAIL only.
+      If phone is the preferred contact method, use it for initial contact but send all OTP/verification via the provided email.
+      
+      Message:
+      ${body.message}
+      
+      Please contact this user using their preferred method to assist with their request.
+      
+      This is an automated message from the VPoll system.
+    `;
+
+    try {
+      // Use existing onUserEnquiry method to send to admin
+      await this.vpollNotifications.onUserEnquiry(process.env.ADMIN_EMAIL || 'admin@vpoll.com', {
+        name: body.name,
+        email: body.contactPersonEmail || 'No email provided',
+        phone: body.contactPersonPhone || 'No phone provided',
+        companyname: 'Legacy User Request',
+        subject: adminEmailSubject,
+        message: adminEmailBody
+      });
+    } catch (error) {
+      console.error('Failed to send admin notification:', error);
+      // Continue execution even if email fails
+    }
+
+    return { message: "Legacy user request submitted successfully. Admin team will contact you within 2 business days." };
   }
 }

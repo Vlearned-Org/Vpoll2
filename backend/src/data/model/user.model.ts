@@ -96,10 +96,12 @@ export class User extends AbstractModel implements UserContract {
   @prop({ hide: true })
   public password: string;
 
-  // Email is Mandatory for all users now
+  // Email is now optional to support legacy users
+  @IsOptional()
   @IsEmail()
-  @prop({ trim: true, lowercase: true, required: true, unique: true })
-  public email: string;
+  @ValidateIf((object, value) => value !== null && value !== undefined && value !== '')
+  @prop({ trim: true, lowercase: true, unique: true, sparse: true })
+  public email?: string;
 
   // Mobile is now optional
   @IsOptional()
@@ -125,4 +127,57 @@ export class User extends AbstractModel implements UserContract {
   @IsString()
   @prop()
   public rejectMessage?: string;
+
+  // Fallback contact information for users without email/phone
+  @IsOptional()
+  @IsString()
+  @prop({ trim: true })
+  public fallbackContactName?: string; // Name of family member/caregiver
+
+  @IsOptional()
+  @IsString()
+  @prop({ trim: true })
+  public fallbackContactPhone?: string; // Phone of family member/caregiver
+
+  @IsOptional()
+  @IsString()
+  @prop({ trim: true })
+  public fallbackContactEmail?: string; // Email of family member/caregiver
+
+  @IsOptional()
+  @IsString()
+  @prop({ trim: true })
+  public fallbackContactRelation?: string; // Relationship (e.g., "Son", "Daughter", "Caregiver")
+
+  @IsOptional()
+  @IsString()
+  @prop({ trim: true })
+  public physicalAddress?: string; // Physical address for postal notifications
+
+  @IsOptional()
+  @IsBoolean()
+  @prop({ default: false })
+  public requiresAssistedAccess?: boolean; // Indicates if user needs help accessing the system
+
+  @IsOptional()
+  @IsString()
+  @prop()
+  public specialInstructions?: string; // Additional notes for admin/support staff
+
+  // Legacy user flag
+  @IsOptional()
+  @IsBoolean()
+  @prop({ default: false })
+  public isLegacyUser?: boolean; // Marks user as a legacy user
+
+  // Access code for temporary login
+  @IsOptional()
+  @IsString()
+  @prop()
+  public accessCode?: string; // Temporary access code
+
+  @IsOptional()
+  @IsDate()
+  @prop()
+  public accessCodeExpiresAt?: Date; // When the access code expires
 }

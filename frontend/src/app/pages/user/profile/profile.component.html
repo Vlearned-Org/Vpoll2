@@ -1,0 +1,449 @@
+<div class="surface-0 min-h-screen">
+  <p-toast key="toast"></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+  
+  <!-- Header -->
+  <div class="bg-primary-500 text-white p-4">
+    <div class="flex align-items-center justify-content-between max-w-6xl mx-auto">
+      <div class="flex align-items-center">
+        <button 
+          pButton 
+          pRipple 
+          icon="pi pi-arrow-left" 
+          class="p-button-text p-button-plain mr-3"
+          (click)="navigateBack()"
+        ></button>
+        <h2 class="m-0">My Profile</h2>
+      </div>
+      <img src="assets/layout/images/vpoll.png" alt="VPoll" class="h-3rem">
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto p-4">
+    <!-- Profile Information Card -->
+    <div class="card mb-4">
+      <div class="flex align-items-center mb-4">
+        <i class="pi pi-user text-primary text-2xl mr-3"></i>
+        <h3 class="m-0">Profile Information</h3>
+      </div>
+
+      <!-- Admin User Information -->
+      <p-message 
+        *ngIf="user?.isAdmin"
+        severity="info"
+        class="mb-4"
+      >
+        <ng-template pTemplate>
+          <div class="flex align-items-center">
+            <div>
+              <strong>
+                <span>👑 Administrator Account</span>
+              </strong>
+              <div class="mt-2">
+                <span>
+                  As an administrator, you don't need to provide NRIC/passport information or undergo verification. You have full access to all administrative functions.
+                </span>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </p-message>
+
+      <!-- Verification Status Alert -->
+      <p-message 
+        *ngIf="user && !user.isAdmin"
+        [severity]="user.accountVerificationStatus === AccountVerificationStatusEnum.APPROVED ? 'success' : 
+                   user.accountVerificationStatus === AccountVerificationStatusEnum.PENDING ? 'info' : 
+                   user.accountVerificationStatus === AccountVerificationStatusEnum.REJECTED ? 'error' : 'warn'"
+        class="mb-4"
+      >
+        <ng-template pTemplate>
+          <div class="flex align-items-center justify-content-between w-full">
+            <div>
+              <strong>
+                <span *ngIf="user.accountVerificationStatus === AccountVerificationStatusEnum.APPROVED">
+                  ✓ Account Verified
+                </span>
+                <span *ngIf="user.accountVerificationStatus === AccountVerificationStatusEnum.PENDING">
+                  ⏳ Verification Pending
+                </span>
+                <span *ngIf="user.accountVerificationStatus === AccountVerificationStatusEnum.REJECTED">
+                  ❌ Verification Rejected
+                </span>
+                <span *ngIf="!user.accountVerificationStatus || user.accountVerificationStatus === AccountVerificationStatusEnum.NONE">
+                  ⚠️ Account Not Verified
+                </span>
+              </strong>
+              <div class="mt-2">
+                <span *ngIf="user.accountVerificationStatus === AccountVerificationStatusEnum.APPROVED">
+                  Your account is fully verified and you can participate in events. You can login using {{ user.email ? 'your email or NRIC' : 'your NRIC' }}.
+                </span>
+                <span *ngIf="user.accountVerificationStatus === AccountVerificationStatusEnum.PENDING">
+                  Your verification is being processed. This usually takes up to 24 hours. You can login using {{ user.email ? 'your email or NRIC' : 'your NRIC' }}.
+                </span>
+                <span *ngIf="user.accountVerificationStatus === AccountVerificationStatusEnum.REJECTED">
+                  Verification was rejected: {{ user.rejectMessage || 'Please contact support for details.' }}
+                </span>
+                <span *ngIf="!user.accountVerificationStatus || user.accountVerificationStatus === AccountVerificationStatusEnum.NONE">
+                  Please complete your profile and submit for verification to participate in events. You can login using {{ user.email ? 'your email or NRIC' : 'your NRIC' }}.
+                </span>
+              </div>
+            </div>
+            <button 
+              *ngIf="user.accountVerificationStatus !== AccountVerificationStatusEnum.APPROVED"
+              pButton 
+              pRipple 
+              [label]="user.accountVerificationStatus === AccountVerificationStatusEnum.PENDING ? 'Resubmit' : 'Submit for Verification'"
+              class="p-button-sm"
+              (click)="resubmitForVerification()"
+              [disabled]="!isProfileFormValid || (!user.isAdmin && !identityDocument)"
+            ></button>
+          </div>
+        </ng-template>
+      </p-message>
+
+      <!-- OTP Verification Modal -->
+      <p-dialog 
+        [(visible)]="showOtpVerification" 
+        header="Verify Email" 
+        [modal]="true" 
+        [style]="{width: '450px'}"
+        [closable]="false"
+      >
+        <div class="text-center mb-4">
+          <i class="pi pi-shield text-primary text-4xl mb-3"></i>
+          <p>We've sent a verification code to your email address. Please enter it below to confirm these important changes.</p>
+        </div>
+        
+        <form [formGroup]="otpForm" class="flex flex-column gap-3">
+          <div class="field">
+            <label for="otp" class="block font-medium mb-2">Verification Code</label>
+            <input 
+              pInputText 
+              id="otp" 
+              formControlName="otp" 
+              placeholder="Enter 6-digit code"
+              class="w-full"
+              maxlength="6"
+            />
+            <small class="p-error block mt-1" *ngIf="getFieldError('otp', otpForm)">
+              {{ getFieldError('otp', otpForm) }}
+            </small>
+          </div>
+        </form>
+
+        <ng-template pTemplate="footer">
+          <button 
+            pButton 
+            pRipple 
+            label="Cancel" 
+            icon="pi pi-times" 
+            class="p-button-text"
+            (click)="cancelOtpVerification()"
+            [disabled]="otpLoading"
+          ></button>
+          <button 
+            pButton 
+            pRipple 
+            label="Resend Code" 
+            icon="pi pi-refresh" 
+            class="p-button-outlined mr-2"
+            (click)="resendOtp()"
+            [disabled]="otpLoading"
+          ></button>
+          <button 
+            pButton 
+            pRipple 
+            label="Verify & Update" 
+            icon="pi pi-check" 
+            (click)="verifyOtpAndUpdate()"
+            [disabled]="!otpForm.valid || otpLoading"
+            [loading]="otpLoading"
+          ></button>
+        </ng-template>
+      </p-dialog>
+
+      <!-- Profile Form -->
+      <form [formGroup]="profileForm" class="grid">
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="name" class="block font-medium mb-2">
+              Full Name <span class="text-red-500">*</span>
+            </label>
+            <input 
+              pInputText 
+              id="name" 
+              formControlName="name" 
+              placeholder="Enter your full name"
+              class="w-full"
+              (input)="onNameChange($event)"
+            />
+            <small class="p-error block mt-1" *ngIf="getFieldError('name')">
+              {{ getFieldError('name') }}
+            </small>
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="email" class="block font-medium mb-2">
+              Email Address 
+              <span class="text-red-500" *ngIf="!user?.email">*</span>
+              <span class="text-gray-500" *ngIf="user?.email">(Optional)</span>
+            </label>
+            <input 
+              pInputText 
+              id="email" 
+              formControlName="email" 
+              placeholder="Enter your email address"
+              class="w-full"
+              (input)="onEmailChange($event)"
+            />
+            <small class="p-error block mt-1" *ngIf="getFieldError('email')">
+              {{ getFieldError('email') }}
+            </small>
+            <small class="p-info block mt-1" *ngIf="!user?.email && !profileForm.get('email')?.value">
+              <i class="pi pi-info-circle mr-1"></i>
+              Add an email to use for login and receive notifications
+            </small>
+            <small class="p-info block mt-1" *ngIf="!user?.email && profileForm.get('email')?.value">
+              <i class="pi pi-shield mr-1"></i>
+              Adding an email will require OTP verification
+            </small>
+            <small class="p-info block mt-1" *ngIf="user?.email && user?.email !== profileForm.get('email')?.value">
+              <i class="pi pi-info-circle mr-1"></i>
+              Changing your email will require OTP verification
+            </small>
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6" *ngIf="!user?.isAdmin">
+          <div class="field">
+            <label for="nric" class="block font-medium mb-2">
+              NRIC / Passport <span class="text-red-500">*</span>
+            </label>
+            <input 
+              pInputText 
+              id="nric" 
+              formControlName="nric" 
+              placeholder="Enter NRIC or Passport number"
+              class="w-full"
+              (input)="onNricChange($event)"
+            />
+            <small class="p-error block mt-1" *ngIf="getFieldError('nric')">
+              {{ getFieldError('nric') }}
+            </small>
+            <small class="p-info block mt-1">
+              <i class="pi pi-info-circle mr-1"></i>
+              No spaces or dashes, alphanumeric only
+            </small>
+            <small class="p-info block mt-1" *ngIf="user?.nric !== profileForm.get('nric')?.value">
+              <i class="pi pi-exclamation-triangle mr-1"></i>
+              Changing your NRIC will require OTP verification
+            </small>
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="mobile" class="block font-medium mb-2">Mobile Number</label>
+            <div class="p-inputgroup">
+              <p-dropdown 
+                [options]="countryCodes" 
+                formControlName="countryCode" 
+                optionLabel="code" 
+                optionValue="code"
+                [showClear]="false"
+                styleClass="country-code-dropdown"
+              >
+                <ng-template let-country pTemplate="item">
+                  <div class="flex align-items-center">
+                    <span class="mr-2">{{ country.flag }}</span>
+                    <span>{{ country.name }} ({{ country.code }})</span>
+                  </div>
+                </ng-template>
+                <ng-template let-country pTemplate="selectedItem">
+                  <div class="flex align-items-center">
+                    <span class="mr-2">{{ country.flag }}</span>
+                    <span>{{ country.code }}</span>
+                  </div>
+                </ng-template>
+              </p-dropdown>
+              <input 
+                pInputText 
+                formControlName="mobileNumber" 
+                placeholder="Enter mobile number"
+              />
+            </div>
+            <small class="p-error block mt-1" *ngIf="getFieldError('mobileNumber')">
+              {{ getFieldError('mobileNumber') }}
+            </small>
+            <small class="p-info block mt-1">Optional - for SMS notifications</small>
+          </div>
+        </div>
+
+        <div class="col-12" *ngIf="!user?.isAdmin">
+          <div class="field">
+            <label class="block font-medium mb-2">
+              NRIC/Passport Document
+              <span class="text-red-500" *ngIf="!user || (user.accountVerificationStatus !== AccountVerificationStatusEnum.APPROVED && !user.isAdmin)">*</span>
+            </label>
+            <app-file-uploader
+              [file]="identityDocument"
+              [canEdit]="true"
+              [enableDisplay]="true"
+              (fileUploaded)="addIdentityDocument($event)"
+              (fileDeleted)="removeIdentityDocument()"
+            ></app-file-uploader>
+            <small class="p-info block mt-1">
+              <i class="pi pi-upload mr-1"></i>
+              Upload a clear photo or scan of your NRIC or Passport
+            </small>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="flex gap-2 justify-content-end">
+            <button 
+              pButton 
+              pRipple 
+              label="Reset Changes" 
+              icon="pi pi-refresh"
+              class="p-button-outlined"
+              (click)="loadUserData()"
+              [disabled]="loading"
+            ></button>
+            <button 
+              pButton 
+              pRipple 
+              label="Update Profile" 
+              icon="pi pi-check"
+              (click)="updateProfile()"
+              [disabled]="!canUpdateProfile"
+              [loading]="loading"
+            ></button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Password Change Card -->
+    <div class="card">
+      <div class="flex align-items-center justify-content-between mb-4">
+        <div class="flex align-items-center">
+          <i class="pi pi-lock text-primary text-2xl mr-3"></i>
+          <h3 class="m-0">Security Settings</h3>
+        </div>
+        <button 
+          pButton 
+          pRipple 
+          [label]="showPasswordSection ? 'Cancel' : 'Change Password'"
+          [icon]="showPasswordSection ? 'pi pi-times' : 'pi pi-key'"
+          [class]="showPasswordSection ? 'p-button-outlined' : ''"
+          (click)="showPasswordSection = !showPasswordSection; passwordForm.reset()"
+        ></button>
+      </div>
+
+      <div *ngIf="showPasswordSection" class="grid">
+        <div class="col-12">
+          <p class="text-600 mb-4">
+            <i class="pi pi-info-circle mr-2"></i>
+            Choose a strong password with at least 8 characters including uppercase, lowercase, and numbers.
+          </p>
+        </div>
+
+        <form [formGroup]="passwordForm" class="contents">
+          <div class="col-12 md:col-4">
+            <div class="field">
+              <label for="currentPassword" class="block font-medium mb-2">
+                Current Password <span class="text-red-500">*</span>
+              </label>
+              <p-password 
+                formControlName="currentPassword"
+                [toggleMask]="true"
+                [feedback]="false"
+                placeholder="Enter current password"
+                styleClass="w-full"
+              ></p-password>
+              <small class="p-error block mt-1" *ngIf="getFieldError('currentPassword', passwordForm)">
+                {{ getFieldError('currentPassword', passwordForm) }}
+              </small>
+            </div>
+          </div>
+
+          <div class="col-12 md:col-4">
+            <div class="field">
+              <label for="newPassword" class="block font-medium mb-2">
+                New Password <span class="text-red-500">*</span>
+              </label>
+              <p-password 
+                formControlName="newPassword"
+                [toggleMask]="true"
+                [feedback]="true"
+                placeholder="Enter new password"
+                styleClass="w-full"
+              ></p-password>
+              <small class="p-error block mt-1" *ngIf="getFieldError('newPassword', passwordForm)">
+                {{ getFieldError('newPassword', passwordForm) }}
+              </small>
+            </div>
+          </div>
+
+          <div class="col-12 md:col-4">
+            <div class="field">
+              <label for="confirmPassword" class="block font-medium mb-2">
+                Confirm New Password <span class="text-red-500">*</span>
+              </label>
+              <p-password 
+                formControlName="confirmPassword"
+                [toggleMask]="true"
+                [feedback]="false"
+                placeholder="Confirm new password"
+                styleClass="w-full"
+              ></p-password>
+              <small class="p-error block mt-1" *ngIf="getFieldError('confirmPassword', passwordForm)">
+                {{ getFieldError('confirmPassword', passwordForm) }}
+              </small>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="flex justify-content-end">
+              <button 
+                pButton 
+                pRipple 
+                label="Update Password" 
+                icon="pi pi-check"
+                (click)="updatePassword()"
+                [disabled]="!canUpdatePassword"
+                [loading]="passwordLoading"
+              ></button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class="card mt-4 bg-blue-50">
+      <div class="flex align-items-start">
+        <i class="pi pi-question-circle text-blue-500 text-2xl mr-3 mt-1"></i>
+        <div>
+          <h4 class="mt-0 mb-2 text-blue-700">Need Help?</h4>
+          <p class="text-600 mb-3">
+            If you're having trouble updating your profile or have questions about verification:
+          </p>
+          <ul class="text-600 pl-3">
+            <li class="mb-1" *ngIf="!user?.isAdmin">Make sure your NRIC/Passport document is clear and readable</li>
+            <li class="mb-1">You can login using either your email address {{ user?.isAdmin ? '' : 'or NRIC' }}</li>
+            <li class="mb-1">Adding or changing your email requires verification for security</li>
+            <li class="mb-1" *ngIf="!user?.isAdmin">NRIC changes may require re-verification of your account</li>
+            <li class="mb-1" *ngIf="!user?.isAdmin">If you don't have an email, you can still login with your NRIC</li>
+            <li class="mb-1" *ngIf="user?.isAdmin">As an administrator, you don't need NRIC verification and have full system access</li>
+            <li class="mb-1" *ngIf="!user?.isAdmin">Contact support if your verification is rejected</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

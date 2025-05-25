@@ -35,8 +35,8 @@ export interface User {
   firstLoginAt?: Date;
   lastLoginAt?: Date;
 
-  // Admin is Mandatory
-  email: string;
+  // Email is now optional to support legacy users
+  email?: string;
 
   // User is Mandatory
   mobile?: string;
@@ -46,4 +46,13 @@ export interface User {
   nricRef?: InternalFile;
   accountVerificationStatus?: AccountVerificationStatusEnum;
   rejectMessage?: string;
+
+  // Fallback contact information for users without email/phone
+  fallbackContactName?: string; // Name of family member/caregiver
+  fallbackContactPhone?: string; // Phone of family member/caregiver
+  fallbackContactEmail?: string; // Email of family member/caregiver
+  fallbackContactRelation?: string; // Relationship (e.g., "Son", "Daughter", "Caregiver")
+  physicalAddress?: string; // Physical address for postal notifications
+  requiresAssistedAccess?: boolean; // Indicates if user needs help accessing the system
+  specialInstructions?: string; // Additional notes for admin/support staff
 }

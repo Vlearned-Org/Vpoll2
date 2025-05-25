@@ -1,0 +1,486 @@
+<div class="surface-0 min-h-screen">
+  <p-toast key="toast"></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+  
+  <!-- Header -->
+  <div class="bg-primary-500 text-white p-4">
+    <div class="flex align-items-center justify-content-between max-w-7xl mx-auto">
+      <div class="flex align-items-center">
+        <button 
+          pButton 
+          pRipple 
+          icon="pi pi-arrow-left" 
+          class="p-button-text p-button-plain mr-3"
+          routerLink="/admin/user-list"
+        ></button>
+        <h2 class="m-0">Legacy Users Management</h2>
+      </div>
+      <button 
+        pButton 
+        pRipple 
+        label="Create Legacy User" 
+        icon="pi pi-plus"
+        (click)="showCreateForm = true"
+        class="p-button-secondary"
+      ></button>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto p-4">
+    <!-- Info Card -->
+    <div class="card mb-4 bg-blue-50">
+      <div class="flex align-items-start">
+        <i class="pi pi-info-circle text-blue-500 text-2xl mr-3 mt-1"></i>
+        <div>
+          <h4 class="mt-0 mb-2 text-blue-700">Legacy Users</h4>
+          <p class="text-600 mb-2">
+            This section is for managing users who don't have email addresses or mobile phones. These users typically need assistance accessing the system.
+          </p>
+          <ul class="text-600 pl-3 mb-0">
+            <li>Create accounts for users without email/phone</li>
+            <li>Set up fallback contacts (family members, caregivers)</li>
+            <li>Generate temporary access codes</li>
+            <li>Send notifications to fallback contacts</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create/Edit Form -->
+    <div class="card mb-4" *ngIf="showCreateForm">
+      <div class="flex align-items-center justify-content-between mb-4">
+        <h3 class="m-0">{{ formTitle }}</h3>
+        <button 
+          pButton 
+          pRipple 
+          icon="pi pi-times" 
+          class="p-button-text"
+          (click)="cancelCreate()"
+        ></button>
+      </div>
+
+      <form [formGroup]="createUserForm" class="grid">
+        <!-- Basic Information -->
+        <div class="col-12">
+          <h4 class="text-primary mb-3">Basic Information</h4>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="name" class="block font-medium mb-2">
+              Full Name <span class="text-red-500">*</span>
+            </label>
+            <input 
+              pInputText 
+              id="name" 
+              formControlName="name" 
+              placeholder="Enter full name"
+              class="w-full"
+            />
+            <small class="p-error block mt-1" *ngIf="getFieldError('name')">
+              {{ getFieldError('name') }}
+            </small>
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="nric" class="block font-medium mb-2">
+              NRIC <span class="text-red-500">*</span>
+            </label>
+            <input 
+              pInputText 
+              id="nric" 
+              formControlName="nric" 
+              placeholder="Enter NRIC"
+              class="w-full"
+            />
+            <small class="p-error block mt-1" *ngIf="getFieldError('nric')">
+              {{ getFieldError('nric') }}
+            </small>
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6" *ngIf="isCreateMode">
+          <div class="field">
+            <label for="password" class="block font-medium mb-2">
+              Password <span class="text-red-500">*</span>
+            </label>
+            <p-password 
+              formControlName="password"
+              [toggleMask]="true"
+              [feedback]="false"
+              placeholder="Enter password"
+              styleClass="w-full"
+            ></p-password>
+            <small class="p-error block mt-1" *ngIf="getFieldError('password')">
+              {{ getFieldError('password') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="col-12">
+          <h4 class="text-primary mb-3 mt-4">Contact Information</h4>
+          <p class="text-600 mb-3">If the user has email or phone, enter them here. Otherwise, use fallback contact information.</p>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="email" class="block font-medium mb-2">Email Address</label>
+            <input 
+              pInputText 
+              id="email" 
+              formControlName="email" 
+              placeholder="Enter email (optional)"
+              class="w-full"
+            />
+            <small class="p-error block mt-1" *ngIf="getFieldError('email')">
+              {{ getFieldError('email') }}
+            </small>
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="mobile" class="block font-medium mb-2">Mobile Number</label>
+            <input 
+              pInputText 
+              id="mobile" 
+              formControlName="mobile" 
+              placeholder="Enter mobile (optional)"
+              class="w-full"
+            />
+            <small class="p-error block mt-1" *ngIf="getFieldError('mobile')">
+              {{ getFieldError('mobile') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Fallback Contact Information -->
+        <div class="col-12">
+          <h4 class="text-primary mb-3 mt-4">Fallback Contact Information</h4>
+          <p class="text-600 mb-3">For users without email/phone, provide alternative contact information (family member, caregiver, etc.).</p>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="fallbackContactName" class="block font-medium mb-2">Fallback Contact Name</label>
+            <input 
+              pInputText 
+              id="fallbackContactName" 
+              formControlName="fallbackContactName" 
+              placeholder="Name of family member/caregiver"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="fallbackContactRelation" class="block font-medium mb-2">Relationship</label>
+            <input 
+              pInputText 
+              id="fallbackContactRelation" 
+              formControlName="fallbackContactRelation" 
+              placeholder="e.g., Son, Daughter, Caregiver"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="fallbackContactPhone" class="block font-medium mb-2">Fallback Contact Phone</label>
+            <input 
+              pInputText 
+              id="fallbackContactPhone" 
+              formControlName="fallbackContactPhone" 
+              placeholder="Phone number of fallback contact"
+              class="w-full"
+            />
+            <small class="p-error block mt-1" *ngIf="getFieldError('fallbackContactPhone')">
+              {{ getFieldError('fallbackContactPhone') }}
+            </small>
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="fallbackContactEmail" class="block font-medium mb-2">Fallback Contact Email</label>
+            <input 
+              pInputText 
+              id="fallbackContactEmail" 
+              formControlName="fallbackContactEmail" 
+              placeholder="Email of fallback contact"
+              class="w-full"
+            />
+            <small class="p-error block mt-1" *ngIf="getFieldError('fallbackContactEmail')">
+              {{ getFieldError('fallbackContactEmail') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="col-12">
+          <h4 class="text-primary mb-3 mt-4">Additional Information</h4>
+        </div>
+
+        <div class="col-12">
+          <div class="field">
+            <label for="physicalAddress" class="block font-medium mb-2">Physical Address</label>
+            <textarea 
+              pInputTextarea 
+              id="physicalAddress" 
+              formControlName="physicalAddress" 
+              placeholder="Physical address for postal notifications"
+              class="w-full"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <p-checkbox 
+              formControlName="requiresAssistedAccess" 
+              binary="true" 
+              label="Requires Assisted Access"
+            ></p-checkbox>
+            <small class="p-info block mt-1">Check if user needs help accessing the system</small>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="field">
+            <label for="specialInstructions" class="block font-medium mb-2">Special Instructions</label>
+            <textarea 
+              pInputTextarea 
+              id="specialInstructions" 
+              formControlName="specialInstructions" 
+              placeholder="Any special instructions for admin/support staff"
+              class="w-full"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="flex gap-2 justify-content-end">
+            <button 
+              pButton 
+              pRipple 
+              label="Cancel" 
+              icon="pi pi-times"
+              class="p-button-outlined"
+              (click)="cancelCreate()"
+            ></button>
+            <button 
+              pButton 
+              pRipple 
+              [label]="submitButtonLabel"
+              icon="pi pi-check"
+              (click)="isCreateMode ? createLegacyUser() : updateUser()"
+              [disabled]="!createUserForm.valid"
+            ></button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Users List -->
+    <div class="card">
+      <div class="flex align-items-center justify-content-between mb-4">
+        <h3 class="m-0">Legacy Users</h3>
+        <span class="text-600">{{ users.length }} users</span>
+      </div>
+
+      <p-table 
+        [value]="users" 
+        [loading]="loading"
+        responsiveLayout="scroll"
+        [paginator]="true" 
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Name</th>
+            <th>NRIC</th>
+            <th>Contact Information</th>
+            <th>Fallback Contact</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-user>
+          <tr>
+            <td>
+              <div class="flex flex-column">
+                <div class="flex align-items-center gap-2">
+                  <span class="font-medium">{{ user.name }}</span>
+                  <p-tag 
+                    *ngIf="user.isLegacyUser" 
+                    value="Legacy" 
+                    severity="info" 
+                    class="text-xs"
+                  ></p-tag>
+                </div>
+                <span class="text-xs text-600" *ngIf="user.requiresAssistedAccess">
+                  <i class="pi pi-users mr-1"></i>Requires Assistance
+                </span>
+              </div>
+            </td>
+            <td>{{ user.nric }}</td>
+            <td>
+              <div class="flex flex-column text-sm">
+                <span *ngIf="user.email" class="mb-1">
+                  <i class="pi pi-envelope mr-1"></i>{{ user.email }}
+                </span>
+                <span *ngIf="user.mobile" class="mb-1">
+                  <i class="pi pi-phone mr-1"></i>{{ user.mobile }}
+                </span>
+                <span *ngIf="!user.email && !user.mobile" class="text-orange-600">
+                  <i class="pi pi-exclamation-triangle mr-1"></i>No direct contact
+                </span>
+              </div>
+            </td>
+            <td>
+              <div class="flex flex-column text-sm" *ngIf="user.fallbackContactName; else noFallback">
+                <span class="font-medium">{{ user.fallbackContactName }}</span>
+                <span class="text-600" *ngIf="user.fallbackContactRelation">{{ user.fallbackContactRelation }}</span>
+                <span *ngIf="user.fallbackContactPhone">
+                  <i class="pi pi-phone mr-1"></i>{{ user.fallbackContactPhone }}
+                </span>
+                <span *ngIf="user.fallbackContactEmail">
+                  <i class="pi pi-envelope mr-1"></i>{{ user.fallbackContactEmail }}
+                </span>
+              </div>
+              <ng-template #noFallback>
+                <span class="text-red-600 text-sm">
+                  <i class="pi pi-times-circle mr-1"></i>No fallback contact
+                </span>
+              </ng-template>
+            </td>
+            <td>
+              <p-tag 
+                [value]="user.accountVerificationStatus || 'NONE'" 
+                [severity]="user.accountVerificationStatus === AccountVerificationStatusEnum.APPROVED ? 'success' : 
+                           user.accountVerificationStatus === AccountVerificationStatusEnum.PENDING ? 'info' : 
+                           user.accountVerificationStatus === AccountVerificationStatusEnum.REJECTED ? 'danger' : 'warning'"
+              ></p-tag>
+            </td>
+            <td>
+              <div class="flex gap-1">
+                <button 
+                  pButton 
+                  pRipple 
+                  icon="pi pi-pencil" 
+                  class="p-button-text p-button-sm"
+                  pTooltip="Edit User"
+                  (click)="editUser(user)"
+                ></button>
+                <button 
+                  pButton 
+                  pRipple 
+                  icon="pi pi-key" 
+                  class="p-button-text p-button-sm p-button-warning"
+                  pTooltip="Reset Password"
+                  (click)="resetPassword(user)"
+                ></button>
+                <button 
+                  pButton 
+                  pRipple 
+                  icon="pi pi-qrcode" 
+                  class="p-button-text p-button-sm p-button-info"
+                  pTooltip="Generate Access Code"
+                  (click)="generateAccessCode(user)"
+                ></button>
+                <button 
+                  pButton 
+                  pRipple 
+                  icon="pi pi-send" 
+                  class="p-button-text p-button-sm p-button-secondary"
+                  pTooltip="Notify Fallback Contact"
+                  (click)="sendNotificationToFallback(user)"
+                  [disabled]="!hasAnyContact(user)"
+                ></button>
+                <button 
+                  *ngIf="!user.isLegacyUser"
+                  pButton 
+                  pRipple 
+                  icon="pi pi-tag" 
+                  class="p-button-text p-button-sm p-button-help"
+                  pTooltip="Mark as Legacy User"
+                  (click)="markAsLegacyUser(user)"
+                ></button>
+                <button 
+                  *ngIf="user.isLegacyUser"
+                  pButton 
+                  pRipple 
+                  icon="pi pi-times" 
+                  class="p-button-text p-button-sm p-button-danger"
+                  pTooltip="Remove Legacy Status"
+                  (click)="unmarkLegacyUser(user)"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="text-center py-4">
+              <div class="flex flex-column align-items-center">
+                <i class="pi pi-users text-4xl text-400 mb-3"></i>
+                <span class="text-600">No legacy users found</span>
+                <button 
+                  pButton 
+                  pRipple 
+                  label="Create First Legacy User" 
+                  icon="pi pi-plus"
+                  class="p-button-outlined mt-3"
+                  (click)="showCreateForm = true"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Help Section -->
+    <div class="card mt-4 bg-green-50">
+      <div class="flex align-items-start">
+        <i class="pi pi-lightbulb text-green-500 text-2xl mr-3 mt-1"></i>
+        <div>
+          <h4 class="mt-0 mb-2 text-green-700">How to Help Legacy Users</h4>
+          <div class="grid">
+            <div class="col-12 md:col-6">
+              <h5 class="text-green-600">For Users Without Email/Phone:</h5>
+              <ul class="text-600 pl-3">
+                <li>Set up fallback contact (family member/caregiver)</li>
+                <li>Generate temporary access codes for event participation</li>
+                <li>Send notifications to fallback contacts</li>
+                <li>Consider assisted access if needed</li>
+              </ul>
+            </div>
+            <div class="col-12 md:col-6">
+              <h5 class="text-green-600">Available Actions:</h5>
+              <ul class="text-600 pl-3">
+                <li><strong>Edit User:</strong> Update user information and fallback contacts</li>
+                <li><strong>Reset Password:</strong> Generate new password for user</li>
+                <li><strong>Access Code:</strong> Create temporary login code (24hrs)</li>
+                <li><strong>Notify Fallback:</strong> Send event info to family/caregiver</li>
+                <li><strong>Mark as Legacy:</strong> Designate user as legacy user requiring assistance</li>
+                <li><strong>Remove Legacy Status:</strong> Remove legacy designation from user</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

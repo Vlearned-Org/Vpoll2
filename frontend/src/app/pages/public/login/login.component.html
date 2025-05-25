@@ -25,18 +25,22 @@
         USER LOGIN</h1>
       <div class="w-full md:w-10 mx-auto" [formGroup]="form">
         <label for="email1" class="block text-900 text-xl font-medium mb-2"
-          >Email</label
+          >Email or NRIC</label
         >
 
             <input
-          type="email" 
+          type="text" 
               pInputText
           formControlName="email" 
-          placeholder="your@email.com" 
+          placeholder="your@email.com or NRIC" 
           class="w-full mb-3" 
               style="padding: 1rem"
               required
             />
+            <ul class="pl-2 ml-2 mt-0 mb-3" style="line-height: 1.5; color: #6b7280; font-size: 0.875rem;">
+              <li>You can login using either your email address or NRIC</li>
+              <li>Existing users without email can login with NRIC only</li>
+            </ul>
 
         <label for="password1" class="block text-900 font-medium text-xl mb-2"
           >Password</label
@@ -82,9 +86,23 @@
           (click)="router.navigate(['sign-up'])"
         />
       </div>
+
+      <!-- Legacy User Option -->
+      <div class="flex align-items-center justify-content-center mt-4">
+        <p class="text-600 text-center">
+          Don't have an email address? Need help accessing your account?<br>
+          <a
+            class="font-medium no-underline cursor-pointer"
+            style="color: var(--primary-color)"
+            (click)="router.navigate(['legacy-user-request'])"
+          >
+            Request assistance from admin team
+          </a>
+        </p>
+      </div>
       </div>
 
-      <hr style="height:2px ;width: 80%;margin-left: 10%;border: none;background: rgb(221, 221, 221);"> 
+      <hr style="height:2px ;width: 80%;margin-left: 10%;border: none;background: rgb(221, 221, 221);">
 
       <div style="display: flex; justify-content: center; width: 100%; padding-top: 10px; padding-bottom: 20px">
           <mat-expansion-panel style="min-width: 76%; max-width: 76%; max-height: 1%; justify-content: center;border: 0px solid gray;" [expanded]="true"  >

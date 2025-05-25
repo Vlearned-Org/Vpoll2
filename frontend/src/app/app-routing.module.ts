@@ -17,6 +17,9 @@ import { UserListComponent } from './pages/system/user-list/user-list.component'
 import { UserEventComponent } from './pages/user/user-event/user-event.component';
 import { UserEventlistComponent } from './pages/user/user-eventlist/user-eventlist.component';
 import { UserHomepageComponent } from './pages/user/user-homepage/user-homepage.component';
+import { ProfileComponent } from './pages/user/profile/profile.component';
+import { LegacyUserRequestComponent } from './pages/public/legacy-user-request/legacy-user-request.component';
+import { LegacyUsersComponent } from './pages/admin/legacy-users/legacy-users.component';
 import { BlocksComponent } from './sample-components/blocks/blocks.component';
 import { DashboardComponent } from './sample-components/dashboard/dashboard.component';
 import { DocumentationComponent } from './sample-components/documentation/documentation.component';
@@ -51,12 +54,24 @@ import { RoleGuard } from './shared/security/guards/role.guard';
           ],
         },
         {
+          path: 'profile',
+          component: AppMainComponent,
+          children: [
+            {
+              path: '',
+              canActivate: [LoggedInGuard],
+              component: ProfileComponent,
+            },
+          ],
+        },
+        {
           path: 'events/:eventId',
           canActivate: [LoggedInGuard],
           component: UserEventComponent,
         },
         { path: 'login', component: LoginComponent },
         { path: 'sign-up', component: SignupComponent },
+        { path: 'legacy-user-request', component: LegacyUserRequestComponent },
         { path: 'forget-password', component: ForgetPasswordComponent },
         { path: 'signin/reset-password', component: ResetPasswordComponent },
         { path: 'admin/login', component: AdminLoginComponent },
@@ -76,6 +91,12 @@ import { RoleGuard } from './shared/security/guards/role.guard';
               canActivate: [LoggedInGuard, RoleGuard],
               data: { roles: [RoleEnum.SYSTEM] },
               component: UserListComponent,
+            },
+            {
+              path: 'legacy-users',
+              canActivate: [LoggedInGuard, RoleGuard],
+              data: { roles: [RoleEnum.SYSTEM] },
+              component: LegacyUsersComponent,
             },
             {
               path: 'company/profile',

@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { AppMainComponent } from './app.main.component';
-import { IdentityService } from './shared/security/services/identity.service';
+import { Component, OnInit } from "@angular/core";
+import { AppMainComponent } from "./app.main.component";
+import { IdentityService } from "./shared/security/services/identity.service";
 
 @Component({
-  selector: 'app-menu',
+  selector: "app-menu",
   template: `
     <div class="layout-menu-container">
       <ul class="layout-menu" role="menu" (keydown)="onKeydown($event)">
@@ -38,7 +38,7 @@ export class AppMenuComponent implements OnInit {
 
   constructor(
     public appMain: AppMainComponent,
-    private identity: IdentityService
+    private identity: IdentityService,
   ) {}
 
   ngOnInit() {
@@ -270,58 +270,63 @@ export class AppMenuComponent implements OnInit {
     if (this.identity.isCommonUser) {
       this.model[0].items = [
         {
-          label: 'Home',
-          icon: 'pi pi-fw pi-list',
-          routerLink: ['/home'],
+          label: "Home",
+          icon: "pi pi-fw pi-list",
+          routerLink: ["/home"],
         },
         {
-          label: 'Events',
-          icon: 'pi pi-fw pi-book',
-          routerLink: ['/events'],
+          label: "Events",
+          icon: "pi pi-fw pi-book",
+          routerLink: ["/events"],
         },
       ];
     } else if (this.identity.isSystem) {
       this.model[0].items = [
         {
-          label: 'Companies',
-          icon: 'pi pi-fw pi-list',
-          routerLink: ['company-list'],
+          label: "Companies",
+          icon: "pi pi-fw pi-list",
+          routerLink: ["company-list"],
         },
         {
-          label: 'Users',
-          icon: 'pi pi-fw pi-users',
-          routerLink: ['user-list'],
+          label: "Users",
+          icon: "pi pi-fw pi-users",
+          routerLink: ["user-list"],
+        },
+        {
+          label: "Legacy Users",
+          icon: "pi pi-fw pi-user-plus",
+          routerLink: ["legacy-users"],
         },
       ];
     } else if (this.identity.isCompanySystem) {
       this.model[0].items = [
         {
-          label: 'Company Profile',
-          icon: 'pi pi-fw pi-book',
-          routerLink: ['company/profile'],
+          label: "Company Profile",
+          icon: "pi pi-fw pi-book",
+          routerLink: ["company/profile"],
         },
         {
-          label: 'User Access',
-          icon: 'pi pi-fw pi-book',
-          routerLink: ['company/users'],
+          label: "User Access",
+          icon: "pi pi-fw pi-book",
+          routerLink: ["company/users"],
         },
         {
-          label: 'Events',
-          icon: 'pi pi-fw pi-book',
-          routerLink: ['company/events'],
+          label: "Events",
+          icon: "pi pi-fw pi-book",
+          routerLink: ["company/events"],
         },
       ];
     } else {
       this.model[0].items = [
         {
-          label: 'Company Profile',
-          icon: 'pi pi-fw pi-book',
-          routerLink: ['company/profile'],
+          label: "Company Profile",
+          icon: "pi pi-fw pi-book",
+          routerLink: ["company/profile"],
         },
         {
-          label: 'Events',
-          icon: 'pi pi-fw pi-book',
-          routerLink: ['company/events'],
+          label: "Events",
+          icon: "pi pi-fw pi-book",
+          routerLink: ["company/events"],
         },
       ];
     }
@@ -329,7 +334,7 @@ export class AppMenuComponent implements OnInit {
 
   onKeydown(event: KeyboardEvent) {
     const nodeElement = <HTMLDivElement>event.target;
-    if (event.code === 'Enter' || event.code === 'Space') {
+    if (event.code === "Enter" || event.code === "Space") {
       nodeElement.click();
       event.preventDefault();
     }

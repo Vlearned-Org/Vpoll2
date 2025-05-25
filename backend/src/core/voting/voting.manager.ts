@@ -26,6 +26,7 @@ export class VotingManager {
       companyId: proxy.companyId,
       eventId: proxy.eventId,
       shareholderId: proxy.shareholderId,
+      cds: (proxy.shareholderId as Shareholder).cds,
       proxyId: proxy._id,
       voterType: proxy.isChairmanAsProxy ? VoterTypeEnum.CHAIRMAN : VoterTypeEnum.PROXY,
       isPreVote: proxy.voteSetting.isPreVote,
@@ -70,14 +71,16 @@ export class VotingManager {
     if (event.polling.endAt) {
       throw new UserException({ message: "Polling ended" });
     }
-    const votingExisted = await this.votingRepo.getOneBy("shareholderId", shareholder._id.toString(), {
+    const votingExisted = await this.votingRepo.getOneBy("cds", shareholder.cds, {
       eventId: shareholder.eventId,
-      voterType: VoterTypeEnum.SHAREHOLDER
+      voterType: VoterTypeEnum.SHAREHOLDER,
+      companyId: shareholder.companyId
     });
     const vote: Voting = {
       companyId: shareholder.companyId,
       eventId: shareholder.eventId,
       shareholderId: shareholder._id.toString(),
+      cds: shareholder.cds,
       proxyId: undefined,
       voterType: VoterTypeEnum.SHAREHOLDER,
       isPreVote: false,

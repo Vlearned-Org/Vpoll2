@@ -81,14 +81,20 @@ export class AuthManager {
     return user;
   }
 
-  public async userValidate(email: string, password: string): Promise<User> {
-    const user = await this.userRepo.getOneBy("email", email);
+  public async userValidate(emailOrNric: string, password: string): Promise<User> {
+    // Try to find user by email first
+    let user = await this.userRepo.getOneBy("email", emailOrNric);
+    
+    // If not found by email, try by NRIC
+    if (!user) {
+      user = await this.userRepo.getOneBy("nric", emailOrNric.toUpperCase());
+    }
 
     if (!user) {
       throw new FailedLoginException({
-        message: "Login email not found",
+        message: "Login credentials not found",
         metadata: {
-          email: email
+          email: emailOrNric
         }
       });
     }
@@ -97,7 +103,7 @@ export class AuthManager {
       throw new FailedLoginException({
         message: "Login wrong password",
         metadata: {
-          email: email
+          email: emailOrNric
         }
       });
     }

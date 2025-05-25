@@ -29,14 +29,14 @@ export class AdminLoginDto extends LoginDto implements AdminLoginDtoContract {
 }
 
 export class RequestResetPasswordWithEmailDto implements RequestResetPasswordWithEmailDtoContract {
-  @IsEmail()
+  @IsString()
   public email: string;
 }
 
 // User
 
 export class UserLoginDto extends LoginDto implements UserLoginDtoContract {
-  @IsEmail()
+  @IsString()
   public email: string;
 }
 
@@ -82,7 +82,7 @@ export class UserSignUpDto implements UserSignUpDtoContract {
   @IsOptional()
   @IsMobilePhone("ms-MY")
   public mobile?: string;
-  
+
   @IsString()
   public name: string;
 

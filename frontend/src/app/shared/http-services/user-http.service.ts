@@ -4,6 +4,33 @@ import { environment } from '@environments/environment';
 import { User } from '@vpoll-shared/contract';
 import { Observable } from 'rxjs';
 
+export interface CreateLegacyUserDto {
+  name: string;
+  nric: string;
+  password: string;
+  email?: string;
+  mobile?: string;
+  fallbackContactName?: string;
+  fallbackContactPhone?: string;
+  fallbackContactEmail?: string;
+  fallbackContactRelation?: string;
+  physicalAddress?: string;
+  requiresAssistedAccess?: boolean;
+  specialInstructions?: string;
+  isAdmin: boolean;
+  status: string;
+  accountVerificationStatus: string;
+}
+
+export interface AccessCodeResponse {
+  accessCode: string;
+  expiresAt: string;
+}
+
+export interface PasswordResetResponse {
+  newPassword: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -26,6 +53,80 @@ export class UserHttpService {
     });
     
     return this.http.get<User>(`${environment.API_URL}/users/${id}`, { headers });
+  }
+
+  public getLegacyUsers(): Observable<User[]> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
+    return this.http.get<User[]>(`${environment.API_URL}/admin/legacy-users`, { headers });
+  }
+
+  public createLegacyUser(userData: CreateLegacyUserDto): Observable<User> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+    
+    return this.http.post<User>(`${environment.API_URL}/admin/legacy-users`, userData, { headers });
+  }
+
+  public updateLegacyUser(userId: string, userData: Partial<CreateLegacyUserDto>): Observable<User> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+    
+    return this.http.patch<User>(`${environment.API_URL}/admin/legacy-users/${userId}`, userData, { headers });
+  }
+
+  public resetUserPassword(userId: string): Observable<PasswordResetResponse> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
+    return this.http.post<PasswordResetResponse>(`${environment.API_URL}/admin/legacy-users/${userId}/reset-password`, {}, { headers });
+  }
+
+  public generateAccessCode(userId: string): Observable<AccessCodeResponse> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
+    return this.http.post<AccessCodeResponse>(`${environment.API_URL}/admin/legacy-users/${userId}/access-code`, {}, { headers });
+  }
+
+  public sendFallbackNotification(userId: string): Observable<any> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
+    return this.http.post<any>(`${environment.API_URL}/admin/legacy-users/${userId}/notify-fallback`, {}, { headers });
+  }
+
+  public markAsLegacyUser(userId: string): Observable<User> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
+    return this.http.post<User>(`${environment.API_URL}/admin/legacy-users/${userId}/mark-as-legacy`, {}, { headers });
+  }
+
+  public unmarkLegacyUser(userId: string): Observable<User> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
+    return this.http.post<User>(`${environment.API_URL}/admin/legacy-users/${userId}/unmark-legacy`, {}, { headers });
   }
 
   public approveUser(id: string): Observable<User> {

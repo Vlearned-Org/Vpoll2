@@ -22,6 +22,7 @@ export interface Voting {
   executorId: string | User;
   voterType: VoterTypeEnum;
   shareholderId: string | Shareholder;
+  cds: string;
   proxyId?: string | Proxy;
   isPreVote: boolean;
   result: Array<ResolutionVotingEntry>;

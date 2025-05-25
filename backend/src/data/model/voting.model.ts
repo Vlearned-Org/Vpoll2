@@ -2,7 +2,7 @@ import { modelOptions, prop, Ref } from "@typegoose/typegoose";
 import { Voting as VotingContract } from "@vpoll-shared/contract";
 import { VoterTypeEnum, VotingResponseEnum } from "@vpoll-shared/enum";
 import { Type } from "class-transformer";
-import { IsBoolean, IsEnum, IsMongoId, IsNumber, IsOptional, ValidateNested } from "class-validator";
+import { IsBoolean, IsEnum, IsMongoId, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
 import { Event, Proxy, Resolution, Shareholder, User,Corporate } from ".";
 import { AbstractModel } from "./abstract.model";
 import { Company } from "./company.model";
@@ -42,6 +42,10 @@ export class Voting extends AbstractModel implements VotingContract {
   @IsMongoId()
   @prop({ required: true, ref: "Shareholder", autopopulate: true })
   public shareholderId: Ref<Shareholder>;
+
+  @IsString()
+  @prop({ required: true, trim: true })
+  public cds: string;
 
   @IsMongoId()
   @prop({ required: true, ref: "User" })

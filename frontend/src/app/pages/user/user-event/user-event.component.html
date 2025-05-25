@@ -156,16 +156,17 @@
           </li>
           <li *ngIf="userEvent.shareholderIdentity.isShareholder">
             <h4>Shareholding Information</h4>
+            <p class="text-sm text-gray-600 mb-3">Each CDS account can vote independently</p>
             <p-table
               [value]="userEvent.shareholderIdentity.shareholders"
               responsiveLayout="scroll"
             >
               <ng-template pTemplate="header">
                 <tr>
-                  <th>CDS</th>
+                  <th>CDS Account</th>
                   <th>No of Shares</th>
                   <th>Remainder Shares</th>
-                  <th>Action</th>
+                  <th>Vote Per CDS</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-shareholder>

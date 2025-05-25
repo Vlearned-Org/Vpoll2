@@ -173,4 +173,76 @@ export class UserRepository extends AbstractRepository<User> {
       { $set: { status: UserStatusEnum.INACTIVE, accountVerificationStatus: AccountVerificationStatusEnum.REJECTED, rejectMessage } }
     );
   }
+
+  public async listLegacyUsers(): Promise<Array<User>> {
+    return this.model.find({
+      isAdmin: false,
+      $or: [
+        // Explicitly marked as legacy user
+        { isLegacyUser: true },
+        // Has fallback contact information (indicates legacy user setup)
+        { $and: [
+          { fallbackContactName: { $exists: true } },
+          { fallbackContactName: { $ne: null } },
+          { fallbackContactName: { $ne: "" } }
+        ]},
+        // Users with no email AND no mobile AND requires assisted access
+        { $and: [
+          { $or: [
+            { email: { $exists: false } },
+            { email: null },
+            { email: "" }
+          ]},
+          { $or: [
+            { mobile: { $exists: false } },
+            { mobile: null },
+            { mobile: "" }
+          ]},
+          { requiresAssistedAccess: true }
+        ]}
+      ]
+    });
+  }
+
+  public async createLegacyUser(userData: any): Promise<User> {
+    const user: User = {
+      ...userData,
+      isAdmin: false,
+      isLegacyUser: true,
+      roles: []
+    } as User;
+    return this.model.create(user);
+  }
+
+  public async updateLegacyUser(userId: string, userData: any): Promise<User> {
+    return this.model.findOneAndUpdate(
+      { _id: userId },
+      { $set: userData },
+      { new: true }
+    );
+  }
+
+  public async setAccessCode(userId: string, accessCode: string, expiresAt: Date): Promise<User> {
+    return this.model.findOneAndUpdate(
+      { _id: userId },
+      { $set: { accessCode, accessCodeExpiresAt: expiresAt } },
+      { new: true }
+    );
+  }
+
+  public async markAsLegacyUser(userId: string): Promise<User> {
+    return this.model.findOneAndUpdate(
+      { _id: userId },
+      { $set: { isLegacyUser: true } },
+      { new: true }
+    );
+  }
+
+  public async unmarkLegacyUser(userId: string): Promise<User> {
+    return this.model.findOneAndUpdate(
+      { _id: userId },
+      { $set: { isLegacyUser: false } },
+      { new: true }
+    );
+  }
 }

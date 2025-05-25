@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environments/environment';
 import {
@@ -14,6 +14,26 @@ import {
   UserLoginDto,
   UserSignUpDto,
 } from '@vpoll-shared/contract';
+
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface LegacyUserRequestDto {
+  name: string;
+  nric: string;
+  contactPersonName?: string;
+  contactPersonPhone?: string;
+  contactPersonEmail?: string;
+  contactPersonRelation?: string;
+  physicalAddress?: string;
+  preferredContactMethod: 'phone' | 'email' | 'postal';
+  requestType: 'new_account' | 'password_reset' | 'access_help' | 'other';
+  message: string;
+  eventName?: string;
+}
+
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -94,6 +114,24 @@ export class AuthHttpService {
   ): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(
       `${environment.API_URL}/reset-password`,
+      payload
+    );
+  }
+
+  public changePassword(payload: ChangePasswordDto): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+    });
+    return this.http.post<any>(
+      `${environment.API_URL}/me/change-password`,
+      payload,
+      { headers: headers }
+    );
+  }
+
+  public submitLegacyUserRequest(payload: LegacyUserRequestDto): Observable<any> {
+    return this.http.post<any>(
+      `${environment.API_URL}/legacy-user-request`,
       payload
     );
   }

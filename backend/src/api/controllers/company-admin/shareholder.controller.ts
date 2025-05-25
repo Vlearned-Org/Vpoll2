@@ -232,7 +232,12 @@ export class ShareholderController {
   @Get(":id/voting")
   @Bind(ApiContext(), Param("id"), Query("eventId"))
   public async getShareholderVoting(context: Context, shareholderId: string, eventId: string): Promise<Voting> {
-    return this.votingRepo.getOneBy("shareholderId", shareholderId, { eventId, voterType: VoterTypeEnum.SHAREHOLDER });
+    const shareholder = await this.shareholderRepo.get(shareholderId, { companyId: context.companyId, eventId });
+    return this.votingRepo.getOneBy("cds", shareholder.cds, { 
+      eventId, 
+      voterType: VoterTypeEnum.SHAREHOLDER,
+      companyId: context.companyId
+    });
   }
 
   private async validateBeforeDeleteShareholder(eventId: string) {

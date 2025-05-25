@@ -1,0 +1,335 @@
+<div class="surface-0 flex align-items-center justify-content-center min-h-screen">
+  <p-toast key="toast"></p-toast>
+  
+  <div class="grid justify-content-center p-2 lg:p-0" style="min-width: 80%">
+    <div class="col-12 xl:col-8" style="border-radius: 56px; padding: 0.3rem">
+      <div
+        class="h-full w-full m-0 py-7 px-4"
+        style="
+          border-radius: 53px;
+          background: linear-gradient(
+            180deg,
+            var(--surface-50) 38.9%,
+            var(--surface-0)
+          );
+        "
+      >
+        <!-- Header -->
+        <div class="text-center mb-5">
+          <img
+            src="assets/layout/images/vpoll.png"
+            alt="Vpoll logo"
+            class="mb-5 cursor-pointer"
+            style="width: 200px"
+            (click)="router.navigate(['/'])"
+          />
+          <div class="text-900 text-3xl font-medium mb-3">Legacy User Request</div>
+          <span class="text-600 font-medium" *ngIf="!submitted">
+            Don't have an email address? Need help accessing your account? Submit a request and our admin team will assist you.
+          </span>
+        </div>
+
+        <!-- Success Message -->
+        <div *ngIf="submitted" class="text-center">
+          <div class="mb-4">
+            <i class="pi pi-check-circle text-green-500 text-6xl mb-3"></i>
+            <h3 class="text-green-700 mb-2">Request Submitted Successfully!</h3>
+            <p class="text-600 mb-4">
+              Our admin team will review your request and contact you within 2 business days using your preferred contact method.
+            </p>
+            <p class="text-600 mb-4">
+              <strong>What happens next:</strong><br>
+              1. Admin team reviews your request<br>
+              2. Account setup or assistance provided<br>
+              3. You'll receive login credentials via your preferred contact method<br>
+              4. You can participate in events
+            </p>
+          </div>
+          
+          <div class="flex gap-2 justify-content-center">
+            <button
+              pButton
+              pRipple
+              label="Submit Another Request"
+              icon="pi pi-plus"
+              class="p-button-outlined"
+              (click)="resetForm()"
+            ></button>
+            <button
+              pButton
+              pRipple
+              label="Go to Login"
+              icon="pi pi-sign-in"
+              (click)="goToLogin()"
+            ></button>
+          </div>
+        </div>
+
+        <!-- Request Form -->
+        <div *ngIf="!submitted" class="w-full md:w-10 mx-auto" [formGroup]="requestForm">
+          
+          <!-- Info Section -->
+          <p-message severity="info" class="mb-4">
+            <ng-template pTemplate>
+              <div>
+                <strong>Who can use this form:</strong><br>
+                • Shareholders without email addresses<br>
+                • Users who need help accessing their accounts<br>
+                • Family members requesting on behalf of elderly shareholders<br>
+                • Anyone having trouble with the normal signup process
+              </div>
+            </ng-template>
+          </p-message>
+
+          <!-- Basic Information -->
+          <div class="card mb-4">
+            <h4 class="text-primary mb-3">Your Information</h4>
+            
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <label for="name" class="block text-900 text-xl font-medium mb-2">
+                  Full Name <span class="text-red-500">*</span>
+                </label>
+                <input
+                  pInputText
+                  id="name"
+                  formControlName="name"
+                  placeholder="Enter your full name"
+                  class="w-full mb-3"
+                  style="padding: 1rem"
+                  (input)="onNameChange($event)"
+                />
+                <small class="p-error block" *ngIf="getFieldError('name')">
+                  {{ getFieldError('name') }}
+                </small>
+              </div>
+
+              <div class="col-12 md:col-6">
+                <label for="nric" class="block text-900 text-xl font-medium mb-2">
+                  NRIC <span class="text-red-500">*</span>
+                </label>
+                <input
+                  pInputText
+                  id="nric"
+                  formControlName="nric"
+                  placeholder="Enter your NRIC"
+                  class="w-full mb-3"
+                  style="padding: 1rem"
+                  (input)="onNricChange($event)"
+                />
+                <small class="p-error block" *ngIf="getFieldError('nric')">
+                  {{ getFieldError('nric') }}
+                </small>
+                <small class="p-info block">No spaces or dashes, letters and numbers only</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Request Type -->
+          <div class="card mb-4">
+            <h4 class="text-primary mb-3">Request Details</h4>
+            
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <label for="requestType" class="block text-900 text-xl font-medium mb-2">
+                  What do you need help with? <span class="text-red-500">*</span>
+                </label>
+                <p-dropdown
+                  [options]="requestTypes"
+                  formControlName="requestType"
+                  placeholder="Select request type"
+                  optionLabel="label"
+                  optionValue="value"
+                  class="w-full mb-3"
+                ></p-dropdown>
+                <small class="p-error block" *ngIf="getFieldError('requestType')">
+                  {{ getFieldError('requestType') }}
+                </small>
+              </div>
+
+              <div class="col-12 md:col-6">
+                <label for="eventName" class="block text-900 text-xl font-medium mb-2">
+                  Event Name (if applicable)
+                </label>
+                <input
+                  pInputText
+                  id="eventName"
+                  formControlName="eventName"
+                  placeholder="Name of the event you want to join"
+                  class="w-full mb-3"
+                  style="padding: 1rem"
+                />
+              </div>
+            </div>
+
+            <div class="col-12">
+              <label for="message" class="block text-900 text-xl font-medium mb-2">
+                Detailed Message <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                pInputTextarea
+                id="message"
+                formControlName="message"
+                placeholder="Please describe your situation and what help you need..."
+                class="w-full mb-3"
+                rows="4"
+                style="padding: 1rem"
+              ></textarea>
+              <small class="p-error block" *ngIf="getFieldError('message')">
+                {{ getFieldError('message') }}
+              </small>
+            </div>
+          </div>
+
+          <!-- Contact Method -->
+          <div class="card mb-4">
+            <h4 class="text-primary mb-3">How Should We Contact You?</h4>
+            
+            <div class="col-12">
+              <label class="block text-900 text-xl font-medium mb-2">
+                Preferred Contact Method <span class="text-red-500">*</span>
+              </label>
+              <div class="flex flex-column gap-2 mb-3">
+                <div *ngFor="let method of contactMethods" class="field-radiobutton">
+                  <p-radioButton
+                    [inputId]="method.value"
+                    [value]="method.value"
+                    formControlName="preferredContactMethod"
+                  ></p-radioButton>
+                  <label [for]="method.value" class="ml-2">{{ method.label }}</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact Person Fields -->
+            <div *ngIf="showContactPersonFields">
+              <h5 class="text-600 mb-3">Contact Person Information</h5>
+              <p class="text-600 mb-3">Provide details of someone who can help you (family member, caregiver, etc.). Note: Email is required for OTP verification even if phone is the primary contact method.</p>
+              
+              <div class="grid">
+                <div class="col-12 md:col-6">
+                  <label for="contactPersonName" class="block text-900 font-medium mb-2">
+                    Contact Person Name <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    pInputText
+                    id="contactPersonName"
+                    formControlName="contactPersonName"
+                    placeholder="Name of family member/caregiver"
+                    class="w-full mb-3"
+                    (input)="onContactNameChange($event)"
+                  />
+                  <small class="p-error block" *ngIf="getFieldError('contactPersonName')">
+                    {{ getFieldError('contactPersonName') }}
+                  </small>
+                </div>
+
+                <div class="col-12 md:col-6">
+                  <label for="contactPersonRelation" class="block text-900 font-medium mb-2">
+                    Relationship
+                  </label>
+                  <input
+                    pInputText
+                    id="contactPersonRelation"
+                    formControlName="contactPersonRelation"
+                    placeholder="e.g., Son, Daughter, Caregiver"
+                    class="w-full mb-3"
+                  />
+                </div>
+
+                <div class="col-12 md:col-6" *ngIf="requestForm.get('preferredContactMethod')?.value === 'phone'">
+                  <label for="contactPersonPhone" class="block text-900 font-medium mb-2">
+                    Contact Person Phone <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    pInputText
+                    id="contactPersonPhone"
+                    formControlName="contactPersonPhone"
+                    placeholder="Phone number of contact person"
+                    class="w-full mb-3"
+                  />
+                  <small class="p-error block" *ngIf="getFieldError('contactPersonPhone')">
+                    {{ getFieldError('contactPersonPhone') }}
+                  </small>
+                  <small class="p-info block">Admin will call this number, but email is still required for OTP</small>
+                </div>
+
+                <div class="col-12 md:col-6">
+                  <label for="contactPersonEmail" class="block text-900 font-medium mb-2">
+                    Contact Person Email <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    pInputText
+                    id="contactPersonEmail"
+                    formControlName="contactPersonEmail"
+                    placeholder="Email of contact person"
+                    class="w-full mb-3"
+                  />
+                  <small class="p-error block" *ngIf="getFieldError('contactPersonEmail')">
+                    {{ getFieldError('contactPersonEmail') }}
+                  </small>
+                  <small class="p-info block">Required for OTP and all authentication processes</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Physical Address -->
+            <div *ngIf="showPhysicalAddress">
+              <h5 class="text-600 mb-3">Physical Address</h5>
+              <div class="col-12">
+                <label for="physicalAddress" class="block text-900 font-medium mb-2">
+                  Complete Address <span class="text-red-500">*</span>
+                </label>
+                <textarea
+                  pInputTextarea
+                  id="physicalAddress"
+                  formControlName="physicalAddress"
+                  placeholder="Enter your complete physical address for postal communication"
+                  class="w-full mb-3"
+                  rows="3"
+                ></textarea>
+                <small class="p-error block" *ngIf="getFieldError('physicalAddress')">
+                  {{ getFieldError('physicalAddress') }}
+                </small>
+                <small class="p-info block">We will send you information via postal mail at this address</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="flex justify-content-center gap-2 mb-4">
+            <button
+              pButton
+              pRipple
+              label="Submit Request"
+              icon="pi pi-send"
+              (click)="submitRequest()"
+              [disabled]="!isFormValid || loading"
+              [loading]="loading"
+              class="w-full p-3 text-xl"
+            ></button>
+          </div>
+
+          <!-- Alternative Actions -->
+          <div class="flex align-items-center justify-content-center gap-4 mt-4">
+            <a
+              class="font-medium no-underline cursor-pointer"
+              style="color: var(--primary-color)"
+              (click)="goToLogin()"
+            >
+              Already have an account? Login
+            </a>
+            <span class="text-400">|</span>
+            <a
+              class="font-medium no-underline cursor-pointer"
+              style="color: var(--primary-color)"
+              (click)="goToSignup()"
+            >
+              Have email? Regular signup
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -44,13 +44,13 @@ export class EventController {
       companyId: context.companyId,
       eventId
     });
-    const shareholderIds = new Set(
-      votings.filter(item => item.voterType === 'SHAREHOLDER').map(item => String(item.shareholderId))
+    const shareholderCds = new Set(
+      votings.filter(item => item.voterType === 'SHAREHOLDER').map(item => item.cds)
     );
 
     const filteredData = votings.filter(item => {
       if (item.voterType === 'PROXY') {
-        return !shareholderIds.has(String(item.shareholderId));
+        return !shareholderCds.has(item.cds);
       }
       return true;
     });

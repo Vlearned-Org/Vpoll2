@@ -7,9 +7,10 @@ import { VotingManager } from "@app/core/voting/voting.manager";
 import { CompanyInformation, Proxy, Shareholder, User, Voting ,Corporate} from "@app/data/model";
 import { AttendanceAuditData, QuestionAuditData ,LeaveAuditData} from "@app/data/model/audit.model";
 import { AuditRepository } from "@app/data/repositories/audit.repository";
-import { Bind, Body, Controller, ForbiddenException, Get, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
+import { Bind, Body, Controller, ForbiddenException, Get, Param, Patch, Post, Query, UseGuards, UnauthorizedException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import {
+  AskQuestionData,
   ChairmanIdentity,
   Context,
   Event,
@@ -24,6 +25,7 @@ import {
 import { AuditTypeEnum, RoleEnum, VoterTypeEnum } from "@vpoll-shared/enum";
 import { LogicException } from "@vpoll-shared/errors/global-exception.filter";
 import { JwtAuthGuard } from "src/core/auth/strategies/jwt.strategy";
+import * as bcrypt from "bcrypt";
 import { ApiContext } from "src/core/context/api-context-param.decorator";
 import {
   CompanyRepository,
@@ -64,7 +66,7 @@ export class MeController {
     const corporateRoles = await this.corporateRepo.all({ mobile: { $in: [user.mobile] } });
 
     const transformedArray1 = shareholdersRoles.map(item => ({
-      role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER 
+      role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER
       : RoleEnum.CHAIRMAN,
       companyId: item.companyId.toString(),
       eventId: item.eventId.toString(),
@@ -113,7 +115,7 @@ export class MeController {
 
   @Get("events")
   public async listEvents(@ApiContext() context: Context): Promise<Array<Event>> {
-    
+
 
     const users = await this.userRepo.all({ _id: { $in: context.id } });
     const user = users[0]
@@ -128,7 +130,7 @@ export class MeController {
     const corporateRoles = await this.corporateRepo.all({ mobile: { $in: [user.mobile] } });
 
     const transformedArray1 = shareholdersRoles.map(item => ({
-      role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER 
+      role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER
       : RoleEnum.CHAIRMAN,
       companyId: item.companyId.toString(),
       eventId: item.eventId.toString(),
@@ -177,7 +179,7 @@ export class MeController {
     const corporateRolesrepo = await this.corporateRepo.all({ mobile: { $in: [user.mobile] } });
 
     const transformedArray1 = shareholdersRolesrepo.map(item => ({
-      role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER 
+      role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER
       : RoleEnum.CHAIRMAN,
       companyId: item.companyId.toString(),
       eventId: item.eventId.toString(),
@@ -325,7 +327,7 @@ export class MeController {
     const corporateRolesrepo = await this.corporateRepo.all({ mobile: { $in: [user.mobile] } });
 
     const transformedArray1 = shareholdersRolesrepo.map(item => ({
-      role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER 
+      role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER
       : RoleEnum.CHAIRMAN,
       companyId: item.companyId.toString(),
       eventId: item.eventId.toString(),
@@ -378,28 +380,28 @@ export class MeController {
     if (attendanceLogs.length === 0) {
       const users = await this.userRepo.all({ _id: { $in: context.id } });
       const user = users[0]
-  
+
       const shareholdersRolesrepo = await this.shareholderRepo.all({ identityNumber: { $in: [user.nric] } });
       const inviteeRolesrepo = await this.inviteeRepo.all({ mobile: { $in: [user.mobile] } });
       const proxyRolesrepo = await this.proxyRepo.all({ identityNumber: { $in: [user.nric] } });
       const corporateRolesrepo = await this.corporateRepo.all({ mobile: { $in: [user.mobile] } });
-  
+
       const transformedArray1 = shareholdersRolesrepo.map(item => ({
-        role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER 
+        role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER
         : RoleEnum.CHAIRMAN,
         companyId: item.companyId.toString(),
         eventId: item.eventId.toString(),
         refId: item._id
       }));
-  
+
       const transformedArray2 = inviteeRolesrepo.map(item => ({
         role: RoleEnum.INVITEE,
         companyId: item.companyId.toString(),
         eventId: item.eventId.toString(),
         refId: item._id
       }));
-  
-  
+
+
       const transformedArray3 = proxyRolesrepo.map(item => ({
         role: RoleEnum.PROXY,
         companyId: item.companyId.toString(),
@@ -413,12 +415,12 @@ export class MeController {
         eventId: item.eventId.toString(),
         refId: item._id
       }));
-  
-  
+
+
       //context.roles = transformedArray;
       let combinedRoles = [...transformedArray1, ...transformedArray2, ...transformedArray3, ...transformedArray4];
-  
-  
+
+
       const eventRoles = combinedRoles.filter(role => role.eventId.toString() === eventId);
       console.log(eventRoles)
       for (const eventRole of eventRoles) {
@@ -457,28 +459,28 @@ export class MeController {
     if (leaveLogs.length >= 0 ) {
       const users = await this.userRepo.all({ _id: { $in: context.id } });
       const user = users[0]
-  
+
       const shareholdersRolesrepo = await this.shareholderRepo.all({ identityNumber: { $in: [user.nric] } });
       const inviteeRolesrepo = await this.inviteeRepo.all({ mobile: { $in: [user.mobile] } });
       const proxyRolesrepo = await this.proxyRepo.all({ identityNumber: { $in: [user.nric] } });
       const corporateRolesrepo = await this.corporateRepo.all({ mobile: { $in: [user.mobile] } });
-  
+
       const transformedArray1 = shareholdersRolesrepo.map(item => ({
-        role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER 
+        role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER
         : RoleEnum.CHAIRMAN,
         companyId: item.companyId.toString(),
         eventId: item.eventId.toString(),
         refId: item._id
       }));
-  
+
       const transformedArray2 = inviteeRolesrepo.map(item => ({
         role: RoleEnum.INVITEE,
         companyId: item.companyId.toString(),
         eventId: item.eventId.toString(),
         refId: item._id
       }));
-  
-  
+
+
       const transformedArray3 = proxyRolesrepo.map(item => ({
         role: RoleEnum.PROXY,
         companyId: item.companyId.toString(),
@@ -492,12 +494,12 @@ export class MeController {
         eventId: item.eventId.toString(),
         refId: item._id
       }));
-  
-  
+
+
       //context.roles = transformedArray;
       let combinedRoles = [...transformedArray1, ...transformedArray2, ...transformedArray3, ...transformedArray4];
-  
-  
+
+
       const eventRoles = combinedRoles.filter(role => role.eventId.toString() === eventId);
       console.log(eventRoles)
       for (const eventRole of eventRoles) {
@@ -534,7 +536,7 @@ export class MeController {
   public async askQuestion(context: Context, eventId: string, payload: AskQuestionDto) {
     try {
       console.log("Received question:", payload.question);
-      
+
       const users = await this.userRepo.all({ _id: { $in: context.id } });
       const user = users[0]
 
@@ -544,7 +546,7 @@ export class MeController {
       const corporateRolesrepo = await this.corporateRepo.all({ mobile: { $in: [user.mobile] } });
 
       const transformedArray1 = shareholdersRolesrepo.map(item => ({
-        role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER 
+        role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER
         : RoleEnum.CHAIRMAN,
         companyId: item.companyId.toString(),
         eventId: item.eventId.toString(),
@@ -572,7 +574,7 @@ export class MeController {
         eventId: item.eventId.toString(),
         refId: item._id.toString()
       }));
-      
+
       let combinedRoles = [...transformedArray1, ...transformedArray2, ...transformedArray3, ...transformedArray4];
       const eventRoles = combinedRoles.filter(role => role.eventId.toString() === eventId);
 
@@ -612,7 +614,7 @@ export class MeController {
       }
 
       const companyId = eventRoles[0].companyId.toString();
-      
+
       // Create clean role objects to avoid potential circular references or mongoose metadata
       const sanitizedRoles = eventRoles.map(role => ({
         role: role.role,
@@ -620,10 +622,10 @@ export class MeController {
         eventId: role.eventId,
         refId: role.refId
       }));
-      
+
       console.log(`Asking question: "${payload.question}" by ${name}`);
       console.log(`Roles: ${JSON.stringify(sanitizedRoles)}`);
-      
+
       // Create a properly structured audit document
       const questionAudit = {
         _id: null, // null ID will be replaced with MongoDB-generated ID
@@ -631,15 +633,15 @@ export class MeController {
         userId: context.id,
         data: QuestionAuditData.create(name, sanitizedRoles, payload.question)
       };
-      
+
       const result = await this.auditRepo.logQuestion(questionAudit);
-      
+
       if (result && result._id) {
         this.eventEmitter.emit("ask-question", new AskQuestionEvent(companyId, eventId, result.data.question, result.data.roles));
       } else {
         console.error("Failed to create question audit record");
       }
-      
+
       return payload;
     } catch (error) {
       console.error(`Error in askQuestion: ${error.message}`);
@@ -671,7 +673,7 @@ export class MeController {
     const corporateRolesrepo = await this.corporateRepo.all({ mobile: { $in: [user.mobile] } });
 
     const transformedArray1 = shareholdersRolesrepo.map(item => ({
-      role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER 
+      role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER
       : RoleEnum.CHAIRMAN,
       companyId: item.companyId.toString(),
       eventId: item.eventId.toString(),
@@ -742,7 +744,7 @@ export class MeController {
     const corporateRolesrepo = await this.corporateRepo.all({ mobile: { $in: [user.mobile] } });
 
     const transformedArray1 = shareholdersRolesrepo.map(item => ({
-      role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER 
+      role: (item.shareholderType.toLowerCase() === RoleEnum.SHAREHOLDER) ? RoleEnum.SHAREHOLDER
       : RoleEnum.CHAIRMAN,
       companyId: item.companyId.toString(),
       eventId: item.eventId.toString(),
@@ -781,7 +783,12 @@ export class MeController {
         role => role.eventId.toString() === eventId && role.role === RoleEnum.SHAREHOLDER && role.refId.toString() === refId
       );
       if (isShareholderSelf) {
-        return this.votingRepo.getOneBy("shareholderId", refId, { eventId, voterType: VoterTypeEnum.SHAREHOLDER });
+        const shareholder = await this.shareholderRepo.get(refId, { eventId });
+        return this.votingRepo.getOneBy("cds", shareholder.cds, {
+          eventId,
+          voterType: VoterTypeEnum.SHAREHOLDER,
+          companyId: shareholder.companyId
+        });
       }
     }
     if (type === "PROXY") {
@@ -822,12 +829,12 @@ export class MeController {
         eventId
       });
 
-      const shareholderIds = new Set(
-        votings.filter(item => item.voterType === 'SHAREHOLDER').map(item => String(item.shareholderId))
+      const shareholderCds = new Set(
+        votings.filter(item => item.voterType === 'SHAREHOLDER').map(item => item.cds)
       );
       const filteredData = votings.filter(item => {
         if (item.voterType === 'PROXY') {
-          return !shareholderIds.has(String(item.shareholderId));
+          return !shareholderCds.has(item.cds);
         }
         return true;
       });
@@ -839,5 +846,26 @@ export class MeController {
       return VotingCalculator.calculate(filteredData, event.resolutions);
     }
     throw new LogicException({ message: "Polling result is not ready" });
+  }
+
+  @Post("change-password")
+  @Bind(ApiContext(), Body())
+  public async changePassword(context: Context, payload: { currentPassword: string; newPassword: string }) {
+    const user = await this.userRepo.get(context.id);
+
+    // Verify current password
+    const isCurrentPasswordValid = await bcrypt.compare(payload.currentPassword, user.password);
+    if (!isCurrentPasswordValid) {
+      throw new UnauthorizedException("Current password is incorrect");
+    }
+
+    // Hash new password
+    const saltRounds = 10;
+    const hashedNewPassword = await bcrypt.hash(payload.newPassword, saltRounds);
+
+    // Update password
+    await this.userRepo.setPassword(user._id, hashedNewPassword);
+
+    return { message: "Password updated successfully" };
   }
 }

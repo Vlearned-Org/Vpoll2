@@ -119,4 +119,26 @@ export class VpollNotifications {
               <small>If you're having trouble clicking the password reset button, please copy & paste this url in your browser:<br> ${process.env.APP_URL}/#/signin/reset-password?token=${data.token}</small>`
     });
   }
+
+  public async sendFallbackNotification(email: string, data: { userName: string; fallbackContactName?: string }): Promise<void> {
+    await this.notification.process(email, NotificationType.simple, {
+      subject: "Vpoll - Information for Family Member/Caregiver",
+      content: `Dear ${data.fallbackContactName || 'Family Member/Caregiver'}, 
+      <br/><br/> 
+      This email is regarding ${data.userName}, who has been registered with Vpoll as a legacy user requiring assistance with digital access.
+      <br/><br/>
+      ${data.userName} may need your help to participate in upcoming AGM events through the Vpoll platform. We will notify you when there are events that require their participation.
+      <br/><br/>
+      Please assist ${data.userName} with:
+      <ul>
+        <li>Accessing the Vpoll platform when needed</li>
+        <li>Participating in voting during AGM events</li>
+        <li>Understanding event notifications and requirements</li>
+      </ul>
+      <br/>
+      If you have any questions or need assistance, please contact our support team.
+      <br/><br/>
+      Best regards, <br />The Vpoll Team.`
+    });
+  }
 }
