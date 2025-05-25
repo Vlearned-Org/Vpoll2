@@ -28,10 +28,14 @@ export interface LegacyUserRequestDto {
   contactPersonEmail?: string;
   contactPersonRelation?: string;
   physicalAddress?: string;
-  preferredContactMethod: 'phone' | 'email' | 'postal';
-  requestType: 'new_account' | 'password_reset' | 'access_help' | 'other';
+  preferredContactMethod: 'phone' | 'email' | 'postal' | 'in_person';
+  requestType: 'new_account' | 'password_reset' | 'access_help' | 'walk_in_account' | 'other';
   message: string;
   eventName?: string;
+  visitLocation?: string;
+  visitDate?: string;
+  assistedBy?: string;
+  isWalkIn?: boolean;
 }
 
 import { Observable } from 'rxjs';

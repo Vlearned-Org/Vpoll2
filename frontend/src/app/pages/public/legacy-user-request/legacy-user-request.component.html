@@ -1,6 +1,8 @@
-<div class="surface-0 flex align-items-center justify-content-center min-h-screen">
+<div
+  class="surface-0 flex align-items-center justify-content-center min-h-screen"
+>
   <p-toast key="toast"></p-toast>
-  
+
   <div class="grid justify-content-center p-2 lg:p-0" style="min-width: 80%">
     <div class="col-12 xl:col-8" style="border-radius: 56px; padding: 0.3rem">
       <div
@@ -23,9 +25,13 @@
             style="width: 200px"
             (click)="router.navigate(['/'])"
           />
-          <div class="text-900 text-3xl font-medium mb-3">Legacy User Request</div>
+          <div class="text-900 text-3xl font-medium mb-3">
+            Legacy User Request
+          </div>
           <span class="text-600 font-medium" *ngIf="!submitted">
-            Don't have an email address? Need help accessing your account? Submit a request and our admin team will assist you.
+            Don't have an email address? Need help accessing your account? Want
+            to visit our office in person? Submit a request and our admin team
+            will assist you.
           </span>
         </div>
 
@@ -34,18 +40,53 @@
           <div class="mb-4">
             <i class="pi pi-check-circle text-green-500 text-6xl mb-3"></i>
             <h3 class="text-green-700 mb-2">Request Submitted Successfully!</h3>
-            <p class="text-600 mb-4">
-              Our admin team will review your request and contact you within 2 business days using your preferred contact method.
-            </p>
-            <p class="text-600 mb-4">
-              <strong>What happens next:</strong><br>
-              1. Admin team reviews your request<br>
-              2. Account setup or assistance provided<br>
-              3. You'll receive login credentials via your preferred contact method<br>
-              4. You can participate in events
-            </p>
+
+            <!-- Regular Request Success -->
+            <div
+              *ngIf="
+                requestForm.get('preferredContactMethod')?.value !== 'in_person'
+              "
+            >
+              <p class="text-600 mb-4">
+                Our admin team will review your request and contact you within 2
+                business days using your preferred contact method.
+              </p>
+              <p class="text-600 mb-4">
+                <strong>What happens next:</strong><br />
+                1. Admin team reviews your request<br />
+                2. Account setup or assistance provided<br />
+                3. You'll receive login credentials via your preferred contact
+                method<br />
+                4. You can participate in events
+              </p>
+            </div>
+
+            <!-- Walk-in Request Success -->
+            <div
+              *ngIf="
+                requestForm.get('preferredContactMethod')?.value === 'in_person'
+              "
+            >
+              <p class="text-600 mb-4">
+                Your in-person visit request has been submitted successfully!
+                Our admin team will prepare for your visit.
+              </p>
+              <p class="text-600 mb-4">
+                <strong>What happens next:</strong><br />
+                1. Admin team reviews your request<br />
+                2. We will contact you to confirm your appointment time<br />
+                3. Visit our office with your identification documents<br />
+                4. Account will be created during your visit<br />
+                5. You'll receive login credentials immediately
+              </p>
+              <div class="visit-info-highlight">
+                <i class="pi pi-info-circle info-icon"></i>
+                <strong>Important:</strong> Please bring your original NRIC and
+                any relevant documents to your appointment.
+              </div>
+            </div>
           </div>
-          
+
           <div class="flex gap-2 justify-content-center">
             <button
               pButton
@@ -66,17 +107,22 @@
         </div>
 
         <!-- Request Form -->
-        <div *ngIf="!submitted" class="w-full md:w-10 mx-auto" [formGroup]="requestForm">
-          
+        <div
+          *ngIf="!submitted"
+          class="w-full md:w-10 mx-auto"
+          [formGroup]="requestForm"
+        >
           <!-- Info Section -->
           <p-message severity="info" class="mb-4">
             <ng-template pTemplate>
               <div>
-                <strong>Who can use this form:</strong><br>
-                • Shareholders without email addresses<br>
-                • Users who need help accessing their accounts<br>
-                • Family members requesting on behalf of elderly shareholders<br>
-                • Anyone having trouble with the normal signup process
+                <strong>Who can use this form:</strong><br />
+                • Shareholders without email addresses<br />
+                • Users who need help accessing their accounts<br />
+                • Family members requesting on behalf of elderly shareholders<br />
+                • Anyone having trouble with the normal signup process<br />
+                • People who prefer to visit the office in person for account
+                setup
               </div>
             </ng-template>
           </p-message>
@@ -84,10 +130,13 @@
           <!-- Basic Information -->
           <div class="card mb-4">
             <h4 class="text-primary mb-3">Your Information</h4>
-            
+
             <div class="grid">
               <div class="col-12 md:col-6">
-                <label for="name" class="block text-900 text-xl font-medium mb-2">
+                <label
+                  for="name"
+                  class="block text-900 text-xl font-medium mb-2"
+                >
                   Full Name <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -100,12 +149,15 @@
                   (input)="onNameChange($event)"
                 />
                 <small class="p-error block" *ngIf="getFieldError('name')">
-                  {{ getFieldError('name') }}
+                  {{ getFieldError("name") }}
                 </small>
               </div>
 
               <div class="col-12 md:col-6">
-                <label for="nric" class="block text-900 text-xl font-medium mb-2">
+                <label
+                  for="nric"
+                  class="block text-900 text-xl font-medium mb-2"
+                >
                   NRIC <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -118,9 +170,11 @@
                   (input)="onNricChange($event)"
                 />
                 <small class="p-error block" *ngIf="getFieldError('nric')">
-                  {{ getFieldError('nric') }}
+                  {{ getFieldError("nric") }}
                 </small>
-                <small class="p-info block">No spaces or dashes, letters and numbers only</small>
+                <small class="p-info block"
+                  >No spaces or dashes, letters and numbers only</small
+                >
               </div>
             </div>
           </div>
@@ -128,11 +182,15 @@
           <!-- Request Type -->
           <div class="card mb-4">
             <h4 class="text-primary mb-3">Request Details</h4>
-            
+
             <div class="grid">
               <div class="col-12 md:col-6">
-                <label for="requestType" class="block text-900 text-xl font-medium mb-2">
-                  What do you need help with? <span class="text-red-500">*</span>
+                <label
+                  for="requestType"
+                  class="block text-900 text-xl font-medium mb-2"
+                >
+                  What do you need help with?
+                  <span class="text-red-500">*</span>
                 </label>
                 <p-dropdown
                   [options]="requestTypes"
@@ -142,13 +200,19 @@
                   optionValue="value"
                   class="w-full mb-3"
                 ></p-dropdown>
-                <small class="p-error block" *ngIf="getFieldError('requestType')">
-                  {{ getFieldError('requestType') }}
+                <small
+                  class="p-error block"
+                  *ngIf="getFieldError('requestType')"
+                >
+                  {{ getFieldError("requestType") }}
                 </small>
               </div>
 
               <div class="col-12 md:col-6">
-                <label for="eventName" class="block text-900 text-xl font-medium mb-2">
+                <label
+                  for="eventName"
+                  class="block text-900 text-xl font-medium mb-2"
+                >
                   Event Name (if applicable)
                 </label>
                 <input
@@ -163,7 +227,10 @@
             </div>
 
             <div class="col-12">
-              <label for="message" class="block text-900 text-xl font-medium mb-2">
+              <label
+                for="message"
+                class="block text-900 text-xl font-medium mb-2"
+              >
                 Detailed Message <span class="text-red-500">*</span>
               </label>
               <textarea
@@ -176,7 +243,7 @@
                 style="padding: 1rem"
               ></textarea>
               <small class="p-error block" *ngIf="getFieldError('message')">
-                {{ getFieldError('message') }}
+                {{ getFieldError("message") }}
               </small>
             </div>
           </div>
@@ -184,19 +251,24 @@
           <!-- Contact Method -->
           <div class="card mb-4">
             <h4 class="text-primary mb-3">How Should We Contact You?</h4>
-            
+
             <div class="col-12">
               <label class="block text-900 text-xl font-medium mb-2">
                 Preferred Contact Method <span class="text-red-500">*</span>
               </label>
               <div class="flex flex-column gap-2 mb-3">
-                <div *ngFor="let method of contactMethods" class="field-radiobutton">
+                <div
+                  *ngFor="let method of contactMethods"
+                  class="field-radiobutton"
+                >
                   <p-radioButton
                     [inputId]="method.value"
                     [value]="method.value"
                     formControlName="preferredContactMethod"
                   ></p-radioButton>
-                  <label [for]="method.value" class="ml-2">{{ method.label }}</label>
+                  <label [for]="method.value" class="ml-2">{{
+                    method.label
+                  }}</label>
                 </div>
               </div>
             </div>
@@ -204,11 +276,18 @@
             <!-- Contact Person Fields -->
             <div *ngIf="showContactPersonFields">
               <h5 class="text-600 mb-3">Contact Person Information</h5>
-              <p class="text-600 mb-3">Provide details of someone who can help you (family member, caregiver, etc.). Note: Email is required for OTP verification even if phone is the primary contact method.</p>
-              
+              <p class="text-600 mb-3">
+                Provide details of someone who can help you (family member,
+                caregiver, etc.). Note: Email is required for OTP verification
+                even if phone is the primary contact method.
+              </p>
+
               <div class="grid">
                 <div class="col-12 md:col-6">
-                  <label for="contactPersonName" class="block text-900 font-medium mb-2">
+                  <label
+                    for="contactPersonName"
+                    class="block text-900 font-medium mb-2"
+                  >
                     Contact Person Name <span class="text-red-500">*</span>
                   </label>
                   <input
@@ -219,13 +298,19 @@
                     class="w-full mb-3"
                     (input)="onContactNameChange($event)"
                   />
-                  <small class="p-error block" *ngIf="getFieldError('contactPersonName')">
-                    {{ getFieldError('contactPersonName') }}
+                  <small
+                    class="p-error block"
+                    *ngIf="getFieldError('contactPersonName')"
+                  >
+                    {{ getFieldError("contactPersonName") }}
                   </small>
                 </div>
 
                 <div class="col-12 md:col-6">
-                  <label for="contactPersonRelation" class="block text-900 font-medium mb-2">
+                  <label
+                    for="contactPersonRelation"
+                    class="block text-900 font-medium mb-2"
+                  >
                     Relationship
                   </label>
                   <input
@@ -237,8 +322,16 @@
                   />
                 </div>
 
-                <div class="col-12 md:col-6" *ngIf="requestForm.get('preferredContactMethod')?.value === 'phone'">
-                  <label for="contactPersonPhone" class="block text-900 font-medium mb-2">
+                <div
+                  class="col-12 md:col-6"
+                  *ngIf="
+                    requestForm.get('preferredContactMethod')?.value === 'phone'
+                  "
+                >
+                  <label
+                    for="contactPersonPhone"
+                    class="block text-900 font-medium mb-2"
+                  >
                     Contact Person Phone <span class="text-red-500">*</span>
                   </label>
                   <input
@@ -248,14 +341,23 @@
                     placeholder="Phone number of contact person"
                     class="w-full mb-3"
                   />
-                  <small class="p-error block" *ngIf="getFieldError('contactPersonPhone')">
-                    {{ getFieldError('contactPersonPhone') }}
+                  <small
+                    class="p-error block"
+                    *ngIf="getFieldError('contactPersonPhone')"
+                  >
+                    {{ getFieldError("contactPersonPhone") }}
                   </small>
-                  <small class="p-info block">Admin will call this number, but email is still required for OTP</small>
+                  <small class="p-info block"
+                    >Admin will call this number, but email is still required
+                    for OTP</small
+                  >
                 </div>
 
                 <div class="col-12 md:col-6">
-                  <label for="contactPersonEmail" class="block text-900 font-medium mb-2">
+                  <label
+                    for="contactPersonEmail"
+                    class="block text-900 font-medium mb-2"
+                  >
                     Contact Person Email <span class="text-red-500">*</span>
                   </label>
                   <input
@@ -265,10 +367,15 @@
                     placeholder="Email of contact person"
                     class="w-full mb-3"
                   />
-                  <small class="p-error block" *ngIf="getFieldError('contactPersonEmail')">
-                    {{ getFieldError('contactPersonEmail') }}
+                  <small
+                    class="p-error block"
+                    *ngIf="getFieldError('contactPersonEmail')"
+                  >
+                    {{ getFieldError("contactPersonEmail") }}
                   </small>
-                  <small class="p-info block">Required for OTP and all authentication processes</small>
+                  <small class="p-info block"
+                    >Required for OTP and all authentication processes</small
+                  >
                 </div>
               </div>
             </div>
@@ -277,7 +384,10 @@
             <div *ngIf="showPhysicalAddress">
               <h5 class="text-600 mb-3">Physical Address</h5>
               <div class="col-12">
-                <label for="physicalAddress" class="block text-900 font-medium mb-2">
+                <label
+                  for="physicalAddress"
+                  class="block text-900 font-medium mb-2"
+                >
                   Complete Address <span class="text-red-500">*</span>
                 </label>
                 <textarea
@@ -288,11 +398,110 @@
                   class="w-full mb-3"
                   rows="3"
                 ></textarea>
-                <small class="p-error block" *ngIf="getFieldError('physicalAddress')">
-                  {{ getFieldError('physicalAddress') }}
+                <small
+                  class="p-error block"
+                  *ngIf="getFieldError('physicalAddress')"
+                >
+                  {{ getFieldError("physicalAddress") }}
                 </small>
-                <small class="p-info block">We will send you information via postal mail at this address</small>
+                <small class="p-info block"
+                  >We will send you information via postal mail at this
+                  address</small
+                >
               </div>
+            </div>
+
+            <!-- In-Person Visit Fields -->
+            <div *ngIf="showInPersonFields">
+              <h5 class="text-600 mb-3">In-Person Visit Details</h5>
+              <p class="text-600 mb-3">
+                Since you will visit our office in person, please provide the
+                following details to help us prepare for your visit.
+              </p>
+
+              <div class="grid">
+                <div class="col-12 md:col-6">
+                  <label
+                    for="visitLocation"
+                    class="block text-900 font-medium mb-2"
+                  >
+                    Preferred Office Location
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    pInputText
+                    id="visitLocation"
+                    formControlName="visitLocation"
+                    placeholder="e.g., Main Office, Regional Office"
+                    class="w-full mb-3"
+                  />
+                  <small
+                    class="p-error block"
+                    *ngIf="getFieldError('visitLocation')"
+                  >
+                    {{ getFieldError("visitLocation") }}
+                  </small>
+                </div>
+
+                <div class="col-12 md:col-6">
+                  <label
+                    for="visitDate"
+                    class="block text-900 font-medium mb-2"
+                  >
+                    Preferred Visit Date <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    pInputText
+                    id="visitDate"
+                    formControlName="visitDate"
+                    class="w-full mb-3"
+                    [min]="getTomorrowDate()"
+                  />
+                  <small
+                    class="p-error block"
+                    *ngIf="getFieldError('visitDate')"
+                  >
+                    {{ getFieldError("visitDate") }}
+                  </small>
+                  <small class="p-info block"
+                    >We will contact you to confirm your appointment</small
+                  >
+                </div>
+
+                <div class="col-12">
+                  <label
+                    for="assistedBy"
+                    class="block text-900 font-medium mb-2"
+                  >
+                    Accompanied By (Optional)
+                  </label>
+                  <input
+                    pInputText
+                    id="assistedBy"
+                    formControlName="assistedBy"
+                    placeholder="Name of person accompanying you (family member, caregiver, etc.)"
+                    class="w-full mb-3"
+                  />
+                  <small class="p-info block"
+                    >Let us know if someone will be helping you during the
+                    visit</small
+                  >
+                </div>
+              </div>
+
+              <p-message severity="info" class="mb-3">
+                <ng-template pTemplate>
+                  <div>
+                    <strong>What to bring for your visit:</strong><br />
+                    • Original NRIC or identification document<br />
+                    • Any relevant shareholding documents (if applicable)<br />
+                    • Contact details of a family member or friend (for future
+                    communications)<br />
+                    • This reference number (will be provided after submission)
+                  </div>
+                </ng-template>
+              </p-message>
             </div>
           </div>
 
@@ -311,7 +520,9 @@
           </div>
 
           <!-- Alternative Actions -->
-          <div class="flex align-items-center justify-content-center gap-4 mt-4">
+          <div
+            class="flex align-items-center justify-content-center gap-4 mt-4"
+          >
             <a
               class="font-medium no-underline cursor-pointer"
               style="color: var(--primary-color)"

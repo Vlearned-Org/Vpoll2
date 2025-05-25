@@ -6,6 +6,7 @@ import { LocalAuthGuard } from "@app/core/auth/strategies/local.strategy";
 import { StorageManager } from "@app/core/storage/storage.manager";
 import { User } from "@app/data/model";
 import { CompanyRepository, EventRepository, UserRepository } from "@app/data/repositories";
+import { LegacyUserRequestRepository } from "@app/data/repositories/legacy-user-request.repository";
 import { Body, Controller, Get, Post, Request, UseGuards } from "@nestjs/common";
 import { LoginResponse, EmailValidationResponse, PublicEvent, RequestResetPasswordWithMobileResponse, RequestResetPasswordWithEmailResponse } from "@vpoll-shared/contract";
 import { UserTokenEnum } from "@vpoll-shared/enum";
@@ -20,23 +21,28 @@ export interface LegacyUserRequestDto {
   contactPersonEmail?: string;
   contactPersonRelation?: string;
   physicalAddress?: string;
-  preferredContactMethod: 'phone' | 'email' | 'postal';
-  requestType: 'new_account' | 'password_reset' | 'access_help' | 'other';
+  preferredContactMethod: 'phone' | 'email' | 'postal' | 'in_person';
+  requestType: 'new_account' | 'password_reset' | 'access_help' | 'walk_in_account' | 'other';
   message: string;
   eventName?: string;
+  visitLocation?: string;
+  visitDate?: string;
+  assistedBy?: string;
+  isWalkIn?: boolean;
 }
 
 @Controller("api")
 export class UserAuthController {
   constructor(
     private userRepo: UserRepository,
+    private storage: StorageManager,
     private auth: AuthManager,
     private password: PasswordManager,
-    private roleManager: RoleManager,
+    private role: RoleManager,
     private eventRepo: EventRepository,
     private companyRepo: CompanyRepository,
-    private storageManager: StorageManager,
-    private vpollNotifications: VpollNotifications
+    private vpollNotifications: VpollNotifications,
+    private legacyUserRequestRepo: LegacyUserRequestRepository
   ) {}
 
   @Get("upcoming-events")
@@ -46,7 +52,7 @@ export class UserAuthController {
     return Promise.all(
       events.map(async event => {
         const fileId = companies.find(comp => comp._id.toString() === event.companyId.toString()).information.logo as string;
-        const partialUrl = fileId ? await this.storageManager.getPublicUrl(fileId.toString(), { company: event.companyId.toString() }) : null;
+        const partialUrl = fileId ? await this.storage.getPublicUrl(fileId.toString(), { company: event.companyId.toString() }) : null;
         return {
           companyId: event.companyId as string,
           eventId: event._id,
@@ -103,10 +109,31 @@ export class UserAuthController {
 
   @Post("legacy-user-request")
   public async submitLegacyUserRequest(@Body() body: LegacyUserRequestDto): Promise<{ message: string }> {
+    // Save the request to database
+    const savedRequest = await this.legacyUserRequestRepo.create({
+      name: body.name,
+      nric: body.nric,
+      contactPersonName: body.contactPersonName,
+      contactPersonPhone: body.contactPersonPhone,
+      contactPersonEmail: body.contactPersonEmail,
+      contactPersonRelation: body.contactPersonRelation,
+      physicalAddress: body.physicalAddress,
+      preferredContactMethod: body.preferredContactMethod as any,
+      requestType: body.requestType as any,
+      message: body.message,
+      eventName: body.eventName,
+      visitLocation: body.visitLocation,
+      visitDate: body.visitDate ? new Date(body.visitDate) : undefined,
+      assistedBy: body.assistedBy,
+      isWalkIn: body.isWalkIn || false
+    });
+
     // Send notification to admin team with the legacy user request
     const adminEmailSubject = `Legacy User Request: ${body.requestType.replace('_', ' ').toUpperCase()}`;
     const adminEmailBody = `
       A legacy user has submitted a request for assistance.
+      
+      Request ID: ${savedRequest.toString()}
       
       User Information:
       - Name: ${body.name}
@@ -127,7 +154,7 @@ export class UserAuthController {
       Message:
       ${body.message}
       
-      Please contact this user using their preferred method to assist with their request.
+      Please log into the admin panel to review and process this request.
       
       This is an automated message from the VPoll system.
     `;

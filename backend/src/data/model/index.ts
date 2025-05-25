@@ -8,3 +8,4 @@ export * from "./shareholder.model";
 export * from "./user.model";
 export * from "./voting.model";
 export * from "./enquiry.model";
+export * from "./legacy-user-request.model";

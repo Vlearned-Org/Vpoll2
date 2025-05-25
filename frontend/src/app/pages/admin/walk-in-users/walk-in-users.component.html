@@ -1,0 +1,319 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+      <div class="flex justify-content-between align-items-center mb-5">
+        <h5>Walk-in User Account Creation</h5>
+        <div class="flex gap-2">
+          <p-button 
+            label="View Legacy Users" 
+            icon="pi pi-users" 
+            class="p-button-outlined"
+            routerLink="/admin/legacy-users">
+          </p-button>
+          <p-button 
+            label="View Requests" 
+            icon="pi pi-list" 
+            class="p-button-outlined"
+            routerLink="/admin/legacy-user-requests">
+          </p-button>
+        </div>
+      </div>
+
+      <!-- Stats Card -->
+      <div class="grid mb-4" *ngIf="stats">
+        <div class="col-12 md:col-4">
+          <div class="surface-card border-round p-3 border-1 border-surface">
+            <div class="flex justify-content-between align-items-start">
+              <div>
+                <div class="text-900 font-medium text-xl">{{ stats.totalWalkInUsers }}</div>
+                <div class="text-600">Total Walk-in Users</div>
+              </div>
+              <div class="bg-blue-100 border-round inline-flex justify-content-center align-items-center" style="width: 2.5rem; height: 2.5rem">
+                <i class="pi pi-users text-blue-500 text-xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 md:col-4">
+          <div class="surface-card border-round p-3 border-1 border-surface">
+            <div class="flex justify-content-between align-items-start">
+              <div>
+                <div class="text-900 font-medium text-xl">{{ stats.monthlyWalkIns }}</div>
+                <div class="text-600">This Month</div>
+              </div>
+              <div class="bg-green-100 border-round inline-flex justify-content-center align-items-center" style="width: 2.5rem; height: 2.5rem">
+                <i class="pi pi-calendar text-green-500 text-xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 md:col-4">
+          <div class="surface-card border-round p-3 border-1 border-surface">
+            <div class="flex justify-content-between align-items-start">
+              <div>
+                <div class="text-900 font-medium text-xl">{{ new Date().toLocaleDateString() }}</div>
+                <div class="text-600">Today's Date</div>
+              </div>
+              <div class="bg-orange-100 border-round inline-flex justify-content-center align-items-center" style="width: 2.5rem; height: 2.5rem">
+                <i class="pi pi-clock text-orange-500 text-xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Success Message - Account Created -->
+      <div *ngIf="createdUser" class="mb-4">
+        <div class="surface-card border-round p-4 border-1 border-green-200 bg-green-50">
+          <div class="flex align-items-center mb-3">
+            <i class="pi pi-check-circle text-green-500 text-2xl mr-3"></i>
+            <h6 class="text-green-800 m-0">Account Created Successfully!</h6>
+          </div>
+          
+          <div class="grid">
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label class="font-semibold text-green-800">Name:</label>
+                <div class="text-900">{{ createdUser.name }}</div>
+              </div>
+              <div class="field">
+                <label class="font-semibold text-green-800">NRIC:</label>
+                <div class="text-900">{{ createdUser.nric }}</div>
+              </div>
+              <div class="field">
+                <label class="font-semibold text-green-800">Login Username:</label>
+                <div class="text-900">{{ createdUser.nric }}</div>
+              </div>
+            </div>
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label class="font-semibold text-green-800">Email:</label>
+                <div class="text-900">{{ createdUser.email }}</div>
+              </div>
+              <div class="field">
+                <label class="font-semibold text-green-800">Status:</label>
+                <div class="text-900">{{ createdUser.status }}</div>
+              </div>
+              <div class="field">
+                <label class="font-semibold text-green-800">Temporary Password:</label>
+                <div class="flex align-items-center gap-2">
+                  <span class="text-900 font-mono bg-white p-2 border-round border-1 border-300" 
+                        [style."-webkit-text-security"]="showPassword ? 'none' : 'disc'"
+                        [style."-moz-text-security"]="showPassword ? 'none' : 'disc'"
+                        [style."text-security"]="showPassword ? 'none' : 'disc'">
+                    {{ temporaryPassword }}
+                  </span>
+                  <p-button 
+                    [icon]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
+                    class="p-button-sm p-button-text"
+                    (click)="togglePasswordVisibility()"
+                    pTooltip="Toggle password visibility">
+                  </p-button>
+                  <p-button 
+                    icon="pi pi-copy" 
+                    class="p-button-sm p-button-text"
+                    (click)="copyToClipboard(temporaryPassword)"
+                    pTooltip="Copy password">
+                  </p-button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-2 mt-3">
+            <p-button 
+              label="Print Credentials" 
+              icon="pi pi-print" 
+              class="p-button-sm"
+              (click)="printCredentials()">
+            </p-button>
+            <p-button 
+              label="Copy All Info" 
+              icon="pi pi-copy" 
+              class="p-button-sm p-button-outlined"
+              (click)="copyToClipboard('Name: ' + createdUser.name + '\nNRIC: ' + createdUser.nric + '\nUsername: ' + createdUser.nric + '\nPassword: ' + temporaryPassword)">
+            </p-button>
+            <p-button 
+              label="Create Another" 
+              icon="pi pi-plus" 
+              class="p-button-sm p-button-secondary"
+              (click)="resetForm()">
+            </p-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Creation Form -->
+      <div *ngIf="!createdUser" [formGroup]="createForm">
+        <div class="grid">
+          <div class="col-12">
+            <div class="surface-card border-round p-4 border-1 border-blue-200 bg-blue-50 mb-4">
+              <div class="flex align-items-center mb-2">
+                <i class="pi pi-info-circle text-blue-500 text-xl mr-2"></i>
+                <h6 class="text-blue-800 m-0">Walk-in Account Creation</h6>
+              </div>
+              <p class="text-blue-700 m-0 text-sm">
+                Use this form to create accounts for users who visit the office in person. 
+                Ensure you have verified their identity with official documents before proceeding.
+              </p>
+            </div>
+          </div>
+
+          <!-- Basic Information -->
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label for="name" class="block text-900 font-medium mb-2">
+                Full Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                pInputText
+                id="name"
+                formControlName="name"
+                placeholder="Enter full name as on NRIC"
+                class="w-full"
+                (input)="onNameChange($event)"
+              />
+              <small class="p-error block" *ngIf="getFieldError('name')">
+                {{ getFieldError('name') }}
+              </small>
+            </div>
+          </div>
+
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label for="nric" class="block text-900 font-medium mb-2">
+                NRIC <span class="text-red-500">*</span>
+              </label>
+              <input
+                pInputText
+                id="nric"
+                formControlName="nric"
+                placeholder="Enter NRIC number"
+                class="w-full"
+                (input)="onNricChange($event)"
+              />
+              <small class="p-error block" *ngIf="getFieldError('nric')">
+                {{ getFieldError('nric') }}
+              </small>
+              <small class="text-600">This will be used as the login username</small>
+            </div>
+          </div>
+
+          <!-- Visit Information -->
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label for="visitLocation" class="block text-900 font-medium mb-2">
+                Visit Location <span class="text-red-500">*</span>
+              </label>
+              <p-dropdown
+                [options]="locations"
+                formControlName="visitLocation"
+                placeholder="Select location"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full">
+              </p-dropdown>
+              <small class="p-error block" *ngIf="getFieldError('visitLocation')">
+                {{ getFieldError('visitLocation') }}
+              </small>
+            </div>
+          </div>
+
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label for="assistedBy" class="block text-900 font-medium mb-2">
+                Assisted By
+              </label>
+              <input
+                pInputText
+                id="assistedBy"
+                formControlName="assistedBy"
+                placeholder="Name of accompanying person (optional)"
+                class="w-full"
+              />
+              <small class="text-600">Family member, caregiver, or helper</small>
+            </div>
+          </div>
+
+          <!-- Optional Contact Information -->
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label for="email" class="block text-900 font-medium mb-2">
+                Email (Optional)
+              </label>
+              <input
+                pInputText
+                id="email"
+                formControlName="email"
+                placeholder="Enter email if available"
+                class="w-full"
+              />
+              <small class="p-error block" *ngIf="getFieldError('email')">
+                {{ getFieldError('email') }}
+              </small>
+              <small class="text-600">For future communications</small>
+            </div>
+          </div>
+
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label for="mobile" class="block text-900 font-medium mb-2">
+                Mobile (Optional)
+              </label>
+              <input
+                pInputText
+                id="mobile"
+                formControlName="mobile"
+                placeholder="Enter mobile number if available"
+                class="w-full"
+              />
+              <small class="p-error block" *ngIf="getFieldError('mobile')">
+                {{ getFieldError('mobile') }}
+              </small>
+            </div>
+          </div>
+
+          <!-- Admin Notes -->
+          <div class="col-12">
+            <div class="field">
+              <label for="adminNotes" class="block text-900 font-medium mb-2">
+                Admin Notes
+              </label>
+              <textarea
+                pInputTextarea
+                id="adminNotes"
+                formControlName="adminNotes"
+                placeholder="Any special notes or observations about this user..."
+                class="w-full"
+                rows="3">
+              </textarea>
+              <small class="text-600">Internal notes for future reference</small>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="col-12">
+            <div class="flex gap-2 justify-content-end">
+              <p-button 
+                label="Reset Form" 
+                icon="pi pi-refresh" 
+                class="p-button-outlined"
+                (click)="resetForm()"
+                [disabled]="loading">
+              </p-button>
+              <p-button 
+                label="Create Account" 
+                icon="pi pi-user-plus" 
+                (click)="createWalkInUser()"
+                [disabled]="!isFormValid || loading"
+                [loading]="loading">
+              </p-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-toast></p-toast>

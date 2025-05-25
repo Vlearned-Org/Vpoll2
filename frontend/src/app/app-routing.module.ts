@@ -20,6 +20,7 @@ import { UserHomepageComponent } from './pages/user/user-homepage/user-homepage.
 import { ProfileComponent } from './pages/user/profile/profile.component';
 import { LegacyUserRequestComponent } from './pages/public/legacy-user-request/legacy-user-request.component';
 import { LegacyUsersComponent } from './pages/admin/legacy-users/legacy-users.component';
+import { LegacyUserRequestsComponent } from './pages/admin/legacy-user-requests/legacy-user-requests.component';
 import { BlocksComponent } from './sample-components/blocks/blocks.component';
 import { DashboardComponent } from './sample-components/dashboard/dashboard.component';
 import { DocumentationComponent } from './sample-components/documentation/documentation.component';
@@ -97,6 +98,12 @@ import { RoleGuard } from './shared/security/guards/role.guard';
               canActivate: [LoggedInGuard, RoleGuard],
               data: { roles: [RoleEnum.SYSTEM] },
               component: LegacyUsersComponent,
+            },
+            {
+              path: 'legacy-user-requests',
+              canActivate: [LoggedInGuard, RoleGuard],
+              data: { roles: [RoleEnum.SYSTEM] },
+              component: LegacyUserRequestsComponent,
             },
             {
               path: 'company/profile',

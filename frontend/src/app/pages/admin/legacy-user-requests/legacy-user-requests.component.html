@@ -1,0 +1,617 @@
+<div class="surface-0 min-h-screen">
+  <p-toast key="toast"></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+  
+  <!-- Header -->
+  <div class="bg-primary-500 text-white p-4">
+    <div class="flex align-items-center justify-content-between max-w-7xl mx-auto">
+      <div class="flex align-items-center">
+        <button 
+          pButton 
+          pRipple 
+          icon="pi pi-arrow-left" 
+          class="p-button-text p-button-plain mr-3"
+          routerLink="/admin/user-list"
+        ></button>
+        <h2 class="m-0">Legacy User Requests</h2>
+      </div>
+      <button 
+        pButton 
+        pRipple 
+        label="Manage Legacy Users" 
+        icon="pi pi-users"
+        (click)="navigateToLegacyUsers()"
+        class="p-button-secondary"
+      ></button>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto p-4">
+    <!-- Info Card -->
+    <div class="card mb-4 bg-blue-50">
+      <div class="flex align-items-start">
+        <i class="pi pi-info-circle text-blue-500 text-2xl mr-3 mt-1"></i>
+        <div class="flex-1">
+          <h4 class="mt-0 mb-2 text-blue-700">Legacy User Request Management</h4>
+          <p class="text-600 mb-3">
+            Review and process requests from users who need help accessing the system. You can approve requests to automatically create user accounts or reject them with feedback.
+          </p>
+          <div class="flex gap-2">
+            <button 
+              pButton 
+              pRipple 
+              label="Manage Legacy Users" 
+              icon="pi pi-users"
+              routerLink="/admin/legacy-users"
+              class="p-button-outlined p-button-sm"
+            ></button>
+            <a 
+              href="/legacy-user-request" 
+              target="_blank"
+              class="p-button p-button-outlined p-button-sm no-underline"
+            >
+              <i class="pi pi-external-link mr-2"></i>
+              View Request Form
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid mb-4">
+      <div class="col-12 lg:col-2 md:col-4">
+        <div class="card bg-blue-100 border-left-3 border-blue-500">
+          <div class="flex justify-content-between mb-3">
+            <div>
+              <span class="block text-500 font-medium mb-3">Total Requests</span>
+              <div class="text-900 font-medium text-xl">{{ stats.total }}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width:2.5rem;height:2.5rem">
+              <i class="pi pi-inbox text-blue-500 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 lg:col-2 md:col-4">
+        <div class="card bg-orange-100 border-left-3 border-orange-500">
+          <div class="flex justify-content-between mb-3">
+            <div>
+              <span class="block text-500 font-medium mb-3">Pending</span>
+              <div class="text-900 font-medium text-xl">{{ stats.pending }}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-orange-100 border-round" style="width:2.5rem;height:2.5rem">
+              <i class="pi pi-clock text-orange-500 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 lg:col-2 md:col-4">
+        <div class="card bg-cyan-100 border-left-3 border-cyan-500">
+          <div class="flex justify-content-between mb-3">
+            <div>
+              <span class="block text-500 font-medium mb-3">Approved</span>
+              <div class="text-900 font-medium text-xl">{{ stats.approved }}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-cyan-100 border-round" style="width:2.5rem;height:2.5rem">
+              <i class="pi pi-check text-cyan-500 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 lg:col-2 md:col-4">
+        <div class="card bg-green-100 border-left-3 border-green-500">
+          <div class="flex justify-content-between mb-3">
+            <div>
+              <span class="block text-500 font-medium mb-3">Processed</span>
+              <div class="text-900 font-medium text-xl">{{ stats.processed }}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width:2.5rem;height:2.5rem">
+              <i class="pi pi-check-circle text-green-500 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 lg:col-2 md:col-4">
+        <div class="card bg-red-100 border-left-3 border-red-500">
+          <div class="flex justify-content-between mb-3">
+            <div>
+              <span class="block text-500 font-medium mb-3">Rejected</span>
+              <div class="text-900 font-medium text-xl">{{ stats.rejected }}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width:2.5rem;height:2.5rem">
+              <i class="pi pi-times text-red-500 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter and Actions -->
+    <div class="card mb-4">
+      <div class="flex align-items-center justify-content-between">
+        <div class="flex align-items-center gap-3">
+          <label for="statusFilter" class="font-medium">Filter by Status:</label>
+          <p-dropdown 
+            id="statusFilter"
+            [options]="statusOptions" 
+            [(ngModel)]="statusFilter"
+            (onChange)="onStatusFilterChange()"
+            optionLabel="label" 
+            optionValue="value"
+            [style]="{'min-width': '200px'}"
+          ></p-dropdown>
+        </div>
+        <div class="flex align-items-center gap-2">
+          <span class="text-600">{{ filteredRequests.length }} requests</span>
+          <button 
+            pButton 
+            pRipple 
+            icon="pi pi-refresh" 
+            class="p-button-outlined"
+            (click)="loadRequests(); loadStats()"
+            [loading]="loading"
+            pTooltip="Refresh"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Requests Table -->
+    <div class="card">
+      <p-table 
+        [value]="filteredRequests" 
+        [loading]="loading"
+        responsiveLayout="scroll"
+        [paginator]="true" 
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} requests"
+        [sortField]="'createdAt'"
+        [sortOrder]="-1"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="name">
+              Name <p-sortIcon field="name"></p-sortIcon>
+            </th>
+            <th pSortableColumn="requestType">
+              Request Type <p-sortIcon field="requestType"></p-sortIcon>
+            </th>
+            <th>Contact Method</th>
+            <th pSortableColumn="status">
+              Status <p-sortIcon field="status"></p-sortIcon>
+            </th>
+            <th pSortableColumn="createdAt">
+              Submitted <p-sortIcon field="createdAt"></p-sortIcon>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-request>
+          <tr>
+            <td>
+              <div class="flex flex-column">
+                <div class="font-medium">{{ request.name }}</div>
+                <div class="text-sm text-600">{{ request.nric }}</div>
+                <div class="text-xs text-500" *ngIf="request.eventName">
+                  Event: {{ request.eventName }}
+                </div>
+              </div>
+            </td>
+            <td>
+              <p-tag 
+                [value]="requestTypeLabels[request.requestType]" 
+                severity="info"
+                class="text-xs"
+              ></p-tag>
+            </td>
+            <td>
+              <div class="flex flex-column text-sm">
+                <div class="flex align-items-center mb-1">
+                  <i class="pi pi-flag mr-1 text-600"></i>
+                  <span class="font-medium">{{ contactMethodLabels[request.preferredContactMethod] }}</span>
+                </div>
+                <div *ngIf="request.contactPersonName" class="text-600">
+                  <i class="pi pi-user mr-1"></i>{{ request.contactPersonName }}
+                  <span *ngIf="request.contactPersonRelation"> ({{ request.contactPersonRelation }})</span>
+                </div>
+                <div *ngIf="request.contactPersonEmail" class="text-600">
+                  <i class="pi pi-envelope mr-1"></i>{{ request.contactPersonEmail }}
+                </div>
+                <div *ngIf="request.contactPersonPhone" class="text-600">
+                  <i class="pi pi-phone mr-1"></i>{{ request.contactPersonPhone }}
+                </div>
+              </div>
+            </td>
+            <td>
+              <p-tag 
+                [value]="request.status.toUpperCase()" 
+                [severity]="getStatusSeverity(request.status)"
+                [icon]="getStatusIcon(request.status)"
+              ></p-tag>
+            </td>
+            <td>
+              <div class="text-sm">{{ formatDate(request.createdAt) }}</div>
+              <div class="text-xs text-600" *ngIf="request.processedAt">
+                Processed: {{ formatDate(request.processedAt) }}
+              </div>
+            </td>
+            <td>
+              <div class="flex gap-1">
+                <button 
+                  pButton 
+                  pRipple 
+                  icon="pi pi-eye" 
+                  class="p-button-text p-button-sm"
+                  pTooltip="View Details"
+                  (click)="viewRequestDetail(request)"
+                ></button>
+                <button 
+                  *ngIf="request.status === 'pending'"
+                  pButton 
+                  pRipple 
+                  icon="pi pi-check" 
+                  class="p-button-text p-button-sm p-button-success"
+                  pTooltip="Approve"
+                  (click)="openApprovalDialog(request)"
+                ></button>
+                <button 
+                  *ngIf="request.status === 'pending'"
+                  pButton 
+                  pRipple 
+                  icon="pi pi-times" 
+                  class="p-button-text p-button-sm p-button-danger"
+                  pTooltip="Reject"
+                  (click)="openRejectionDialog(request)"
+                ></button>
+                <button 
+                  pButton 
+                  pRipple 
+                  icon="pi pi-trash" 
+                  class="p-button-text p-button-sm p-button-danger"
+                  pTooltip="Delete"
+                  (click)="deleteRequest(request)"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="text-center py-4">
+              <div class="flex flex-column align-items-center">
+                <i class="pi pi-inbox text-4xl text-400 mb-3"></i>
+                <span class="text-600">No legacy user requests found</span>
+                <p class="text-500 mt-2">Requests submitted through the legacy user form will appear here</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- Request Detail Dialog -->
+  <p-dialog 
+    [(visible)]="showRequestDetail" 
+    header="Request Details" 
+    [modal]="true" 
+    [style]="{width: '800px'}"
+    [closable]="true"
+    (onHide)="closeRequestDetail()"
+  >
+    <div *ngIf="selectedRequest" class="grid">
+      <!-- Basic Information -->
+      <div class="col-12">
+        <h4 class="text-primary mb-3">Basic Information</h4>
+      </div>
+      <div class="col-12 md:col-6">
+        <label class="font-medium text-600">Name:</label>
+        <p class="mt-1">{{ selectedRequest.name }}</p>
+      </div>
+      <div class="col-12 md:col-6">
+        <label class="font-medium text-600">NRIC:</label>
+        <p class="mt-1">{{ selectedRequest.nric }}</p>
+      </div>
+      <div class="col-12 md:col-6">
+        <label class="font-medium text-600">Request Type:</label>
+        <p class="mt-1">{{ requestTypeLabels[selectedRequest.requestType] }}</p>
+      </div>
+      <div class="col-12 md:col-6" *ngIf="selectedRequest.eventName">
+        <label class="font-medium text-600">Event Name:</label>
+        <p class="mt-1">{{ selectedRequest.eventName }}</p>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="col-12">
+        <h4 class="text-primary mb-3 mt-3">Contact Information</h4>
+      </div>
+      <div class="col-12 md:col-6">
+        <label class="font-medium text-600">Preferred Contact Method:</label>
+        <p class="mt-1">{{ contactMethodLabels[selectedRequest.preferredContactMethod] }}</p>
+      </div>
+      <div class="col-12 md:col-6" *ngIf="selectedRequest.contactPersonName">
+        <label class="font-medium text-600">Contact Person:</label>
+        <p class="mt-1">{{ selectedRequest.contactPersonName }}
+          <span *ngIf="selectedRequest.contactPersonRelation"> ({{ selectedRequest.contactPersonRelation }})</span>
+        </p>
+      </div>
+      <div class="col-12 md:col-6" *ngIf="selectedRequest.contactPersonEmail">
+        <label class="font-medium text-600">Contact Email:</label>
+        <p class="mt-1">{{ selectedRequest.contactPersonEmail }}</p>
+      </div>
+      <div class="col-12 md:col-6" *ngIf="selectedRequest.contactPersonPhone">
+        <label class="font-medium text-600">Contact Phone:</label>
+        <p class="mt-1">{{ selectedRequest.contactPersonPhone }}</p>
+      </div>
+      <div class="col-12" *ngIf="selectedRequest.physicalAddress">
+        <label class="font-medium text-600">Physical Address:</label>
+        <p class="mt-1">{{ selectedRequest.physicalAddress }}</p>
+      </div>
+
+      <!-- Message -->
+      <div class="col-12">
+        <h4 class="text-primary mb-3 mt-3">Request Message</h4>
+        <div class="bg-gray-100 p-3 border-round">
+          <p class="m-0 white-space-pre-line">{{ selectedRequest.message }}</p>
+        </div>
+      </div>
+
+      <!-- Status Information -->
+      <div class="col-12">
+        <h4 class="text-primary mb-3 mt-3">Status Information</h4>
+      </div>
+      <div class="col-12 md:col-6">
+        <label class="font-medium text-600">Current Status:</label>
+        <p class="mt-1">
+          <p-tag 
+            [value]="selectedRequest.status.toUpperCase()" 
+            [severity]="getStatusSeverity(selectedRequest.status)"
+            [icon]="getStatusIcon(selectedRequest.status)"
+          ></p-tag>
+        </p>
+      </div>
+      <div class="col-12 md:col-6">
+        <label class="font-medium text-600">Submitted:</label>
+        <p class="mt-1">{{ formatDate(selectedRequest.createdAt) }}</p>
+      </div>
+      <div class="col-12 md:col-6" *ngIf="selectedRequest.processedAt">
+        <label class="font-medium text-600">Processed:</label>
+        <p class="mt-1">{{ formatDate(selectedRequest.processedAt) }}</p>
+      </div>
+      <div class="col-12" *ngIf="selectedRequest.rejectionReason">
+        <label class="font-medium text-600">Rejection Reason:</label>
+        <p class="mt-1 text-red-600">{{ selectedRequest.rejectionReason }}</p>
+      </div>
+
+      <!-- Admin Notes -->
+      <div class="col-12">
+        <h4 class="text-primary mb-3 mt-3">Admin Notes</h4>
+        <form [formGroup]="notesForm">
+          <textarea 
+            pInputTextarea 
+            formControlName="adminNotes"
+            placeholder="Add admin notes..."
+            class="w-full mb-3"
+            rows="3"
+          ></textarea>
+          <button 
+            pButton 
+            pRipple 
+            label="Update Notes" 
+            icon="pi pi-check"
+            class="p-button-sm"
+            (click)="updateAdminNotes()"
+          ></button>
+        </form>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="flex gap-2 justify-content-end">
+        <button 
+          *ngIf="selectedRequest?.status === 'pending'"
+          pButton 
+          pRipple 
+          label="Approve" 
+          icon="pi pi-check"
+          class="p-button-success"
+          (click)="openApprovalDialog(selectedRequest)"
+        ></button>
+        <button 
+          *ngIf="selectedRequest?.status === 'pending'"
+          pButton 
+          pRipple 
+          label="Reject" 
+          icon="pi pi-times"
+          class="p-button-danger"
+          (click)="openRejectionDialog(selectedRequest)"
+        ></button>
+        <button 
+          pButton 
+          pRipple 
+          label="Close" 
+          icon="pi pi-times"
+          class="p-button-outlined"
+          (click)="closeRequestDetail()"
+        ></button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Approval Dialog -->
+  <p-dialog 
+    [(visible)]="showApprovalDialog" 
+    header="Approve Request" 
+    [modal]="true" 
+    [style]="{width: '600px'}"
+    [closable]="true"
+  >
+    <div *ngIf="selectedRequest">
+      <p class="mb-4">
+        Approve the legacy user request from <strong>{{ selectedRequest.name }}</strong> ({{ selectedRequest.nric }})?
+      </p>
+
+      <form [formGroup]="approvalForm" class="grid">
+        <div class="col-12">
+          <p-checkbox 
+            formControlName="createUser" 
+            binary="true" 
+            label="Create user account immediately"
+            class="mb-3"
+          ></p-checkbox>
+        </div>
+
+        <div *ngIf="approvalForm.get('createUser')?.value" class="col-12">
+          <h5 class="text-600 mb-3">User Account Details</h5>
+          
+          <div class="grid">
+            <div class="col-12 md:col-6">
+              <label for="email" class="block font-medium mb-2">Email Address</label>
+              <input 
+                pInputText 
+                id="email" 
+                formControlName="email" 
+                placeholder="Enter email (optional)"
+                class="w-full"
+              />
+            </div>
+            <div class="col-12 md:col-6">
+              <label for="mobile" class="block font-medium mb-2">Mobile Number</label>
+              <input 
+                pInputText 
+                id="mobile" 
+                formControlName="mobile" 
+                placeholder="Enter mobile (optional)"
+                class="w-full"
+              />
+            </div>
+            <div class="col-12">
+              <p-checkbox 
+                formControlName="generatePassword" 
+                binary="true" 
+                label="Generate random password"
+                class="mb-3"
+              ></p-checkbox>
+            </div>
+            <div *ngIf="!approvalForm.get('generatePassword')?.value" class="col-12">
+              <label for="customPassword" class="block font-medium mb-2">Custom Password</label>
+              <input 
+                pInputText 
+                id="customPassword" 
+                formControlName="customPassword" 
+                placeholder="Enter custom password"
+                class="w-full"
+                type="password"
+              />
+              <small class="p-error block mt-1" *ngIf="getFieldError('customPassword', approvalForm)">
+                {{ getFieldError('customPassword', approvalForm) }}
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <label for="adminNotes" class="block font-medium mb-2">Admin Notes</label>
+          <textarea 
+            pInputTextarea 
+            id="adminNotes" 
+            formControlName="adminNotes"
+            placeholder="Add any notes about this approval..."
+            class="w-full"
+            rows="3"
+          ></textarea>
+        </div>
+      </form>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button 
+        pButton 
+        pRipple 
+        label="Cancel" 
+        icon="pi pi-times"
+        class="p-button-outlined"
+        (click)="showApprovalDialog = false"
+      ></button>
+      <button 
+        pButton 
+        pRipple 
+        label="Approve Request" 
+        icon="pi pi-check"
+        class="p-button-success"
+        (click)="approveRequest()"
+        [disabled]="!approvalForm.valid"
+      ></button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Rejection Dialog -->
+  <p-dialog 
+    [(visible)]="showRejectionDialog" 
+    header="Reject Request" 
+    [modal]="true" 
+    [style]="{width: '500px'}"
+    [closable]="true"
+  >
+    <div *ngIf="selectedRequest">
+      <p class="mb-4">
+        Reject the legacy user request from <strong>{{ selectedRequest.name }}</strong> ({{ selectedRequest.nric }})?
+      </p>
+
+      <form [formGroup]="rejectionForm">
+        <div class="field">
+          <label for="rejectionReason" class="block font-medium mb-2">
+            Rejection Reason <span class="text-red-500">*</span>
+          </label>
+          <textarea 
+            pInputTextarea 
+            id="rejectionReason" 
+            formControlName="rejectionReason"
+            placeholder="Please explain why this request is being rejected..."
+            class="w-full"
+            rows="4"
+          ></textarea>
+          <small class="p-error block mt-1" *ngIf="getFieldError('rejectionReason')">
+            {{ getFieldError('rejectionReason') }}
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="adminNotes" class="block font-medium mb-2">Admin Notes</label>
+          <textarea 
+            pInputTextarea 
+            id="adminNotes" 
+            formControlName="adminNotes"
+            placeholder="Add any internal notes..."
+            class="w-full"
+            rows="2"
+          ></textarea>
+        </div>
+      </form>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button 
+        pButton 
+        pRipple 
+        label="Cancel" 
+        icon="pi pi-times"
+        class="p-button-outlined"
+        (click)="showRejectionDialog = false"
+      ></button>
+      <button 
+        pButton 
+        pRipple 
+        label="Reject Request" 
+        icon="pi pi-times"
+        class="p-button-danger"
+        (click)="rejectRequest()"
+        [disabled]="!rejectionForm.valid"
+      ></button>
+    </ng-template>
+  </p-dialog>
+</div>

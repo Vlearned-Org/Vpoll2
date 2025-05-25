@@ -77,11 +77,50 @@ export class UserHttpService {
   public updateLegacyUser(userId: string, userData: Partial<CreateLegacyUserDto>): Observable<User> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
     });
-    
-    return this.http.patch<User>(`${environment.API_URL}/admin/legacy-users/${userId}`, userData, { headers });
+
+    return this.http.put<User>(`${environment.API_URL}/users/${userId}`, userData, { headers });
+  }
+
+  public createWalkInUser(userData: {
+    name: string;
+    nric: string;
+    visitLocation: string;
+    assistedBy?: string;
+    adminNotes?: string;
+    email?: string;
+    mobile?: string;
+  }): Observable<{ user: User; temporaryPassword: string; message: string }> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.post<{ user: User; temporaryPassword: string; message: string }>(
+      `${environment.API_URL}/users/walk-in/create`, 
+      userData, 
+      { headers }
+    );
+  }
+
+  public getWalkInStats(): Observable<{
+    totalWalkInUsers: number;
+    monthlyWalkIns: number;
+    recentWalkIns: User[];
+  }> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<{
+      totalWalkInUsers: number;
+      monthlyWalkIns: number;
+      recentWalkIns: User[];
+    }>(`${environment.API_URL}/users/walk-in/stats`, { headers });
   }
 
   public resetUserPassword(userId: string): Observable<PasswordResetResponse> {

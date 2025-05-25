@@ -16,6 +16,22 @@
       border-color: #ef4444;
       box-shadow: 0 0 0 1px #ef4444;
     }
+    
+    &[type="date"] {
+      font-family: inherit;
+      cursor: pointer;
+      
+      &::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        border-radius: 4px;
+        margin-right: 2px;
+        opacity: 0.6;
+        
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
   }
 
   .p-dropdown {
@@ -207,6 +223,56 @@
   border-left: 4px solid #f59e0b;
 }
 
+.in-person-visit-info {
+  background: #f0f9ff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  border-left: 4px solid #0ea5e9;
+  
+  h5 {
+    color: #0369a1;
+    margin-bottom: 1rem;
+  }
+  
+  .visit-requirements {
+    background: #e0f2fe;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-top: 1rem;
+    border: 1px solid #b3e5fc;
+    
+    ul {
+      margin: 0.5rem 0 0 0;
+      padding-left: 1.5rem;
+      
+      li {
+        margin-bottom: 0.5rem;
+        color: #0f172a;
+      }
+    }
+  }
+}
+
+.walk-in-section {
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  
+  .walk-in-icon {
+    color: #059669;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  h5 {
+    color: #065f46;
+    font-weight: 600;
+  }
+}
+
 .alternative-actions {
   border-top: 1px solid #e5e7eb;
   padding-top: 1.5rem;
@@ -236,6 +302,37 @@
   color: var(--text-color-secondary);
   margin-top: 0.25rem;
   line-height: 1.4;
+}
+
+.visit-info-highlight {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+  
+  .info-icon {
+    color: #2563eb;
+    margin-right: 0.5rem;
+  }
+  
+  strong {
+    color: #1d4ed8;
+  }
+}
+
+.date-input-wrapper {
+  position: relative;
+  
+  .date-helper {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-color-secondary);
+    font-size: 0.875rem;
+    pointer-events: none;
+  }
 }
 
 .error-message {

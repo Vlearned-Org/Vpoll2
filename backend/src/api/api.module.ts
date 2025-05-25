@@ -17,6 +17,7 @@ import { StorageController } from "./controllers/storage.controller";
 import { EnquiriesController } from "./controllers/system/enquiry.controller";
 import { CompaniesController } from "./controllers/system/company.controller";
 import { UsersController, LegacyUsersController } from "./controllers/system/user.controller";
+import { LegacyUserRequestController } from "./controllers/system/legacy-user-request.controller";
 import { TestController } from "./controllers/test.controller";
 import { WebsocketEventGateway } from "./websocket.gateway";
 
@@ -27,6 +28,7 @@ import { WebsocketEventGateway } from "./websocket.gateway";
     CompaniesController,
     UsersController,
     LegacyUsersController,
+    LegacyUserRequestController,
     AdminAuthController,
     UserAuthController,
     EventController,

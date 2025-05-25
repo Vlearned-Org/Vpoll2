@@ -64,6 +64,7 @@ import { UserHomepageComponent } from './pages/user/user-homepage/user-homepage.
 import { ProfileComponent } from './pages/user/profile/profile.component';
 import { LegacyUserRequestComponent } from './pages/public/legacy-user-request/legacy-user-request.component';
 import { LegacyUsersComponent } from './pages/admin/legacy-users/legacy-users.component';
+import { LegacyUserRequestsComponent } from './pages/admin/legacy-user-requests/legacy-user-requests.component';
 import { AppCodeModule } from './sample-components/app-code/app.code.component';
 import { BlocksComponent } from './sample-components/blocks/blocks.component';
 import { BlockViewer } from './sample-components/blockviewer/blockviewer.component';
@@ -169,6 +170,7 @@ const MODALS = [
     ProfileComponent,
     LegacyUserRequestComponent,
     LegacyUsersComponent,
+    LegacyUserRequestsComponent,
     ProxyVotingComponent,
     ForgetPasswordComponent,
     SignupComponent,

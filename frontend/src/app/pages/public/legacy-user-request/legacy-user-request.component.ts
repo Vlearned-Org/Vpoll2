@@ -12,10 +12,14 @@ export interface LegacyUserRequestDto {
   contactPersonEmail?: string;
   contactPersonRelation?: string;
   physicalAddress?: string;
-  preferredContactMethod: 'phone' | 'email' | 'postal';
-  requestType: 'new_account' | 'password_reset' | 'access_help' | 'other';
+  preferredContactMethod: 'phone' | 'email' | 'postal' | 'in_person';
+  requestType: 'new_account' | 'password_reset' | 'access_help' | 'walk_in_account' | 'other';
   message: string;
   eventName?: string;
+  visitLocation?: string;
+  visitDate?: string;
+  assistedBy?: string;
+  isWalkIn?: boolean;
 }
 
 @Component({
@@ -32,13 +36,15 @@ export class LegacyUserRequestComponent implements OnInit {
     { label: 'Create New Account', value: 'new_account' },
     { label: 'Reset Password', value: 'password_reset' },
     { label: 'Access Help', value: 'access_help' },
+    { label: 'Walk-in Account Creation', value: 'walk_in_account' },
     { label: 'Other', value: 'other' }
   ];
 
   public contactMethods = [
     { label: 'Phone (through contact person) - Admin will call', value: 'phone' },
     { label: 'Email (through contact person) - For OTP and notifications', value: 'email' },
-    { label: 'Postal Mail', value: 'postal' }
+    { label: 'Postal Mail', value: 'postal' },
+    { label: 'In-Person Visit - I will visit the office', value: 'in_person' }
   ];
 
   constructor(
@@ -64,7 +70,11 @@ export class LegacyUserRequestComponent implements OnInit {
       preferredContactMethod: ['email', Validators.required],
       requestType: ['new_account', Validators.required],
       message: ['', [Validators.required, Validators.minLength(10)]],
-      eventName: ['']
+      eventName: [''],
+      visitLocation: [''],
+      visitDate: [''],
+      assistedBy: [''],
+      isWalkIn: [false]
     });
 
     this.requestForm.get('preferredContactMethod').valueChanges.subscribe(method => {
@@ -77,11 +87,15 @@ export class LegacyUserRequestComponent implements OnInit {
     const contactPersonPhoneControl = this.requestForm.get('contactPersonPhone');
     const contactPersonEmailControl = this.requestForm.get('contactPersonEmail');
     const physicalAddressControl = this.requestForm.get('physicalAddress');
+    const visitLocationControl = this.requestForm.get('visitLocation');
+    const visitDateControl = this.requestForm.get('visitDate');
 
     contactPersonNameControl.clearValidators();
     contactPersonPhoneControl.clearValidators();
     contactPersonEmailControl.clearValidators();
     physicalAddressControl.clearValidators();
+    visitLocationControl.clearValidators();
+    visitDateControl.clearValidators();
 
     contactPersonPhoneControl.setValidators([Validators.pattern(/^\+?[0-9]{8,15}$/)]);
     contactPersonEmailControl.setValidators([Validators.email]);
@@ -108,12 +122,19 @@ export class LegacyUserRequestComponent implements OnInit {
       case 'postal':
         physicalAddressControl.setValidators([Validators.required]);
         break;
+      case 'in_person':
+        visitLocationControl.setValidators([Validators.required]);
+        visitDateControl.setValidators([Validators.required]);
+        this.requestForm.get('isWalkIn').setValue(true);
+        break;
     }
 
     contactPersonNameControl.updateValueAndValidity();
     contactPersonPhoneControl.updateValueAndValidity();
     contactPersonEmailControl.updateValueAndValidity();
     physicalAddressControl.updateValueAndValidity();
+    visitLocationControl.updateValueAndValidity();
+    visitDateControl.updateValueAndValidity();
   }
 
   public onNricChange(event: any): void {
@@ -213,7 +234,10 @@ export class LegacyUserRequestComponent implements OnInit {
       preferredContactMethod: 'Preferred Contact Method',
       requestType: 'Request Type',
       message: 'Message',
-      eventName: 'Event Name'
+      eventName: 'Event Name',
+      visitLocation: 'Visit Location',
+      visitDate: 'Visit Date',
+      assistedBy: 'Assisted By'
     };
     return labels[fieldName] || fieldName;
   }
@@ -227,7 +251,17 @@ export class LegacyUserRequestComponent implements OnInit {
     return this.requestForm.get('preferredContactMethod')?.value === 'postal';
   }
 
+  public get showInPersonFields(): boolean {
+    return this.requestForm.get('preferredContactMethod')?.value === 'in_person';
+  }
+
   public get isFormValid(): boolean {
     return this.requestForm.valid;
+  }
+
+  public getTomorrowDate(): string {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
   }
 }

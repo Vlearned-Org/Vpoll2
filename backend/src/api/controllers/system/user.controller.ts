@@ -146,6 +146,70 @@ export class LegacyUsersController {
     return this.userRepo.unmarkLegacyUser(id);
   }
 
+  @Post("walk-in/create")
+  @Bind(ApiContext(), Body())
+  public async createWalkInUser(context: Context, payload: {
+    name: string;
+    nric: string;
+    visitLocation: string;
+    assistedBy?: string;
+    adminNotes?: string;
+    email?: string;
+    mobile?: string;
+  }) {
+    const password = this.generateRandomPassword();
+    const hashedPassword = await PasswordUtils.hash(password, true);
+    
+    const userData = {
+      name: payload.name,
+      nric: payload.nric,
+      password: hashedPassword,
+      email: payload.email || `${payload.nric.toLowerCase()}@walkin.local`,
+      mobile: payload.mobile || '',
+      isAdmin: false,
+      status: UserStatusEnum.ACTIVE,
+      accountVerificationStatus: AccountVerificationStatusEnum.APPROVED,
+      isLegacyUser: true,
+      requiresAssistedAccess: true,
+      specialInstructions: `Walk-in account created at ${payload.visitLocation}. ${payload.assistedBy ? `Assisted by: ${payload.assistedBy}. ` : ''}Created by admin: ${context.name}. ${payload.adminNotes || ''}`,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const createdUser = await this.userRepo.createLegacyUser(userData);
+    
+    return { 
+      user: createdUser, 
+      temporaryPassword: password,
+      message: "Walk-in account created successfully"
+    };
+  }
+
+  @Get("walk-in/stats")
+  @Bind(ApiContext())
+  public async getWalkInStats(context: Context) {
+    const walkInUsers = await this.userRepo.find({
+      isLegacyUser: true,
+      requiresAssistedAccess: true,
+      specialInstructions: { $regex: /Walk-in account created/ }
+    });
+
+    const today = new Date();
+    const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    const monthlyWalkIns = walkInUsers.filter(user => 
+      user.createdAt >= thisMonth
+    );
+
+    return {
+      totalWalkInUsers: walkInUsers.length,
+      monthlyWalkIns: monthlyWalkIns.length,
+      recentWalkIns: walkInUsers
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 10)
+    };
+  }
+
   private generateRandomPassword(): string {
     const length = 12;
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";

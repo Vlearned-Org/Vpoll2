@@ -15,14 +15,24 @@
         ></button>
         <h2 class="m-0">Legacy Users Management</h2>
       </div>
-      <button 
-        pButton 
-        pRipple 
-        label="Create Legacy User" 
-        icon="pi pi-plus"
-        (click)="showCreateForm = true"
-        class="p-button-secondary"
-      ></button>
+      <div class="flex gap-2">
+        <button 
+          pButton 
+          pRipple 
+          label="View Requests" 
+          icon="pi pi-inbox"
+          routerLink="/admin/legacy-user-requests"
+          class="p-button-outlined"
+        ></button>
+        <button 
+          pButton 
+          pRipple 
+          label="Create Legacy User" 
+          icon="pi pi-plus"
+          (click)="showCreateForm = true"
+          class="p-button-secondary"
+        ></button>
+      </div>
     </div>
   </div>
 
