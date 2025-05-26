@@ -12,13 +12,13 @@ export class EnquiryManager {
   constructor(private enquiryRepo: EnquiryRepository,private notif: VpollNotifications) {
         // Create a transporter object using the default SMTP transport
         this.transporter = nodemailer.createTransport({
-          host:"mail.vlearned.com",
+          host:"smtp.gmail.com",
           port: 465,  // Use 587 for STARTTLS or 465 for SSL
           secure: true, // True if port 465 is used
           auth: {
             // type: 'login',
-            user: "support@vlearned.com",
-            pass: "[N20g(ERHFy,"
+            user: "vpollsupport@aismartuallearning.com",
+            pass: "vpgr betd twcc vvwz"
           },
            tls: {
              rejectUnauthorized: true
@@ -32,7 +32,7 @@ export class EnquiryManager {
     
     try {
       const info = await this.transporter.sendMail({
-        from: "support@vlearned.com",
+        from: "vpollsupport@aismartuallearning.com",
         to,
         subject,
         text,

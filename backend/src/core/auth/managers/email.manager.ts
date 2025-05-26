@@ -12,12 +12,12 @@ export class EmailService {
   constructor() {
     // Configuration from mail.js, ideally from config service
     this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "mail.vlearned.com",
+      host: process.env.SMTP_HOST || "smtp.gmail.com",
       port: parseInt(process.env.SMTP_PORT || "465"),
       secure: process.env.SMTP_SECURE || true, // true for 465, false for other ports
       auth: {
-        user: process.env.SMTP_USER || "support@vlearned.com",
-        pass: process.env.SMTP_PASS || "[N20g(ERHFy,"
+        user: process.env.SMTP_USER || "vpollsupport@aismartuallearning.com",
+        pass: process.env.SMTP_PASS || "vpgr betd twcc vvwz"
       },
       tls: {
         rejectUnauthorized: true
@@ -41,7 +41,7 @@ export class EmailService {
     this.otps.set(email, { otp, expires: expiryTime });
 
     const mailOptions = {
-      from: process.env.SMTP_FROM || "support@vlearned.com",
+      from: process.env.SMTP_FROM || "vpollsupport@aismartuallearning.com",
       to: email,
       subject: 'Vpoll Email Verification Code',
       text: `Your Vpoll verification code is: ${otp}. This code will expire in 10 minutes.`,

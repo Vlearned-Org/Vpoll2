@@ -4,13 +4,13 @@ import { Channel } from "./abstract.channel";
 const nodemailer = require("nodemailer");
 
 const transportData ={
-  host:"mail.vlearned.com", //"mail.vpoll.com.my",
+  host:"smtp.gmail.com", //"smtp.gmail.com",
   port: 465,
   secure: true, // true for 465, false for other ports
   auth: {
     // type: 'login',
-    user: "support@vlearned.com",
-    pass: "[N20g(ERHFy,"
+    user: "vpollsupport@aismartuallearning.com",
+    pass: "vpgr betd twcc vvwz"
   },
    tls: {
      rejectUnauthorized: true
@@ -24,7 +24,7 @@ const transporter = nodemailer.createTransport(transportData);
 export class EmailChannel extends Channel {
   public async send(notification: NotificationsFields): Promise<void> {
     const data = {
-      from: `support@vlearned.com`,
+      from: `vpollsupport@aismartuallearning.com`,
       to: [notification.recipient.email],
       subject: notification.subject,
       html: notification.content

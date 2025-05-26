@@ -5,7 +5,7 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   exit 1
 fi
 
-domains=(vpoll.com.my www.vpoll.com.my zoom.vpoll.com.my mail.vpoll.com.my)
+domains=(vpoll.com.my www.vpoll.com.my zoom.vpoll.com.my smtp.gmail.com)
 rsa_key_size=4096
 data_path="./certbot"
 email="davidcheng@aismartuallearning.com" # Adding a valid address is strongly recommended

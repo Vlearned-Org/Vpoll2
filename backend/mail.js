@@ -1,13 +1,13 @@
 const nodemailer = require("nodemailer")
 
 const transporter =  nodemailer.createTransport({
-    host:"mail.vpoll.com.my",
-    port: 587,
-    secure: false, // true for 465, false for other ports
+    host:"smtp.gmail.com",
+    port: 465,
+    secure: true, // true for 465, false for other ports
     auth: {
       // type: 'login',
-      user: "mailer@vpoll.com.my",
-      pass: "seUzcPEqokf8bt9"
+      user: "vpollsupport@aismartuallearning.com",
+      pass: "vpgr betd twcc vvwz"
     },
      tls: {
        rejectUnauthorized: false
@@ -17,8 +17,8 @@ const transporter =  nodemailer.createTransport({
   });
 
 transporter.sendMail({
-    from: "mailer@vpoll.com.my",
-    to: "low@getnada.com",
+    from: "vpollsupport@aismartuallearning.com",
+    to: "anzobnjmn@gmail.com",
     subject: "Test email",
     text: "Hello World"
 })
