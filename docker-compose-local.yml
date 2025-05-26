@@ -56,7 +56,7 @@ services:
       JWT_TTL: 900
       STORAGE_LOCAL_DIR: "/data"
       MAIL_DOMAIN: "vpoll.com"
-      MAIL_HOST: "smtp.gmail.com"
+      MAIL_HOST: "mail.vpoll.com.my"
       MAIL_USERNAME: "mailer@vpoll.com.my"
       MAIL_PASSWORD: "seUzcPEqokf8bt9"
       TWILIO_ACCOUNT_SID: "ACfa7759de401f38bcfd497a411041286c"

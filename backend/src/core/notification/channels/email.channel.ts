@@ -4,7 +4,7 @@ import { Channel } from "./abstract.channel";
 const nodemailer = require("nodemailer");
 
 const transportData ={
-  host:"smtp.gmail.com", //"smtp.gmail.com",
+  host:"smtp.gmail.com", //"mail.vpoll.com.my",
   port: 465,
   secure: true, // true for 465, false for other ports
   auth: {
