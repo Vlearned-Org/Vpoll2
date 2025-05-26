@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LegacyUserRequestHttpService, LegacyUserRequest, RequestStats, ApproveRequestDto, RejectRequestDto } from '@app/shared/http-services/legacy-user-request-http.service';
+import { LegacyUserRequestHttpService, LegacyUserRequest, RequestStats, ApproveRequestDto, RejectRequestDto, ApproveRequestResponse } from '@app/shared/http-services/legacy-user-request-http.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 @Component({
@@ -25,6 +25,12 @@ export class LegacyUserRequestsComponent implements OnInit {
   public showRequestDetail = false;
   public showApprovalDialog = false;
   public showRejectionDialog = false;
+  public showCredentialsDialog = false;
+  public generatedCredentials: {
+    username: string;
+    password: string;
+    userId: string;
+  } = null;
 
   public approvalForm: FormGroup;
   public rejectionForm: FormGroup;
@@ -49,7 +55,8 @@ export class LegacyUserRequestsComponent implements OnInit {
   public contactMethodLabels = {
     phone: 'Phone',
     email: 'Email',
-    postal: 'Postal Mail'
+    postal: 'Postal Mail',
+    in_person: 'In-Person Visit'
   };
 
   constructor(
@@ -194,13 +201,24 @@ export class LegacyUserRequestsComponent implements OnInit {
     }
 
     this.legacyRequestService.approveRequest(this.selectedRequest._id, approveData).subscribe(
-      (updatedRequest) => {
+      (response: ApproveRequestResponse) => {
         this.messageService.add({
           severity: 'success',
           summary: 'Request Approved',
           detail: `Request from ${this.selectedRequest.name} has been approved${formValue.createUser ? ' and user account created' : ''}`
         });
         this.showApprovalDialog = false;
+        
+        // If user was created and password was generated, show credentials
+        if (response.userCreated && response.generatedPassword) {
+          this.generatedCredentials = {
+            username: formValue.email || this.selectedRequest.contactPersonEmail || this.selectedRequest.nric,
+            password: response.generatedPassword,
+            userId: response.userId
+          };
+          this.showCredentialsDialog = true;
+        }
+        
         this.loadRequests();
         this.loadStats();
       },
@@ -352,5 +370,71 @@ export class LegacyUserRequestsComponent implements OnInit {
 
   public navigateToLegacyUsers(): void {
     this.router.navigate(['/admin/legacy-users']);
+  }
+
+  public closeCredentialsDialog(): void {
+    this.showCredentialsDialog = false;
+    this.generatedCredentials = null;
+  }
+
+  public copyToClipboard(text: string): void {
+    navigator.clipboard.writeText(text).then(() => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Copied',
+        detail: 'Text copied to clipboard'
+      });
+    }).catch(() => {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Copy Failed',
+        detail: 'Failed to copy to clipboard'
+      });
+    });
+  }
+
+  public printCredentials(): void {
+    const printWindow = window.open('', '_blank');
+    const printContent = `
+      <html>
+        <head>
+          <title>User Credentials - ${this.selectedRequest?.name}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .credentials { border: 2px solid #ccc; padding: 20px; margin: 20px 0; }
+            .field { margin: 10px 0; }
+            .label { font-weight: bold; }
+            .value { font-family: monospace; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h2>User Account Credentials</h2>
+            <p>For: ${this.selectedRequest?.name} (${this.selectedRequest?.nric})</p>
+            <p>Generated on: ${new Date().toLocaleString()}</p>
+          </div>
+          <div class="credentials">
+            <div class="field">
+              <div class="label">Username:</div>
+              <div class="value">${this.generatedCredentials?.username}</div>
+            </div>
+            <div class="field">
+              <div class="label">Password:</div>
+              <div class="value">${this.generatedCredentials?.password}</div>
+            </div>
+            <div class="field">
+              <div class="label">User ID:</div>
+              <div class="value">${this.generatedCredentials?.userId}</div>
+            </div>
+          </div>
+          <p><strong>Note:</strong> Please provide these credentials to the user securely. The password should be changed on first login.</p>
+        </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.print();
   }
 }

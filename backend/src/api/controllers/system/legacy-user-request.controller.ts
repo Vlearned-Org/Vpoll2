@@ -26,6 +26,13 @@ interface ApproveRequestDto {
   visitNotes?: string;
 }
 
+interface ApproveRequestResponse {
+  request: LegacyUserRequest;
+  userCreated?: boolean;
+  generatedPassword?: string;
+  userId?: string;
+}
+
 interface RejectRequestDto {
   rejectionReason: string;
   adminNotes?: string;
@@ -72,7 +79,7 @@ export class LegacyUserRequestController {
     context: Context, 
     id: string, 
     body: ApproveRequestDto
-  ): Promise<LegacyUserRequest> {
+  ): Promise<ApproveRequestResponse> {
     const request = await this.legacyUserRequestRepo.findById(id);
     if (!request) {
       throw new Error("Request not found");
@@ -85,11 +92,19 @@ export class LegacyUserRequestController {
       body.adminNotes
     );
 
+    let response: ApproveRequestResponse = {
+      request: approvedRequest,
+      userCreated: false
+    };
+
     // Create user if requested
     if (body.createUser) {
       try {
+        console.log(`[LEGACY USER] Creating user account for request ${id}...`);
         const plainPassword = body.userData?.password || this.generateRandomPassword();
+        console.log(`[LEGACY USER] Using ${body.userData?.password ? 'custom' : 'generated'} password`);
         const hashedPassword = await PasswordUtils.hash(plainPassword, true);
+        console.log(`[LEGACY USER] Password hashed successfully`);
         
         const userData = {
           name: request.name,
@@ -109,22 +124,53 @@ export class LegacyUserRequestController {
           specialInstructions: this.buildSpecialInstructions(request, body)
         };
 
-        const createdUser = await this.userRepo.createLegacyUser(userData);
+        console.log(`[LEGACY USER] Creating user with data:`, {
+          name: userData.name,
+          nric: userData.nric,
+          email: userData.email,
+          hasPassword: !!userData.password,
+          isAdmin: userData.isAdmin,
+          requiresAssistedAccess: userData.requiresAssistedAccess
+        });
         
+        const createdUser = await this.userRepo.createLegacyUser(userData);
+        console.log(`[LEGACY USER] User created successfully with ID: ${createdUser._id}`);
+        
+        // Update response with user creation details
+        response.userCreated = true;
+        response.generatedPassword = plainPassword;
+        response.userId = createdUser._id.toString();
+        
+        console.log(`[LEGACY USER] Marking request as processed...`);
         // Mark request as processed
         await this.legacyUserRequestRepo.markAsProcessed(id, createdUser._id);
+        console.log(`[LEGACY USER] Request marked as processed successfully`);
 
         // Send notification based on contact method
         if (request.preferredContactMethod === 'in_person' || request.isWalkIn) {
           // For walk-in users, we'll handle communication differently
-          console.log(`Walk-in user account created: ${createdUser.nric}`);
+          console.log(`[LEGACY USER] Walk-in user account created successfully:`);
+          console.log(`  - Name: ${createdUser.name}`);
+          console.log(`  - NRIC: ${createdUser.nric}`);
+          console.log(`  - Email: ${createdUser.email}`);
+          console.log(`  - User ID: ${createdUser._id}`);
+          console.log(`  - Generated Password: ${plainPassword}`);
+          console.log(`  - Request ID: ${request._id}`);
         } else if (request.contactPersonEmail || request.contactPersonPhone) {
+          console.log(`[LEGACY USER] Sending credentials to contact person for user: ${createdUser.nric}`);
           await this.sendApprovalNotification(request, createdUser, plainPassword);
         }
 
       } catch (error) {
-        console.error("Failed to create user from approved request:", error);
+        console.error(`[LEGACY USER] Failed to create user from approved request ${id}:`, error);
+        console.error(`[LEGACY USER] Request details:`, {
+          name: request.name,
+          nric: request.nric,
+          contactMethod: request.preferredContactMethod,
+          isWalkIn: request.isWalkIn
+        });
         // Keep request as approved but don't mark as processed
+        response.userCreated = false;
       }
     }
 
@@ -132,11 +178,11 @@ export class LegacyUserRequestController {
     if (body.walkInCompleted && (request.isWalkIn || request.preferredContactMethod === 'in_person')) {
       await this.legacyUserRequestRepo.updateAdminNotes(
         id, 
-        `${approvedRequest.adminNotes || ''}\n\nWalk-in visit completed. ${body.visitNotes || ''}`
+        `${response.request.adminNotes || ''}\n\nWalk-in visit completed. ${body.visitNotes || ''}`
       );
     }
 
-    return approvedRequest;
+    return response;
   }
 
   private buildSpecialInstructions(request: LegacyUserRequest, body: ApproveRequestDto): string {
@@ -201,12 +247,33 @@ export class LegacyUserRequestController {
   }
 
   private generateRandomPassword(): string {
-    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+    console.log(`[LEGACY USER] Generating random password...`);
+    
+    // Generate a stronger password with special characters for better security
+    const upperCase = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+    const lowerCase = 'abcdefghijkmnpqrstuvwxyz';
+    const numbers = '23456789';
+    const specials = '@#$%&*!';
+    
     let password = '';
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    
+    // Ensure at least one character from each category
+    password += upperCase.charAt(Math.floor(Math.random() * upperCase.length));
+    password += lowerCase.charAt(Math.floor(Math.random() * lowerCase.length));
+    password += numbers.charAt(Math.floor(Math.random() * numbers.length));
+    password += specials.charAt(Math.floor(Math.random() * specials.length));
+    
+    // Fill the rest randomly
+    const allChars = upperCase + lowerCase + numbers + specials;
+    for (let i = 4; i < 12; i++) {
+      password += allChars.charAt(Math.floor(Math.random() * allChars.length));
     }
-    return password;
+    
+    // Shuffle the password to randomize the positions
+    const finalPassword = password.split('').sort(() => Math.random() - 0.5).join('');
+    
+    console.log(`[LEGACY USER] Password generated successfully (length: ${finalPassword.length})`);
+    return finalPassword;
   }
 
   private async sendApprovalNotification(request: LegacyUserRequest, user: any, password: string) {

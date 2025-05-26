@@ -614,4 +614,162 @@
       ></button>
     </ng-template>
   </p-dialog>
+
+  <!-- User Credentials Dialog -->
+  <p-dialog 
+    [(visible)]="showCredentialsDialog" 
+    header="User Account Created" 
+    [modal]="true" 
+    [style]="{width: '600px'}"
+    [closable]="true"
+    [dismissableMask]="false"
+    (onHide)="closeCredentialsDialog()"
+  >
+    <div *ngIf="generatedCredentials && selectedRequest" class="credentials-dialog">
+      <!-- Success Header -->
+      <div class="text-center mb-4">
+        <i class="pi pi-check-circle text-green-500 text-5xl mb-3"></i>
+        <h3 class="text-green-700 mb-2">Account Created Successfully!</h3>
+        <p class="text-600">
+          User account has been created for <strong>{{ selectedRequest.name }}</strong>
+        </p>
+      </div>
+
+      <!-- Special Message for In-Person Visits -->
+      <div *ngIf="selectedRequest.preferredContactMethod === 'in_person'" class="in-person-notice">
+        <div class="bg-blue-50 border-1 border-blue-200 border-round p-3 mb-4">
+          <div class="flex align-items-center">
+            <i class="pi pi-info-circle text-blue-500 text-xl mr-2"></i>
+            <div>
+              <h5 class="mt-0 mb-1 text-blue-700">In-Person Visit</h5>
+              <p class="m-0 text-600">
+                Please provide these credentials to the user during their office visit. 
+                Consider printing this information for their reference.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Credentials Display -->
+      <div class="credentials-section">
+        <h4 class="text-primary mb-3">Login Credentials</h4>
+        
+        <div class="credentials-card">
+          <div class="grid">
+            <div class="col-12">
+              <div class="credential-item">
+                <label class="credential-label">Username / Email:</label>
+                <div class="credential-value-container">
+                  <span class="credential-value">{{ generatedCredentials.username }}</span>
+                  <button 
+                    pButton 
+                    pRipple 
+                    icon="pi pi-copy" 
+                    class="p-button-text p-button-sm"
+                    pTooltip="Copy username"
+                    (click)="copyToClipboard(generatedCredentials.username)"
+                  ></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="credential-item">
+                <label class="credential-label">Password:</label>
+                <div class="credential-value-container">
+                  <span class="credential-value password-value">{{ generatedCredentials.password }}</span>
+                  <button 
+                    pButton 
+                    pRipple 
+                    icon="pi pi-copy" 
+                    class="p-button-text p-button-sm"
+                    pTooltip="Copy password"
+                    (click)="copyToClipboard(generatedCredentials.password)"
+                  ></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="credential-item">
+                <label class="credential-label">User ID:</label>
+                <div class="credential-value-container">
+                  <span class="credential-value">{{ generatedCredentials.userId }}</span>
+                  <button 
+                    pButton 
+                    pRipple 
+                    icon="pi pi-copy" 
+                    class="p-button-text p-button-sm"
+                    pTooltip="Copy user ID"
+                    (click)="copyToClipboard(generatedCredentials.userId)"
+                  ></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instructions -->
+      <div class="instructions-section">
+        <h5 class="text-600 mb-2">Instructions for User:</h5>
+        <ul class="instructions-list">
+          <li>Use the username/email and password above to log into the system</li>
+          <li>Change the password on first login for security</li>
+          <li>Keep these credentials secure and do not share them</li>
+          <li *ngIf="selectedRequest.preferredContactMethod === 'in_person'">
+            Bring identification documents for verification during your visit
+          </li>
+        </ul>
+      </div>
+
+      <!-- Security Notice -->
+      <div class="security-notice">
+        <div class="bg-orange-50 border-1 border-orange-200 border-round p-3">
+          <div class="flex align-items-start">
+            <i class="pi pi-exclamation-triangle text-orange-500 mr-2 mt-1"></i>
+            <div>
+              <strong class="text-orange-700">Security Notice:</strong>
+              <p class="m-0 mt-1 text-600">
+                This password is temporary and should be changed immediately after first login. 
+                Do not share these credentials via unsecured channels.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="flex gap-2 justify-content-between w-full">
+        <div class="flex gap-2">
+          <button 
+            pButton 
+            pRipple 
+            label="Print Credentials" 
+            icon="pi pi-print"
+            class="p-button-outlined"
+            (click)="printCredentials()"
+          ></button>
+          <button 
+            pButton 
+            pRipple 
+            label="Copy All" 
+            icon="pi pi-copy"
+            class="p-button-outlined"
+            (click)="copyToClipboard('Username: ' + generatedCredentials.username + '\nPassword: ' + generatedCredentials.password + '\nUser ID: ' + generatedCredentials.userId)"
+          ></button>
+        </div>
+        <button 
+          pButton 
+          pRipple 
+          label="Close" 
+          icon="pi pi-times"
+          class="p-button-success"
+          (click)="closeCredentialsDialog()"
+        ></button>
+      </div>
+    </ng-template>
+  </p-dialog>
 </div>

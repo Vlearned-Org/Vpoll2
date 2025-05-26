@@ -12,10 +12,14 @@ export interface LegacyUserRequest {
   contactPersonEmail?: string;
   contactPersonRelation?: string;
   physicalAddress?: string;
-  preferredContactMethod: 'phone' | 'email' | 'postal';
+  preferredContactMethod: 'phone' | 'email' | 'postal' | 'in_person';
   requestType: 'new_account' | 'password_reset' | 'access_help' | 'other';
   message: string;
   eventName?: string;
+  visitLocation?: string;
+  visitDate?: string;
+  assistedBy?: string;
+  isWalkIn?: boolean;
   status: 'pending' | 'approved' | 'rejected' | 'processed';
   adminNotes?: string;
   processedBy?: string;
@@ -42,6 +46,13 @@ export interface ApproveRequestDto {
     email?: string;
     mobile?: string;
   };
+}
+
+export interface ApproveRequestResponse {
+  request: LegacyUserRequest;
+  userCreated?: boolean;
+  generatedPassword?: string;
+  userId?: string;
 }
 
 export interface RejectRequestDto {
@@ -91,8 +102,8 @@ export class LegacyUserRequestHttpService {
     });
   }
 
-  public approveRequest(id: string, data: ApproveRequestDto): Observable<LegacyUserRequest> {
-    return this.http.post<LegacyUserRequest>(`${this.baseUrl}/${id}/approve`, data, {
+  public approveRequest(id: string, data: ApproveRequestDto): Observable<ApproveRequestResponse> {
+    return this.http.post<ApproveRequestResponse>(`${this.baseUrl}/${id}/approve`, data, {
       headers: this.getHeaders()
     });
   }

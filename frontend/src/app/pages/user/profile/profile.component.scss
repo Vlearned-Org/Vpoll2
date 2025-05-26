@@ -145,15 +145,31 @@
 
   p-password {
     width: 100% !important;
+    display: block !important;
 
     .p-password {
       width: 100% !important;
-      display: flex;
+      display: flex !important;
       position: relative;
+      min-width: 0 !important;
 
       input {
         width: 100% !important;
-        padding-right: 2.5rem;
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+        padding-right: 2.5rem !important;
+        box-sizing: border-box !important;
+      }
+
+      &.p-inputwrapper-filled,
+      &.p-inputwrapper-focus {
+        width: 100% !important;
+        
+        input {
+          width: 100% !important;
+          min-width: 0 !important;
+          flex: 1 1 auto !important;
+        }
       }
 
       .p-password-toggle-icon {
@@ -163,7 +179,14 @@
         transform: translateY(-50%);
         color: var(--primary-color);
         cursor: pointer;
+        z-index: 2;
       }
+    }
+
+    &.p-inputwrapper-filled,
+    &.p-inputwrapper-focus {
+      width: 100% !important;
+      display: block !important;
     }
   }
 
@@ -264,6 +287,7 @@
     border-radius: 6px;
     border: 1px solid #d1d5db;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100% !important;
 
     &:focus {
       border-color: var(--primary-color);
@@ -273,6 +297,47 @@
     &.ng-invalid.ng-touched {
       border-color: #ef4444;
       box-shadow: 0 0 0 1px #ef4444;
+    }
+  }
+
+  // Specific fixes for password fields in grid
+  .password-section-grid {
+    .col-12.md\\:col-4 {
+      p-password {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+        
+        .p-password {
+          width: 100% !important;
+          max-width: 100% !important;
+          display: flex !important;
+          
+          input {
+            width: 100% !important;
+            max-width: 100% !important;
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+          }
+          
+          &.p-inputwrapper-filled,
+          &.p-inputwrapper-focus {
+            width: 100% !important;
+            max-width: 100% !important;
+            
+            input {
+              width: 100% !important;
+              max-width: 100% !important;
+            }
+          }
+        }
+        
+        &.p-inputwrapper-filled,
+        &.p-inputwrapper-focus {
+          width: 100% !important;
+          max-width: 100% !important;
+        }
+      }
     }
   }
 
@@ -397,6 +462,22 @@
         border-top: none;
       }
     }
+
+    // Mobile password field fixes
+    p-password {
+      width: 100% !important;
+      max-width: 100% !important;
+      
+      .p-password {
+        width: 100% !important;
+        max-width: 100% !important;
+        
+        input {
+          width: 100% !important;
+          max-width: 100% !important;
+        }
+      }
+    }
   }
 }
 
@@ -420,6 +501,18 @@
 
     button {
       width: 100%;
+    }
+  }
+
+  // Extra small screen password fixes
+  :host ::ng-deep {
+    p-password {
+      .p-password {
+        input {
+          min-width: 0 !important;
+          padding-right: 3rem !important;
+        }
+      }
     }
   }
 }
