@@ -1,6 +1,4 @@
-<div
-  class="surface-0 flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden"
->
+<div class="surface-0 flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
   <div class="grid justify-content-center p-2 lg:p-0" style="min-width: 80%">
     <div class="col-12 xl:col-6" style="border-radius: 56px; padding: 0.3rem">
       <div
@@ -23,61 +21,17 @@
             (click)="router.navigate(['/'])"
           />
           <div class="text-900 text-3xl font-medium mb-3">Register</div>
-          <span *ngIf="step === 'request-email-otp'" class="text-600 font-medium"
-            >Enter the email address associated with your account and request
-            for OTP to verify you are the owner of the email address.</span
-          >
-          <span
-            *ngIf="step === 'verify-email-otp-register'"
-            class="text-600 font-medium"
-            >Enter the OTP you received via email to verify you are the owner
-            of the email and set your login password.
-          </span>
+          <span class="text-600 font-medium">Create your account by filling in the form below.</span>
           <p-messages [value]="messages"></p-messages>
         </div>
 
         <div class="w-full md:w-10 mx-auto">
-          <ng-container *ngIf="step === 'request-email-otp'">
-            <label for="emailAddress" class="block text-900 text-xl font-medium mb-2"
-              >Email Address</label
-            >
-                <input
-              type="email"
-                  pInputText
-              [(ngModel)]="emailAddress"
-              placeholder="your@email.com"
-              class="w-full mb-3"
-                  style="padding: 1rem"
-              id="emailAddress"
-                />
-
-            <button
-              [disabled]="!emailAddress"
-              pButton
-              pRipple
-              label="Get OTP"
-              (click)="requestEmailOTP()"
-              class="w-full p-3 text-xl"
-            ></button>
-          </ng-container>
-          <ng-container *ngIf="step === 'verify-email-otp-register'">
-            <label for="internalEmail" class="block text-900 text-xl font-medium mb-2"
-              >Email Address</label
-            >
-            <input
-              pInputText
-              [disabled]="true"
-              id="internalEmail"
-              class="w-full mb-3"
-              type="text"
-              [(ngModel)]="internalEmail"
-            />
-
+          <ng-container>
             <ng-container [formGroup]="signUpForm">
               <label
                 for="name1"
                 class="block text-900 font-medium text-xl mb-2"
-                >Name</label
+                > Full Name</label
               >
               <input
                 pInputText
@@ -105,7 +59,7 @@
             </ul>
 
             <label for="email" class="block text-900 font-medium text-xl mb-2"
-            >Email (from verification)</label
+            >Email</label
           >
             <input
               pInputText
@@ -115,10 +69,7 @@
               formControlName="email"
               required
             />
-            <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5; color: #6b7280;">
-              <li>You can login using either your email or NRIC</li>
-              <li>Email is required for account verification and notifications</li>
-            </ul>
+           
 
             <label for="mobileNumber" class="block text-900 font-medium text-xl mb-2">Mobile No. (Optional)</label>
             <div class="w-full mb-3 flex">
@@ -155,20 +106,7 @@
               <label
                 for="password1"
                 class="block text-900 font-medium text-xl mb-2"
-                >OTP</label
-              >
-              <input
-                pInputText
-                id="otp"
-                class="w-full mb-3"
-                type="text"
-                formControlName="otp"
-              />
-
-              <label
-                for="password1"
-                class="block text-900 font-medium text-xl mb-2"
-                >Login Password</label
+                >Enter Password</label
               >
               <p-password
                 formControlName="password"
@@ -178,7 +116,7 @@
               >
               </p-password>
               <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
-                <li>At least one lowercase</li>
+                <li>At least one Lowercase</li>
                 <li>At least one uppercase</li>
                 <li>At least one numeric</li>
                 <li>Minimum 8 characters</li>
@@ -187,7 +125,7 @@
               <label
                 for="password2"
                 class="block text-900 font-medium text-xl mb-2"
-                >Re-type Password</label
+                >Confirm Password</label
               >
 
               <p-password
@@ -198,20 +136,12 @@
               ></p-password>
 
               <button
-                [disabled]="!signUpValid"
+               
                 pButton
                 pRipple
                 label="Sign-Up"
                 (click)="signUp()"
                 class="w-full p-3 text-xl mb-3"
-              ></button>
-              <button
-                [disabled]="false"
-                pButton
-                pRipple
-                label="Resend OTP"
-                (click)="requestEmailOTP()"
-                class="w-full p-3 text-xl p-button-outlined"
               ></button>
             </ng-container>
           </ng-container>
