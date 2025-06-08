@@ -71,20 +71,30 @@
           >
         </div>
           <div style=" display: flex; justify-content: center; align-items: center; " >
-            <img 
-            src="assets/layout/images/button-04.gif" 
-            alt="Sign In Button" 
-            style="width: 50%; cursor: pointer;" 
-            (click)="signin()"
-          />
+           
+          
+        <button
+             
+              pButton
+              pRipple
+              label="Sign In Button"
+              (click)="signin"
+              class="w-auto p-3 text-xl"
+            ></button>
+       
         </div>
-        <div style=" display: flex; justify-content: center; align-items: center; " >
-          <img 
-          src="assets/layout/images/button-05.gif" 
-          alt="Sign Up Button" 
-          style="width: 50%; cursor: pointer;" 
-          (click)="router.navigate(['sign-up'])"
-        />
+        
+        <div style=" display: flex; justify-content: center; align-items: center; margin-top:2px;" >
+         
+       
+        <button
+             
+              pButton
+              pRipple
+              label="Sign Up"
+              (click)="router.navigate(['sign-up'])"
+              class="w-auto p-3 text-xl"
+            ></button>
       </div>
 
       <!-- Legacy User Option -->
