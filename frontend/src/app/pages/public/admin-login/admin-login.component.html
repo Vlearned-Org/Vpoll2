@@ -61,12 +61,22 @@
                 >Forgot password?</a> -->
             </div>
               <div style=" display: flex; justify-content: center; align-items: center; " >
-                <img 
-                src="assets/layout/images/button-03.gif" 
-                alt="Sign In Button" 
-                style="width: 50%; cursor: pointer;" 
+               
+              <button
+                pButton
+                pRipple
+                 style="background-color: rgb(115, 12, 184); color: white; border-radius: 5px; border: none; cursor: pointer;"
+              
+              [style.width.%]="100"
+              [style.height.px]="50"
+              [style.fontSize.px]="20"
+              [style.padding.px]="10"
+              [style.margin.px]="5"
+                label="Sign In"
+              
                 (click)="signin()"
-              />
+              ></button>
+              
             </div>
           </div>
           <hr style="height:2px ;width: 80%;margin-left: 10%;border: none;background: rgb(221, 221, 221);"> 
