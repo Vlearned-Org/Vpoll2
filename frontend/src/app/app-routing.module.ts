@@ -19,6 +19,7 @@ import { UserEventComponent } from './pages/user/user-event/user-event.component
 import { UserEventlistComponent } from './pages/user/user-eventlist/user-eventlist.component';
 import { UserHomepageComponent } from './pages/user/user-homepage/user-homepage.component';
 import { ProfileComponent } from './pages/user/profile/profile.component';
+import { PrivacySettingsComponent } from './shared/components/privacy-settings/privacy-settings.component';
 import { LegacyUserRequestComponent } from './pages/public/legacy-user-request/legacy-user-request.component';
 import { LegacyUsersComponent } from './pages/admin/legacy-users/legacy-users.component';
 import { LegacyUserRequestsComponent } from './pages/admin/legacy-user-requests/legacy-user-requests.component';
@@ -63,6 +64,17 @@ import { RoleGuard } from './shared/security/guards/role.guard';
               path: '',
               canActivate: [LoggedInGuard],
               component: ProfileComponent,
+            },
+          ],
+        },
+        {
+          path: 'privacy-settings',
+          component: AppMainComponent,
+          children: [
+            {
+              path: '',
+              canActivate: [LoggedInGuard],
+              component: PrivacySettingsComponent,
             },
           ],
         },

@@ -29,6 +29,16 @@
             <li>Device Information</li>
           </ul>
         </div>
+
+        <div class="data-category" *ngIf="allowGranularConsent">
+          <strong>Optional Data:</strong>
+          <ul class="data-items">
+            <li>Usage Analytics and Performance Data</li>
+            <li>Marketing Preferences</li>
+            <li>Communication Preferences</li>
+            <li>Cookies and Tracking Data</li>
+          </ul>
+        </div>
       </div>
 
       <!-- Purpose of Data Collection -->
@@ -42,6 +52,29 @@
           <li><strong>Legal Compliance:</strong> To comply with corporate governance and regulatory requirements</li>
           <li><strong>Security:</strong> To protect against fraud and unauthorized access</li>
         </ul>
+      </div>
+
+      <!-- Legal Basis Information -->
+      <div class="legal-basis-info" *ngIf="allowGranularConsent">
+        <h5>Legal Basis for Processing</h5>
+        <div class="legal-basis-grid">
+          <div class="legal-basis-item">
+            <span class="basis-type">Consent (Art. 6(1)(a))</span>
+            <span class="basis-description">Marketing communications, optional features</span>
+          </div>
+          <div class="legal-basis-item">
+            <span class="basis-type">Contract (Art. 6(1)(b))</span>
+            <span class="basis-description">Account management, voting services</span>
+          </div>
+          <div class="legal-basis-item">
+            <span class="basis-type">Legal Obligation (Art. 6(1)(c))</span>
+            <span class="basis-description">Regulatory compliance, audit requirements</span>
+          </div>
+          <div class="legal-basis-item">
+            <span class="basis-type">Legitimate Interest (Art. 6(1)(f))</span>
+            <span class="basis-description">Security, fraud prevention, service improvement</span>
+          </div>
+        </div>
       </div>
 
       <!-- Toggle for more details -->
@@ -60,7 +93,13 @@
       <div class="detailed-info" *ngIf="showFullDetails">
         <div class="info-section">
           <h5>Data Retention</h5>
-          <p>Your personal data will be retained for as long as your account remains active and as required by applicable laws and regulations.</p>
+          <p>Your personal data will be retained for:</p>
+          <ul>
+            <li><strong>Account Data:</strong> Duration of your account plus 7 years for legal compliance</li>
+            <li><strong>Voting Records:</strong> As required by corporate governance regulations (typically 7 years)</li>
+            <li><strong>Audit Logs:</strong> 7 years for regulatory compliance</li>
+            <li><strong>Marketing Data:</strong> Until consent is withdrawn or 3 years of inactivity</li>
+          </ul>
         </div>
         
         <div class="info-section">
@@ -70,47 +109,203 @@
             <li>Legal compliance and regulatory reporting</li>
             <li>Authorized service providers under strict confidentiality agreements</li>
             <li>Protection of rights and security of our platform</li>
+            <li>Corporate restructuring (with appropriate safeguards)</li>
           </ul>
         </div>
         
         <div class="info-section">
-          <h5>Your Rights</h5>
-          <p>You have the right to access, correct, or request deletion of your personal data, subject to legal and operational requirements.</p>
+          <h5>Your Rights Under GDPR</h5>
+          <p>You have the following rights regarding your personal data:</p>
+          <ul>
+            <li><strong>Right of Access:</strong> Request copies of your personal data</li>
+            <li><strong>Right to Rectification:</strong> Correct inaccurate or incomplete data</li>
+            <li><strong>Right to Erasure:</strong> Request deletion (subject to legal requirements)</li>
+            <li><strong>Right to Restrict Processing:</strong> Limit how we use your data</li>
+            <li><strong>Right to Data Portability:</strong> Receive your data in a portable format</li>
+            <li><strong>Right to Object:</strong> Object to processing based on legitimate interests</li>
+            <li><strong>Right to Withdraw Consent:</strong> Withdraw consent at any time</li>
+          </ul>
+          <p><strong>Exercise Your Rights:</strong> Contact our Data Protection Officer at dpo@vpoll.com</p>
+        </div>
+
+        <div class="info-section">
+          <h5>International Transfers</h5>
+          <p>Your data may be transferred to and processed in countries outside Malaysia. We ensure appropriate safeguards are in place for such transfers.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Consent Checkboxes -->
-  <div class="consent-checkboxes">
-    <div class="consent-item">
-      <p-checkbox 
-        formControlName="dataProcessingConsent" 
-        binary="true" 
-        inputId="dataConsent"
-        styleClass="consent-checkbox"
-      ></p-checkbox>
-      <label for="dataConsent" class="consent-label">
-        I understand and consent to the collection, processing, and use of my personal data as described above for the purposes of account management, voting participation, and legal compliance.
-        <span class="required-indicator">*</span>
-      </label>
-    </div>
+  <!-- Essential Consent Checkboxes -->
+  <div class="consent-section">
+    <h5 class="consent-section-title">
+      <i class="pi pi-exclamation-triangle" style="color: #e74c3c;"></i>
+      Required Consents
+    </h5>
+    
+    <div class="consent-checkboxes">
+      <div class="consent-item required">
+        <p-checkbox 
+          formControlName="dataProcessingConsent" 
+          binary="true" 
+          inputId="dataConsent"
+          styleClass="consent-checkbox"
+        ></p-checkbox>
+        <label for="dataConsent" class="consent-label">
+          I understand and consent to the collection, processing, and use of my personal data as described above for the purposes of account management, voting participation, and legal compliance.
+          <span class="required-indicator">*</span>
+        </label>
+      </div>
 
-    <div class="consent-item">
-      <p-checkbox 
-        formControlName="termsAndConditions" 
-        binary="true" 
-        inputId="termsConsent"
-        styleClass="consent-checkbox"
-      ></p-checkbox>
-      <label for="termsConsent" class="consent-label">
-        I agree to the 
-        <a href="#" class="terms-link" (click)="openTermsAndConditions($event)">Terms and Conditions</a> 
-        and 
-        <a href="#" class="terms-link" (click)="openPrivacyPolicy($event)">Privacy Policy</a>
-        governing the use of this platform.
-        <span class="required-indicator">*</span>
-      </label>
+      <div class="consent-item required">
+        <p-checkbox 
+          formControlName="termsAndConditions" 
+          binary="true" 
+          inputId="termsConsent"
+          styleClass="consent-checkbox"
+        ></p-checkbox>
+        <label for="termsConsent" class="consent-label">
+          I agree to the 
+          <a href="#" class="terms-link" (click)="openTermsAndConditions($event)">Terms and Conditions</a> 
+          and 
+          <a href="#" class="terms-link" (click)="openPrivacyPolicy($event)">Privacy Policy</a>
+          governing the use of this platform.
+          <span class="required-indicator">*</span>
+        </label>
+      </div>
+
+      <div class="consent-item required" *ngIf="allowGranularConsent">
+        <p-checkbox 
+          formControlName="functionalCookiesConsent" 
+          binary="true" 
+          inputId="functionalCookies"
+          styleClass="consent-checkbox"
+          [disabled]="true"
+        ></p-checkbox>
+        <label for="functionalCookies" class="consent-label">
+          Essential cookies required for platform functionality 
+          <a href="#" class="terms-link" (click)="openCookiePolicy($event)">(Cookie Policy)</a>
+          <span class="required-indicator">*</span>
+          <small class="helper-text">These cookies are necessary for the platform to function properly and cannot be disabled.</small>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Optional Consents (only shown for signup with granular consent) -->
+  <div class="consent-section" *ngIf="allowGranularConsent && consentType === 'signup'">
+    <h5 class="consent-section-title">
+      <i class="pi pi-cog" style="color: var(--primary-color);"></i>
+      Optional Preferences
+      <small class="section-subtitle">You can change these preferences anytime in your account settings</small>
+    </h5>
+    
+    <div class="consent-checkboxes optional">
+      <!-- Communication Preferences -->
+      <div class="consent-group">
+        <h6 class="group-title">Communication Preferences</h6>
+        
+        <div class="consent-item optional">
+          <p-checkbox 
+            formControlName="emailCommunicationConsent" 
+            binary="true" 
+            inputId="emailComm"
+            styleClass="consent-checkbox"
+          ></p-checkbox>
+          <label for="emailComm" class="consent-label">
+            Email notifications about voting events and important updates
+            <small class="helper-text">Recommended for staying informed about AGMs and voting opportunities</small>
+          </label>
+        </div>
+
+        <div class="consent-item optional">
+          <p-checkbox 
+            formControlName="smsCommunicationConsent" 
+            binary="true" 
+            inputId="smsComm"
+            styleClass="consent-checkbox"
+          ></p-checkbox>
+          <label for="smsComm" class="consent-label">
+            SMS notifications for urgent voting reminders
+            <small class="helper-text">Requires providing a mobile number</small>
+          </label>
+        </div>
+
+        <div class="consent-item optional">
+          <p-checkbox 
+            formControlName="marketingConsent" 
+            binary="true" 
+            inputId="marketing"
+            styleClass="consent-checkbox"
+          ></p-checkbox>
+          <label for="marketing" class="consent-label">
+            Marketing communications about new features and services
+            <small class="helper-text">Promotional emails about platform improvements and new features</small>
+          </label>
+        </div>
+      </div>
+
+      <!-- Analytics and Performance -->
+      <div class="consent-group">
+        <h6 class="group-title">Analytics and Performance</h6>
+        
+        <div class="consent-item optional">
+          <p-checkbox 
+            formControlName="analyticsConsent" 
+            binary="true" 
+            inputId="analytics"
+            styleClass="consent-checkbox"
+          ></p-checkbox>
+          <label for="analytics" class="consent-label">
+            Help improve our platform by sharing anonymous usage analytics
+            <small class="helper-text">Helps us understand how to make the platform better for everyone</small>
+          </label>
+        </div>
+
+        <div class="consent-item optional">
+          <p-checkbox 
+            formControlName="thirdPartyAnalyticsConsent" 
+            binary="true" 
+            inputId="thirdPartyAnalytics"
+            styleClass="consent-checkbox"
+          ></p-checkbox>
+          <label for="thirdPartyAnalytics" class="consent-label">
+            Third-party analytics and performance monitoring
+            <small class="helper-text">Services like Google Analytics to help improve user experience</small>
+          </label>
+        </div>
+      </div>
+
+      <!-- Cookie Preferences -->
+      <div class="consent-group">
+        <h6 class="group-title">Cookie Preferences</h6>
+        
+        <div class="consent-item optional">
+          <p-checkbox 
+            formControlName="marketingCookiesConsent" 
+            binary="true" 
+            inputId="marketingCookies"
+            styleClass="consent-checkbox"
+          ></p-checkbox>
+          <label for="marketingCookies" class="consent-label">
+            Marketing and advertising cookies
+            <small class="helper-text">Used to show relevant advertisements and measure campaign effectiveness</small>
+          </label>
+        </div>
+
+        <div class="consent-item optional">
+          <p-checkbox 
+            formControlName="socialMediaConsent" 
+            binary="true" 
+            inputId="socialMedia"
+            styleClass="consent-checkbox"
+          ></p-checkbox>
+          <label for="socialMedia" class="consent-label">
+            Social media integration and sharing features
+            <small class="helper-text">Enables sharing content on social media platforms</small>
+          </label>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -118,16 +313,35 @@
   <div class="legal-notice">
     <p class="notice-text">
       <i class="pi pi-info-circle"></i>
-      <strong>Important:</strong> By proceeding, you acknowledge that you have read, understood, and agree to our data processing practices. You must provide explicit consent to continue using our services.
+      <strong>Important:</strong> By proceeding, you acknowledge that you have read, understood, and agree to our data processing practices. You must provide consent to all required items before continuing. You can modify your optional preferences at any time in your account settings.
+    </p>
+  </div>
+
+  <!-- Data Protection Contact -->
+  <div class="dpo-contact" *ngIf="allowGranularConsent">
+    <h6>Data Protection Contact</h6>
+    <p>
+      <strong>Data Protection Officer:</strong> dpo@vpoll.com<br>
+      <strong>Privacy Inquiries:</strong> privacy@vpoll.com<br>
+      <strong>Response Time:</strong> We will respond to your inquiry within 30 days as required by GDPR
     </p>
   </div>
 
   <!-- Validation Messages -->
-  <div class="validation-messages" *ngIf="consentForm.touched && !consentForm.valid">
+  <div class="validation-messages" *ngIf="consentForm.touched && !isConsentValid">
     <p-message 
       severity="error" 
       text="You must provide consent to all required items before proceeding."
       styleClass="consent-error"
     ></p-message>
+  </div>
+
+  <!-- Consent Version Info -->
+  <div class="consent-version-info" *ngIf="allowGranularConsent">
+    <small class="version-text">
+      Consent Version: {{ consentVersion }} | 
+      Last Updated: {{ getCurrentDate() }} |
+      <a href="#" class="terms-link" (click)="openPrivacyPolicy($event)">View Full Privacy Policy</a>
+    </small>
   </div>
 </div> 

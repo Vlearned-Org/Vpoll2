@@ -279,6 +279,11 @@ export class AppMenuComponent implements OnInit {
           icon: "pi pi-fw pi-book",
           routerLink: ["/events"],
         },
+        {
+          label: "Privacy Settings",
+          icon: "pi pi-fw pi-shield",
+          routerLink: ["/privacy-settings"],
+        },
       ];
     } else if (this.identity.isSystem) {
       this.model[0].items = [
@@ -315,6 +320,11 @@ export class AppMenuComponent implements OnInit {
           icon: "pi pi-fw pi-book",
           routerLink: ["company/events"],
         },
+        {
+          label: "Privacy Settings",
+          icon: "pi pi-fw pi-shield",
+          routerLink: ["/privacy-settings"],
+        },
       ];
     } else {
       this.model[0].items = [
@@ -327,6 +337,11 @@ export class AppMenuComponent implements OnInit {
           label: "Events",
           icon: "pi pi-fw pi-book",
           routerLink: ["company/events"],
+        },
+        {
+          label: "Privacy Settings",
+          icon: "pi pi-fw pi-shield",
+          routerLink: ["/privacy-settings"],
         },
       ];
     }

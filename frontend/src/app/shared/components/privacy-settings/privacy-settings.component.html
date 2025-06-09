@@ -1,0 +1,318 @@
+<div class="privacy-settings-container">
+  <div class="privacy-header">
+    <h2>
+      <i class="pi pi-shield mr-2"></i>
+      Privacy & Data Settings
+    </h2>
+    <p class="header-description">
+      Manage your privacy preferences, consent settings, and exercise your data protection rights under GDPR.
+    </p>
+  </div>
+
+  <p-tabView [(activeIndex)]="activeTab" styleClass="privacy-tabs">
+    <!-- Consent Management Tab -->
+    <p-tabPanel header="Consent Preferences" leftIcon="pi pi-check">
+      <div class="tab-content">
+        <h3>Manage Your Consent Preferences</h3>
+        <p class="tab-description">
+          Update your consent preferences for different types of data processing. Changes will take effect immediately.
+        </p>
+        
+        <form [formGroup]="privacyForm" class="consent-form">
+          <!-- Communication Preferences -->
+          <div class="consent-section">
+            <h4><i class="pi pi-envelope mr-2"></i>Communication Preferences</h4>
+            
+            <div class="consent-item">
+              <p-checkbox 
+                formControlName="emailCommunicationConsent" 
+                binary="true" 
+                inputId="emailComm"
+              ></p-checkbox>
+              <label for="emailComm" class="consent-label">
+                <strong>Email notifications</strong>
+                <small>Receive important updates about voting events and AGMs</small>
+              </label>
+            </div>
+
+            <div class="consent-item">
+              <p-checkbox 
+                formControlName="smsCommunicationConsent" 
+                binary="true" 
+                inputId="smsComm"
+              ></p-checkbox>
+              <label for="smsComm" class="consent-label">
+                <strong>SMS notifications</strong>
+                <small>Receive urgent voting reminders via SMS</small>
+              </label>
+            </div>
+
+            <div class="consent-item">
+              <p-checkbox 
+                formControlName="marketingConsent" 
+                binary="true" 
+                inputId="marketing"
+              ></p-checkbox>
+              <label for="marketing" class="consent-label">
+                <strong>Marketing communications</strong>
+                <small>Receive information about new features and services</small>
+              </label>
+            </div>
+          </div>
+
+          <!-- Analytics and Performance -->
+          <div class="consent-section">
+            <h4><i class="pi pi-chart-bar mr-2"></i>Analytics & Performance</h4>
+            
+            <div class="consent-item">
+              <p-checkbox 
+                formControlName="analyticsConsent" 
+                binary="true" 
+                inputId="analytics"
+              ></p-checkbox>
+              <label for="analytics" class="consent-label">
+                <strong>Usage analytics</strong>
+                <small>Help improve our platform with anonymous usage data</small>
+              </label>
+            </div>
+
+            <div class="consent-item">
+              <p-checkbox 
+                formControlName="thirdPartyAnalyticsConsent" 
+                binary="true" 
+                inputId="thirdPartyAnalytics"
+              ></p-checkbox>
+              <label for="thirdPartyAnalytics" class="consent-label">
+                <strong>Third-party analytics</strong>
+                <small>Allow services like Google Analytics for insights</small>
+              </label>
+            </div>
+          </div>
+
+          <!-- Cookie Preferences -->
+          <div class="consent-section">
+            <h4><i class="pi pi-cog mr-2"></i>Cookie Preferences</h4>
+            
+            <div class="consent-item">
+              <p-checkbox 
+                formControlName="functionalCookiesConsent" 
+                binary="true" 
+                inputId="functionalCookies"
+                [disabled]="true"
+              ></p-checkbox>
+              <label for="functionalCookies" class="consent-label">
+                <strong>Essential cookies</strong>
+                <small>Required for platform functionality (cannot be disabled)</small>
+              </label>
+            </div>
+
+            <div class="consent-item">
+              <p-checkbox 
+                formControlName="marketingCookiesConsent" 
+                binary="true" 
+                inputId="marketingCookies"
+              ></p-checkbox>
+              <label for="marketingCookies" class="consent-label">
+                <strong>Marketing cookies</strong>
+                <small>Used for advertising and campaign measurement</small>
+              </label>
+            </div>
+
+            <div class="consent-item">
+              <p-checkbox 
+                formControlName="socialMediaConsent" 
+                binary="true" 
+                inputId="socialMedia"
+              ></p-checkbox>
+              <label for="socialMedia" class="consent-label">
+                <strong>Social media integration</strong>
+                <small>Enable sharing features and social media widgets</small>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button 
+              pButton 
+              type="button" 
+              label="Save Preferences" 
+              icon="pi pi-save"
+              class="p-button-success"
+              (click)="savePrivacySettings()"
+              [loading]="loading"
+            ></button>
+          </div>
+        </form>
+      </div>
+    </p-tabPanel>
+
+    <!-- Data Rights Tab -->
+    <p-tabPanel header="Your Data Rights" leftIcon="pi pi-user">
+      <div class="tab-content">
+        <h3>Exercise Your Data Protection Rights</h3>
+        <p class="tab-description">
+          Under GDPR, you have several rights regarding your personal data. Click on any option below to make a request.
+        </p>
+        
+        <div class="data-rights-grid">
+          <div 
+            *ngFor="let right of dataRights" 
+            class="data-right-card"
+            [class.disabled]="!right.enabled"
+          >
+            <div class="right-header">
+              <i [class]="'pi ' + right.icon + ' right-icon'"></i>
+              <h4>{{ right.title }}</h4>
+            </div>
+            <p>{{ right.description }}</p>
+            <button 
+              pButton 
+              type="button" 
+              [label]="'Request ' + right.title"
+              class="p-button-outlined"
+              [disabled]="!right.enabled"
+              (click)="exerciseDataRight(right.action)"
+            ></button>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <h4>Quick Actions</h4>
+          <div class="action-buttons">
+            <button 
+              pButton 
+              type="button" 
+              label="Download My Data" 
+              icon="pi pi-download"
+              class="p-button-info"
+              (click)="downloadPersonalData()"
+            ></button>
+            <button 
+              pButton 
+              type="button" 
+              label="Contact Data Protection Officer" 
+              icon="pi pi-envelope"
+              class="p-button-secondary"
+              (click)="contactDPO()"
+            ></button>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- Consent History Tab -->
+    <p-tabPanel header="Consent History" leftIcon="pi pi-history">
+      <div class="tab-content">
+        <h3>Your Consent History</h3>
+        <p class="tab-description">
+          View the history of all consent decisions you've made, including when they were granted or withdrawn.
+        </p>
+        
+        <div class="consent-history">
+          <p-table [value]="consentHistory" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Consent Type</th>
+                <th>Status</th>
+                <th>Purpose</th>
+                <th>Date</th>
+                <th>Version</th>
+                <th>Actions</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-consent>
+              <tr>
+                <td>
+                  <span class="consent-type">{{ consent.consentType }}</span>
+                </td>
+                <td>
+                  <p-tag 
+                    [value]="consent.granted ? 'Granted' : 'Withdrawn'" 
+                    [severity]="consent.granted ? 'success' : 'danger'"
+                  ></p-tag>
+                </td>
+                <td>
+                  <span class="consent-purpose">{{ consent.purpose }}</span>
+                </td>
+                <td>{{ formatDate(consent.timestamp) }}</td>
+                <td>{{ consent.version }}</td>
+                <td>
+                  <button 
+                    pButton 
+                    type="button"
+                    icon="pi pi-times"
+                    class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                    *ngIf="consent.granted"
+                    (click)="withdrawConsent(consent.consentType)"
+                    pTooltip="Withdraw consent"
+                  ></button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- Data Requests Tab -->
+    <p-tabPanel header="Data Requests" leftIcon="pi pi-file">
+      <div class="tab-content">
+        <h3>Your Data Subject Requests</h3>
+        <p class="tab-description">
+          Track the status of your data protection requests and see their completion status.
+        </p>
+        
+        <div class="data-requests">
+          <p-table [value]="dataRequests" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Request Type</th>
+                <th>Status</th>
+                <th>Request Date</th>
+                <th>Completion Date</th>
+                <th>Description</th>
+                <th>Request ID</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-request>
+              <tr>
+                <td>{{ request.requestType | titlecase }}</td>
+                <td>
+                  <p-tag 
+                    [value]="request.status | titlecase" 
+                    [severity]="getStatusSeverity(request.status)"
+                  ></p-tag>
+                </td>
+                <td>{{ formatDate(request.requestDate) }}</td>
+                <td>{{ request.completionDate ? formatDate(request.completionDate) : '-' }}</td>
+                <td>{{ request.description }}</td>
+                <td>
+                  <code>{{ request.requestId }}</code>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="6" class="text-center">
+                  <p>No data requests found.</p>
+                  <p>Use the "Your Data Rights" tab to make a new request.</p>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+
+  <!-- Data Protection Contact Info -->
+  <div class="contact-info">
+    <h4><i class="pi pi-user mr-2"></i>Data Protection Contact</h4>
+    <div class="contact-details">
+      <p><strong>Data Protection Officer:</strong> dpo@vpoll.com</p>
+      <p><strong>Privacy Inquiries:</strong> privacy@vpoll.com</p>
+      <p><strong>Response Time:</strong> We respond within 30 days as required by GDPR</p>
+    </div>
+  </div>
+</div> 

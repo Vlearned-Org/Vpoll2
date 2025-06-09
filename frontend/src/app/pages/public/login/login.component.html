@@ -88,6 +88,7 @@
         <!-- Consent Form -->
         <app-consent-form 
           consentType="login"
+          [allowGranularConsent]="false"
           (consentChanged)="onConsentChange($event)"
         ></app-consent-form>
           <div style=" display: flex; justify-content: center; align-items: center; " >

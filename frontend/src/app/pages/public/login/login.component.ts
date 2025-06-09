@@ -9,6 +9,7 @@ import { AppConfig } from '../../../api/appconfig';
 import { ConfigService } from '../../../mock-service/app.config.service';
 import { PublicEvent } from '@vpoll-shared/contract';
 import { MessageService } from 'primeng/api';
+import { ConsentRecord } from '@app/shared/components/consent-form/consent-form.component';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -24,6 +25,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   public upcomingEvents: Array<PublicEvent> = [];
   public consentGiven = false;
+  public consentRecords: ConsentRecord[] = [];
   public loading = false;
   constructor(
     public configService: ConfigService,
@@ -140,8 +142,9 @@ export class LoginComponent implements OnInit, OnDestroy {
       );
   }
 
-  public onConsentChange(consentValid: boolean): void {
-    this.consentGiven = consentValid;
+  public onConsentChange(consentData: {valid: boolean, consents: ConsentRecord[]}): void {
+    this.consentGiven = consentData.valid;
+    this.consentRecords = consentData.consents;
   }
 
   public get isLoginValid(): boolean {

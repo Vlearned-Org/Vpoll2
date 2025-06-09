@@ -68,6 +68,7 @@ import { LegacyUserRequestComponent } from "./pages/public/legacy-user-request/l
 import { LegacyUsersComponent } from "./pages/admin/legacy-users/legacy-users.component";
 import { LegacyUserRequestsComponent } from "./pages/admin/legacy-user-requests/legacy-user-requests.component";
 import { ConsentFormComponent } from "./shared/components/consent-form/consent-form.component";
+import { PrivacySettingsComponent } from "./shared/components/privacy-settings/privacy-settings.component";
 import { AppCodeModule } from "./sample-components/app-code/app.code.component";
 import { BlocksComponent } from "./sample-components/blocks/blocks.component";
 import { BlockViewer } from "./sample-components/blockviewer/blockviewer.component";
@@ -207,6 +208,7 @@ const MODALS = [
     LegacyUsersComponent,
     LegacyUserRequestsComponent,
     ConsentFormComponent,
+    PrivacySettingsComponent,
     ProxyVotingComponent,
     ForgetPasswordComponent,
     SignupComponent,

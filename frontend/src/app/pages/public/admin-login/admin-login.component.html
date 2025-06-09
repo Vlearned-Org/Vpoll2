@@ -60,6 +60,13 @@
                 style="color: var(--primary-color)"
                 >Forgot password?</a> -->
             </div>
+
+            <!-- Admin Consent Form -->
+            <app-consent-form 
+              consentType="login"
+              [allowGranularConsent]="false"
+              (consentChanged)="onConsentChange($event)"
+            ></app-consent-form>
               <div style=" display: flex; justify-content: center; align-items: center; " >
                
               <button
@@ -75,6 +82,8 @@
                 label="Sign In"
               
                 (click)="signin()"
+                [disabled]="!isLoginValid || loading"
+                [loading]="loading"
               ></button>
               
             </div>

@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthHttpService } from '@app/shared/http-services/auth-http.service';
 import { Message, MessageService } from 'primeng/api';
+import { ConsentRecord } from '@app/shared/components/consent-form/consent-form.component';
 
 export interface CountryCode {
   name: string;
@@ -21,6 +22,7 @@ export class SignupComponent implements OnInit {
   public countryCodes: CountryCode[];
   public selectedCountryCode: CountryCode;
   public consentGiven = false;
+  public consentRecords: ConsentRecord[] = [];
   public loading = false;
 
   constructor(
@@ -92,6 +94,7 @@ export class SignupComponent implements OnInit {
     const payload = {
       ...formRawValue,
       mobile: fullMobileNumber, // Set the constructed mobile number
+      consents: this.consentRecords // Include consent records
     };
 
     // Remove individual mobile parts from payload if they exist to avoid backend confusion
@@ -133,7 +136,8 @@ export class SignupComponent implements OnInit {
     );
   }
 
-  public onConsentChange(consentValid: boolean): void {
-    this.consentGiven = consentValid;
+  public onConsentChange(consentData: {valid: boolean, consents: ConsentRecord[]}): void {
+    this.consentGiven = consentData.valid;
+    this.consentRecords = consentData.consents;
   }
 }

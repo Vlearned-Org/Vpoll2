@@ -21,10 +21,12 @@ import { UsersController, LegacyUsersController } from "./controllers/system/use
 import { LegacyUserRequestController } from "./controllers/system/legacy-user-request.controller";
 import { TestController } from "./controllers/test.controller";
 import { WebsocketEventGateway } from "./websocket.gateway";
+import { PrivacyController } from "./controllers/privacy/privacy.controller";
+import { PrivacyModule } from "@app/core/privacy/privacy.module";
 
 @Module({
   providers: [WebsocketEventGateway],
-  imports: [DataModule, HttpModule, CoreModule, AuthModule],
+  imports: [DataModule, HttpModule, CoreModule, AuthModule, PrivacyModule],
   controllers: [
     CompaniesController,
     UsersController,
@@ -44,7 +46,8 @@ import { WebsocketEventGateway } from "./websocket.gateway";
     AdminCompanyController,
     AnalyticsController,
     ReportController,
-    EnquiriesController
+    EnquiriesController,
+    PrivacyController
   ]
 })
 export class ApiModule {}

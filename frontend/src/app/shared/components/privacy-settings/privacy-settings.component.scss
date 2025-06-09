@@ -1,0 +1,377 @@
+.privacy-settings-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.privacy-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  
+  h2 {
+    margin: 0 0 1rem 0;
+    font-size: 2.2rem;
+    font-weight: 600;
+    
+    i {
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+  
+  .header-description {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    line-height: 1.6;
+  }
+}
+
+:host ::ng-deep {
+  .privacy-tabs {
+    .p-tabview-nav {
+      background: #f8f9fa;
+      border-radius: 8px 8px 0 0;
+      
+      .p-tabview-nav-link {
+        border: none;
+        background: transparent;
+        color: #6c757d;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        
+        &:hover {
+          background: rgba(108, 117, 125, 0.1);
+          color: #495057;
+        }
+        
+        &.p-highlight {
+          background: white;
+          color: var(--primary-color);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          border-radius: 8px 8px 0 0;
+        }
+      }
+    }
+    
+    .p-tabview-panels {
+      background: white;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.tab-content {
+  padding: 2rem;
+  
+  h3 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  
+  .tab-description {
+    color: #6c757d;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+}
+
+// Consent Form Styles
+.consent-form {
+  .consent-section {
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+    
+    h4 {
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      
+      i {
+        margin-right: 0.5rem;
+      }
+    }
+    
+    .consent-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: white;
+      border-radius: 6px;
+      border: 1px solid #e9ecef;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      .consent-label {
+        flex: 1;
+        margin: 0;
+        cursor: pointer;
+        
+        strong {
+          display: block;
+          color: #2c3e50;
+          margin-bottom: 0.25rem;
+          font-size: 1rem;
+        }
+        
+        small {
+          color: #6c757d;
+          line-height: 1.4;
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+  
+  .form-actions {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e9ecef;
+  }
+}
+
+// Data Rights Styles
+.data-rights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  
+  .data-right-card {
+    padding: 1.5rem;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    
+    &:hover:not(.disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-color: var(--primary-color);
+    }
+    
+    &.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .right-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      
+      .right-icon {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        margin-right: 0.75rem;
+      }
+      
+      h4 {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+    }
+    
+    p {
+      color: #6c757d;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+  }
+}
+
+.quick-actions {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  
+  h4 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+}
+
+// Table Styles
+:host ::ng-deep {
+  .p-datatable {
+    .p-datatable-thead > tr > th {
+      background: #f8f9fa;
+      color: #495057;
+      font-weight: 600;
+      border-color: #dee2e6;
+    }
+    
+    .p-datatable-tbody > tr > td {
+      border-color: #dee2e6;
+      vertical-align: middle;
+    }
+    
+    .consent-type {
+      font-family: 'Courier New', monospace;
+      background: #e9ecef;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+    }
+    
+    .consent-purpose {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    
+    code {
+      background: #f8f9fa;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      color: #e83e8c;
+    }
+  }
+}
+
+// Contact Info Styles
+.contact-info {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+  
+  h4 {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    
+    i {
+      opacity: 0.9;
+    }
+  }
+  
+  .contact-details {
+    p {
+      margin: 0.5rem 0;
+      line-height: 1.6;
+      
+      strong {
+        opacity: 0.9;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .privacy-settings-container {
+    padding: 1rem;
+  }
+  
+  .privacy-header {
+    padding: 1.5rem;
+    
+    h2 {
+      font-size: 1.8rem;
+    }
+  }
+  
+  .tab-content {
+    padding: 1rem;
+  }
+  
+  .data-rights-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .quick-actions .action-buttons {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+    }
+  }
+  
+  .consent-form .consent-section {
+    padding: 1rem;
+    
+    .consent-item {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+  }
+}
+
+// Loading States
+.loading-overlay {
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+}
+
+// Custom Checkbox Styles
+:host ::ng-deep {
+  .p-checkbox {
+    .p-checkbox-box {
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid #ced4da;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        border-color: var(--primary-color);
+      }
+      
+      &.p-highlight {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        
+        .p-checkbox-icon {
+          color: white;
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+} 

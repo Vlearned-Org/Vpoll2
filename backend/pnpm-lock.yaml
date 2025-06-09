@@ -39,7 +39,7 @@ importers:
         specifier: 7.6.18
         version: 7.6.18(@nestjs/common@7.6.18(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@6.6.7))(@nestjs/websockets@7.6.18)(rxjs@6.6.7)
       '@nestjs/schedule':
-        specifier: ^0.4.0
+        specifier: ^0.4.3
         version: 0.4.3(@nestjs/common@7.6.18(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@6.6.7))(reflect-metadata@0.1.14)
       '@nestjs/terminus':
         specifier: ^7.0.1

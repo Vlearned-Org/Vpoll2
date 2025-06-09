@@ -3,6 +3,7 @@ import { TypegooseModule } from "nestjs-typegoose";
 import { Company, Event, InternalFile, Invitee, Proxy,Corporate, Shareholder, User, Voting,Enquiry } from "./model";
 import { Audit } from "./model/audit.model";
 import { LegacyUserRequest } from "./model/legacy-user-request.model";
+import { Consent, DataSubjectRequest, PrivacySettings } from "./model/consent.model";
 import {
   CompanyRepository,
   EventRepository,
@@ -34,7 +35,7 @@ export const REPOSITORIES = [
 ];
 
 @Module({
-  imports: [TypegooseModule.forFeature([User, Company, Event, Shareholder, Proxy,Corporate, Invitee, Voting, InternalFile, Audit, Enquiry, LegacyUserRequest])],
+  imports: [TypegooseModule.forFeature([User, Company, Event, Shareholder, Proxy,Corporate, Invitee, Voting, InternalFile, Audit, Enquiry, LegacyUserRequest, Consent, DataSubjectRequest, PrivacySettings])],
   controllers: [],
   providers: [...REPOSITORIES],
   exports: [...REPOSITORIES]
