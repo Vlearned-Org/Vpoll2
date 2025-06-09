@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { RoleEnum } from '@vpoll-shared/enum';
 import { AppMainComponent } from './app.main.component';
+import { EventAnalyticsComponent } from './components/event-analytics/event-analytics.component';
 import { EventPageComponent } from './components/event-page/event-page.component';
 import { AdminsAccessComponent } from './pages/admin/admins-access/admins-access.component';
 import { CompanyEventsComponent } from './pages/admin/company-events/company-events.component';
@@ -136,6 +137,14 @@ import { RoleGuard } from './shared/security/guards/role.guard';
                 roles: [RoleEnum.COMPANY_SYSTEM, RoleEnum.COMPANY_ADMIN],
               },
               component: EventPageComponent,
+            },
+            {
+              path: 'company/events/:eventId/analytics',
+              canActivate: [LoggedInGuard, RoleGuard],
+              data: {
+                roles: [RoleEnum.COMPANY_SYSTEM, RoleEnum.COMPANY_ADMIN],
+              },
+              component: EventAnalyticsComponent,
             },
             {
               path: 'uikit/formlayout',

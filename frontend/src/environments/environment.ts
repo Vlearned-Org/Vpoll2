@@ -4,9 +4,9 @@
 
 export const environment = {
   production: false,
-  APP_DOMAIN: 'http://localhost:8001/',
-  API_DOMAIN: 'http://localhost:8001/',
-  API_URL: 'http://localhost:8001//api',
+  APP_DOMAIN: 'http://localhost:8080',
+  API_DOMAIN: 'http://localhost:8080',
+  API_URL: 'http://localhost:8080/api',
 };
 
 /*

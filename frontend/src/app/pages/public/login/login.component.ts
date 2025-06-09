@@ -23,6 +23,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   subscription: Subscription;
   public upcomingEvents: Array<PublicEvent> = [];
+  public consentGiven = false;
   constructor(
     public configService: ConfigService,
     public router: Router,
@@ -72,6 +73,15 @@ export class LoginComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.consentGiven) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Consent Required',
+        detail: 'You must provide consent to data processing before logging in'
+      });
+      return;
+    }
+
     const { email, password, rememberMe, source } = this.form.value;
     this.auth
       .userLogin({ email, password, rememberMe, source })
@@ -93,6 +103,10 @@ export class LoginComponent implements OnInit, OnDestroy {
           });
         }
       );
+  }
+
+  public onConsentChange(consentValid: boolean): void {
+    this.consentGiven = consentValid;
   }
 
   // Custom validator for email or NRIC

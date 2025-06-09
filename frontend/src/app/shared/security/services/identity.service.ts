@@ -31,11 +31,28 @@ export class IdentityService {
     if (newToken) {
       localStorage.setItem('access_token', newToken);
     }
-    console.log(newToken);
+    console.log('New token:', newToken);
     const token = localStorage.getItem('access_token');
-    console.log(token);
+    console.log('Current token from localStorage:', token);
     if (!token) {
+      console.log('No token found in localStorage');
       return EMPTY;
+    }
+
+    // Check if token is expired
+    try {
+      const isExpired = this.jwtHelperSvc.isTokenExpired(token);
+      console.log('Token expiration check result:', isExpired);
+      if (isExpired) {
+        console.log('Token is expired, clearing localStorage');
+        this.clear();
+        localStorage.clear();
+        this.router.navigate(['/']);
+        return EMPTY;
+      }
+    } catch (error) {
+      console.error('Error checking token expiration:', error);
+      // Don't clear token on error, let it be handled by backend
     }
 
     if (

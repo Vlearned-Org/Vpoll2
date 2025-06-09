@@ -67,7 +67,12 @@ export class AbstractRepository<T> {
   }
 
   public async create(body: T): Promise<T> {
-    return this.model.create(this.session ? [body] : body, this.session ? { session: this.session } : null);
+    if (this.session) {
+      const result = await this.model.create([body], { session: this.session });
+      return result[0] as T;
+    } else {
+      return this.model.create(body) as any;
+    }
   }
 
   public async bulk(body: T[]): Promise<T[]> {

@@ -34,7 +34,7 @@
         <div class="flex-1">
           <h4 class="mt-0 mb-2 text-blue-700">Legacy User Request Management</h4>
           <p class="text-600 mb-3">
-            Review and process requests from users who need help accessing the system. You can approve requests to automatically create user accounts or reject them with feedback.
+            Review and process requests from users who need help creating accounts or resetting passwords. You can approve requests to automatically create user accounts or reject them with feedback.
           </p>
           <div class="flex gap-2">
             <button 
@@ -195,9 +195,6 @@
               <div class="flex flex-column">
                 <div class="font-medium">{{ request.name }}</div>
                 <div class="text-sm text-600">{{ request.nric }}</div>
-                <div class="text-xs text-500" *ngIf="request.eventName">
-                  Event: {{ request.eventName }}
-                </div>
               </div>
             </td>
             <td>
@@ -219,9 +216,6 @@
                 </div>
                 <div *ngIf="request.contactPersonEmail" class="text-600">
                   <i class="pi pi-envelope mr-1"></i>{{ request.contactPersonEmail }}
-                </div>
-                <div *ngIf="request.contactPersonPhone" class="text-600">
-                  <i class="pi pi-phone mr-1"></i>{{ request.contactPersonPhone }}
                 </div>
               </div>
             </td>
@@ -320,10 +314,7 @@
         <label class="font-medium text-600">Request Type:</label>
         <p class="mt-1">{{ requestTypeLabels[selectedRequest.requestType] }}</p>
       </div>
-      <div class="col-12 md:col-6" *ngIf="selectedRequest.eventName">
-        <label class="font-medium text-600">Event Name:</label>
-        <p class="mt-1">{{ selectedRequest.eventName }}</p>
-      </div>
+
 
       <!-- Contact Information -->
       <div class="col-12">
@@ -343,22 +334,8 @@
         <label class="font-medium text-600">Contact Email:</label>
         <p class="mt-1">{{ selectedRequest.contactPersonEmail }}</p>
       </div>
-      <div class="col-12 md:col-6" *ngIf="selectedRequest.contactPersonPhone">
-        <label class="font-medium text-600">Contact Phone:</label>
-        <p class="mt-1">{{ selectedRequest.contactPersonPhone }}</p>
-      </div>
-      <div class="col-12" *ngIf="selectedRequest.physicalAddress">
-        <label class="font-medium text-600">Physical Address:</label>
-        <p class="mt-1">{{ selectedRequest.physicalAddress }}</p>
-      </div>
 
-      <!-- Message -->
-      <div class="col-12">
-        <h4 class="text-primary mb-3 mt-3">Request Message</h4>
-        <div class="bg-gray-100 p-3 border-round">
-          <p class="m-0 white-space-pre-line">{{ selectedRequest.message }}</p>
-        </div>
-      </div>
+
 
       <!-- Status Information -->
       <div class="col-12">
@@ -661,14 +638,14 @@
               <div class="credential-item">
                 <label class="credential-label">Username / Email:</label>
                 <div class="credential-value-container">
-                  <span class="credential-value">{{ generatedCredentials.username }}</span>
+                  <span class="credential-value">{{ generatedCredentials.email }}</span>
                   <button 
                     pButton 
                     pRipple 
                     icon="pi pi-copy" 
                     class="p-button-text p-button-sm"
                     pTooltip="Copy username"
-                    (click)="copyToClipboard(generatedCredentials.username)"
+                    (click)="copyToClipboard(generatedCredentials.email)"
                   ></button>
                 </div>
               </div>
@@ -758,7 +735,7 @@
             label="Copy All" 
             icon="pi pi-copy"
             class="p-button-outlined"
-            (click)="copyToClipboard('Username: ' + generatedCredentials.username + '\nPassword: ' + generatedCredentials.password + '\nUser ID: ' + generatedCredentials.userId)"
+            (click)="copyToClipboard('Username: ' + generatedCredentials.email + '\nPassword: ' + generatedCredentials.password + '\nUser ID: ' + generatedCredentials.userId)"
           ></button>
         </div>
         <button 

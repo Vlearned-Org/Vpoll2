@@ -34,7 +34,9 @@
   .p-password .p-password-input {
     border-radius: 6px;
     border: 1px solid var(--surface-300);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
 
     &:focus {
       border-color: var(--primary-color);
@@ -92,7 +94,8 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
   }
 
-  h3, h4 {
+  h3,
+  h4 {
     color: var(--text-color);
     font-weight: 600;
   }
@@ -103,23 +106,23 @@
   }
 
   &.border-blue-500 {
-    border-left-color: #3B82F6;
+    border-left-color: #3b82f6;
   }
 
   &.border-orange-500 {
-    border-left-color: #F97316;
+    border-left-color: #f97316;
   }
 
   &.border-cyan-500 {
-    border-left-color: #06B6D4;
+    border-left-color: #06b6d4;
   }
 
   &.border-green-500 {
-    border-left-color: #10B981;
+    border-left-color: #10b981;
   }
 
   &.border-red-500 {
-    border-left-color: #EF4444;
+    border-left-color: #ef4444;
   }
 }
 
@@ -240,19 +243,19 @@
   gap: 0.5rem;
 
   &.status-pending {
-    color: #F59E0B;
+    color: #f59e0b;
   }
 
   &.status-approved {
-    color: #06B6D4;
+    color: #06b6d4;
   }
 
   &.status-processed {
-    color: #10B981;
+    color: #10b981;
   }
 
   &.status-rejected {
-    color: #EF4444;
+    color: #ef4444;
   }
 }
 
@@ -384,14 +387,14 @@
 }
 
 .rejection-warning {
-  background: #FEF2F2;
-  border: 1px solid #FECACA;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1rem;
 
   .warning-text {
-    color: #B91C1C;
+    color: #b91c1c;
     font-size: 0.875rem;
   }
 }
@@ -512,7 +515,7 @@
   }
 
   .credential-value {
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
     font-size: 0.9rem;
     color: var(--text-color);
     background: var(--surface-100);
@@ -557,7 +560,7 @@
     margin-top: 1.5rem;
 
     .text-orange-700 {
-      color: #C2410C;
+      color: #c2410c;
     }
   }
 }
@@ -654,7 +657,7 @@
   }
 
   .credential-value {
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
     font-size: 0.9rem;
     color: var(--text-color);
     background: var(--surface-100);
@@ -699,7 +702,7 @@
     margin-top: 1.5rem;
 
     .text-orange-700 {
-      color: #C2410C;
+      color: #c2410c;
     }
   }
 }

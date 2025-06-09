@@ -168,6 +168,15 @@ export class UserHttpService {
     return this.http.post<User>(`${environment.API_URL}/admin/legacy-users/${userId}/unmark-legacy`, {}, { headers });
   }
 
+  public checkNricExists(nric: string): Observable<{ exists: boolean; nric: string }> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
+    return this.http.get<{ exists: boolean; nric: string }>(`${environment.API_URL}/admin/legacy-users/check-nric/${nric}`, { headers });
+  }
+
   public approveUser(id: string): Observable<User> {
     // Debug logging
     const token = localStorage.getItem('access_token');

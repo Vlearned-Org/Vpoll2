@@ -101,6 +101,14 @@ export class LegacyUserRequestController {
     if (body.createUser) {
       try {
         console.log(`[LEGACY USER] Creating user account for request ${id}...`);
+        
+        // Check if NRIC already exists
+        const nricExists = await this.userRepo.checkNricExists(request.nric);
+        if (nricExists) {
+          throw new Error(`NRIC ${request.nric.toUpperCase()} is already registered with another user`);
+        }
+        console.log(`[LEGACY USER] NRIC validation passed`);
+        
         const plainPassword = body.userData?.password || this.generateRandomPassword();
         console.log(`[LEGACY USER] Using ${body.userData?.password ? 'custom' : 'generated'} password`);
         const hashedPassword = await PasswordUtils.hash(plainPassword, true);
@@ -116,10 +124,8 @@ export class LegacyUserRequestController {
           status: UserStatusEnum.ACTIVE,
           accountVerificationStatus: AccountVerificationStatusEnum.APPROVED,
           fallbackContactName: request.contactPersonName,
-          fallbackContactPhone: request.contactPersonPhone,
           fallbackContactEmail: request.contactPersonEmail,
           fallbackContactRelation: request.contactPersonRelation,
-          physicalAddress: request.physicalAddress,
           requiresAssistedAccess: request.isWalkIn || request.preferredContactMethod === 'in_person',
           specialInstructions: this.buildSpecialInstructions(request, body)
         };
@@ -156,7 +162,7 @@ export class LegacyUserRequestController {
           console.log(`  - User ID: ${createdUser._id}`);
           console.log(`  - Generated Password: ${plainPassword}`);
           console.log(`  - Request ID: ${request._id}`);
-        } else if (request.contactPersonEmail || request.contactPersonPhone) {
+        } else if (request.contactPersonEmail) {
           console.log(`[LEGACY USER] Sending credentials to contact person for user: ${createdUser.nric}`);
           await this.sendApprovalNotification(request, createdUser, plainPassword);
         }
@@ -222,7 +228,7 @@ export class LegacyUserRequestController {
     );
 
     // Send rejection notification if contact available
-    if (request.contactPersonEmail || request.contactPersonPhone) {
+    if (request.contactPersonEmail) {
       await this.sendRejectionNotification(request, body.rejectionReason);
     }
 
@@ -304,7 +310,7 @@ export class LegacyUserRequestController {
         {
           name: request.contactPersonName || request.name,
           email: request.contactPersonEmail || '',
-          phone: request.contactPersonPhone || '',
+          phone: '',
           companyname: 'VPoll System',
           subject,
           message
@@ -347,7 +353,7 @@ export class LegacyUserRequestController {
         {
           name: request.contactPersonName || request.name,
           email: request.contactPersonEmail || '',
-          phone: request.contactPersonPhone || '',
+          phone: '',
           companyname: 'VPoll System',
           subject,
           message

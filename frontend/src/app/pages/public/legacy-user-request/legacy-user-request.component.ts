@@ -3,19 +3,17 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { AuthHttpService } from '@app/shared/http-services/auth-http.service';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 export interface LegacyUserRequestDto {
   name: string;
   nric: string;
   contactPersonName?: string;
-  contactPersonPhone?: string;
   contactPersonEmail?: string;
   contactPersonRelation?: string;
-  physicalAddress?: string;
-  preferredContactMethod: 'phone' | 'email' | 'postal' | 'in_person';
-  requestType: 'new_account' | 'password_reset' | 'access_help' | 'walk_in_account' | 'other';
-  message: string;
-  eventName?: string;
+  preferredContactMethod: 'email' | 'in_person';
+  requestType: 'new_account' | 'password_reset';
   visitLocation?: string;
   visitDate?: string;
   assistedBy?: string;
@@ -32,18 +30,18 @@ export class LegacyUserRequestComponent implements OnInit {
   public loading = false;
   public submitted = false;
 
+  // NRIC validation
+  private nricValidationSubject = new Subject<string>();
+  public nricValidationLoading = false;
+  public nricValidationMessage = '';
+
   public requestTypes = [
     { label: 'Create New Account', value: 'new_account' },
-    { label: 'Reset Password', value: 'password_reset' },
-    { label: 'Access Help', value: 'access_help' },
-    { label: 'Walk-in Account Creation', value: 'walk_in_account' },
-    { label: 'Other', value: 'other' }
+    { label: 'Reset Password', value: 'password_reset' }
   ];
 
   public contactMethods = [
-    { label: 'Phone (through contact person) - Admin will call', value: 'phone' },
     { label: 'Email (through contact person) - For OTP and notifications', value: 'email' },
-    { label: 'Postal Mail', value: 'postal' },
     { label: 'In-Person Visit - I will visit the office', value: 'in_person' }
   ];
 
@@ -56,6 +54,7 @@ export class LegacyUserRequestComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeForm();
+    this.setupNricValidation();
   }
 
   private initializeForm(): void {
@@ -63,14 +62,11 @@ export class LegacyUserRequestComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(2)]],
       nric: ['', [Validators.required, Validators.pattern(/^[A-Z0-9]{8,12}$/)]],
       contactPersonName: [''],
-      contactPersonPhone: ['', [Validators.pattern(/^\+?[0-9]{8,15}$/)]],
+
       contactPersonEmail: ['', [Validators.email]],
       contactPersonRelation: [''],
-      physicalAddress: [''],
       preferredContactMethod: ['email', Validators.required],
       requestType: ['new_account', Validators.required],
-      message: ['', [Validators.required, Validators.minLength(10)]],
-      eventName: [''],
       visitLocation: [''],
       visitDate: [''],
       assistedBy: [''],
@@ -80,47 +76,37 @@ export class LegacyUserRequestComponent implements OnInit {
     this.requestForm.get('preferredContactMethod').valueChanges.subscribe(method => {
       this.updateValidators(method);
     });
+
+    // Setup NRIC validation
+    this.requestForm.get('nric').valueChanges.subscribe(value => {
+      if (value && value.length >= 3) {
+        this.nricValidationSubject.next(value);
+      } else {
+        this.nricValidationMessage = '';
+      }
+    });
   }
 
   private updateValidators(contactMethod: string): void {
     const contactPersonNameControl = this.requestForm.get('contactPersonName');
-    const contactPersonPhoneControl = this.requestForm.get('contactPersonPhone');
     const contactPersonEmailControl = this.requestForm.get('contactPersonEmail');
-    const physicalAddressControl = this.requestForm.get('physicalAddress');
     const visitLocationControl = this.requestForm.get('visitLocation');
     const visitDateControl = this.requestForm.get('visitDate');
 
     contactPersonNameControl.clearValidators();
-    contactPersonPhoneControl.clearValidators();
     contactPersonEmailControl.clearValidators();
-    physicalAddressControl.clearValidators();
     visitLocationControl.clearValidators();
     visitDateControl.clearValidators();
 
-    contactPersonPhoneControl.setValidators([Validators.pattern(/^\+?[0-9]{8,15}$/)]);
     contactPersonEmailControl.setValidators([Validators.email]);
 
     switch (contactMethod) {
-      case 'phone':
-        contactPersonNameControl.setValidators([Validators.required]);
-        contactPersonPhoneControl.setValidators([
-          Validators.required,
-          Validators.pattern(/^\+?[0-9]{8,15}$/)
-        ]);
-        contactPersonEmailControl.setValidators([
-          Validators.required,
-          Validators.email
-        ]);
-        break;
       case 'email':
         contactPersonNameControl.setValidators([Validators.required]);
         contactPersonEmailControl.setValidators([
           Validators.required,
           Validators.email
         ]);
-        break;
-      case 'postal':
-        physicalAddressControl.setValidators([Validators.required]);
         break;
       case 'in_person':
         visitLocationControl.setValidators([Validators.required]);
@@ -130,9 +116,7 @@ export class LegacyUserRequestComponent implements OnInit {
     }
 
     contactPersonNameControl.updateValueAndValidity();
-    contactPersonPhoneControl.updateValueAndValidity();
     contactPersonEmailControl.updateValueAndValidity();
-    physicalAddressControl.updateValueAndValidity();
     visitLocationControl.updateValueAndValidity();
     visitDateControl.updateValueAndValidity();
   }
@@ -163,6 +147,16 @@ export class LegacyUserRequestComponent implements OnInit {
       return;
     }
 
+    // Check for NRIC validation errors
+    if (this.requestForm.get('nric').hasError('nricExists')) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'NRIC Already Registered',
+        detail: this.nricValidationMessage
+      });
+      return;
+    }
+
     this.loading = true;
     const requestData: LegacyUserRequestDto = this.requestForm.value;
 
@@ -178,11 +172,22 @@ export class LegacyUserRequestComponent implements OnInit {
       },
       (error) => {
         this.loading = false;
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Submission Failed',
-          detail: error.message || 'Failed to submit request. Please try again.'
-        });
+        // Handle NRIC conflict errors specifically
+        if (error.error && error.error.message && error.error.message.includes('NRIC') && error.error.message.includes('already registered')) {
+          this.requestForm.get('nric').setErrors({ nricExists: true });
+          this.nricValidationMessage = error.error.message;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'NRIC Already Registered',
+            detail: error.error.message
+          });
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Submission Failed',
+            detail: error.error?.message || error.message || 'Failed to submit request. Please try again.'
+          });
+        }
       }
     );
   }
@@ -190,6 +195,7 @@ export class LegacyUserRequestComponent implements OnInit {
   public resetForm(): void {
     this.submitted = false;
     this.requestForm.reset();
+    this.nricValidationMessage = '';
     this.initializeForm();
   }
 
@@ -213,9 +219,9 @@ export class LegacyUserRequestComponent implements OnInit {
     if (field?.errors && field.touched) {
       if (field.errors['required']) return `${this.getFieldLabel(fieldName)} is required`;
       if (field.errors['email']) return 'Please enter a valid email address';
+      if (field.errors['nricExists']) return this.nricValidationMessage;
       if (field.errors['pattern']) {
         if (fieldName === 'nric') return 'NRIC should be 8-12 alphanumeric characters';
-        if (fieldName.includes('Phone')) return 'Please enter a valid phone number';
       }
       if (field.errors['minlength']) return `${this.getFieldLabel(fieldName)} is too short`;
     }
@@ -227,14 +233,10 @@ export class LegacyUserRequestComponent implements OnInit {
       name: 'Name',
       nric: 'NRIC',
       contactPersonName: 'Contact Person Name',
-      contactPersonPhone: 'Contact Person Phone',
       contactPersonEmail: 'Contact Person Email',
       contactPersonRelation: 'Relationship',
-      physicalAddress: 'Physical Address',
       preferredContactMethod: 'Preferred Contact Method',
       requestType: 'Request Type',
-      message: 'Message',
-      eventName: 'Event Name',
       visitLocation: 'Visit Location',
       visitDate: 'Visit Date',
       assistedBy: 'Assisted By'
@@ -244,11 +246,7 @@ export class LegacyUserRequestComponent implements OnInit {
 
   public get showContactPersonFields(): boolean {
     const method = this.requestForm.get('preferredContactMethod')?.value;
-    return method === 'phone' || method === 'email';
-  }
-
-  public get showPhysicalAddress(): boolean {
-    return this.requestForm.get('preferredContactMethod')?.value === 'postal';
+    return method === 'email';
   }
 
   public get showInPersonFields(): boolean {
@@ -263,5 +261,37 @@ export class LegacyUserRequestComponent implements OnInit {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow.toISOString().split('T')[0];
+  }
+
+  private setupNricValidation(): void {
+    this.nricValidationSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(nric => {
+        this.nricValidationLoading = true;
+        this.nricValidationMessage = '';
+        return this.authHttpService.checkNricExists(nric);
+      })
+    ).subscribe(
+      (response) => {
+        this.nricValidationLoading = false;
+        if (response.exists) {
+          this.nricValidationMessage = `NRIC ${response.nric} is already registered. If this is your account, please use the login page or password reset option.`;
+          this.requestForm.get('nric').setErrors({ nricExists: true });
+        } else {
+          this.nricValidationMessage = '';
+          const currentErrors = this.requestForm.get('nric').errors;
+          if (currentErrors && currentErrors['nricExists']) {
+            delete currentErrors['nricExists'];
+            const hasOtherErrors = Object.keys(currentErrors).length > 0;
+            this.requestForm.get('nric').setErrors(hasOtherErrors ? currentErrors : null);
+          }
+        }
+      },
+      (error) => {
+        this.nricValidationLoading = false;
+        console.error('NRIC validation error:', error);
+      }
+    );
   }
 }

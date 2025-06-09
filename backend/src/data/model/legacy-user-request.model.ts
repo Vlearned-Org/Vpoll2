@@ -12,16 +12,11 @@ export enum LegacyUserRequestStatus {
 
 export enum LegacyUserRequestType {
   NEW_ACCOUNT = "new_account",
-  PASSWORD_RESET = "password_reset", 
-  ACCESS_HELP = "access_help",
-  WALK_IN_ACCOUNT = "walk_in_account",
-  OTHER = "other"
+  PASSWORD_RESET = "password_reset"
 }
 
 export enum PreferredContactMethod {
-  PHONE = "phone",
   EMAIL = "email",
-  POSTAL = "postal",
   IN_PERSON = "in_person"
 }
 
@@ -45,10 +40,7 @@ export class LegacyUserRequest extends AbstractModel {
   @IsString()
   public contactPersonName?: string;
 
-  @prop()
-  @IsOptional()
-  @IsString()
-  public contactPersonPhone?: string;
+
 
   @prop()
   @IsOptional()
@@ -60,10 +52,7 @@ export class LegacyUserRequest extends AbstractModel {
   @IsString()
   public contactPersonRelation?: string;
 
-  @prop()
-  @IsOptional()
-  @IsString()
-  public physicalAddress?: string;
+
 
   @prop({ 
     required: true,
@@ -81,14 +70,7 @@ export class LegacyUserRequest extends AbstractModel {
   @IsEnum(LegacyUserRequestType)
   public requestType: LegacyUserRequestType;
 
-  @prop({ required: true })
-  @IsString()
-  public message: string;
 
-  @prop()
-  @IsOptional()
-  @IsString()
-  public eventName?: string;
 
   @prop({ 
     default: LegacyUserRequestStatus.PENDING,

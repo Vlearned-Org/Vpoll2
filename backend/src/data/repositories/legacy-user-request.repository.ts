@@ -11,12 +11,13 @@ export class LegacyUserRequestRepository extends AbstractRepository<LegacyUserRe
   }
 
   async create(requestData: Partial<LegacyUserRequest>): Promise<LegacyUserRequest> {
-    const request = new this.model({
+    const requestWithDefaults = {
       ...requestData,
       status: LegacyUserRequestStatus.PENDING,
       createdAt: new Date()
-    });
-    return request.save();
+    } as LegacyUserRequest;
+    
+    return super.create(requestWithDefaults);
   }
 
   async findAll(filters: any = {}): Promise<LegacyUserRequest[]> {

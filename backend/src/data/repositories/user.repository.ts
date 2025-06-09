@@ -91,7 +91,7 @@ export class UserRepository extends AbstractRepository<User> {
       accountVerificationStatus: AccountVerificationStatusEnum.APPROVED,
       roles: [{ role: RoleEnum.COMPANY_SYSTEM, companyId }]
     } as User;
-    return this.model.create(user);
+    return super.create(user);
   }
 
   public async createCompanyAdmin(payload: CreateCompanyAdminDto): Promise<User> {
@@ -105,7 +105,7 @@ export class UserRepository extends AbstractRepository<User> {
       accountVerificationStatus: AccountVerificationStatusEnum.APPROVED,
       roles: [{ role: RoleEnum.COMPANY_ADMIN, companyId }]
     } as User;
-    return this.model.create(user);
+    return super.create(user);
   }
 
   public async createBasicUser(email: string, password: string, dataname: string, datanric: string, mobile?: string): Promise<User> {
@@ -120,22 +120,34 @@ export class UserRepository extends AbstractRepository<User> {
       roles: [],
       mobile
     } as User;
-    return this.model.create(user);
+    return super.create(user);
   }
 
   public async updateVerificationInfo(userId: string, payload: UserVerificationDto): Promise<User> {
+    // Check if NRIC already exists (excluding current user)
+    if (payload.identity) {
+      const nricExists = await this.checkNricExists(payload.identity, userId);
+      if (nricExists) {
+        throw new Error(`NRIC ${payload.identity.toUpperCase()} is already registered with another user`);
+      }
+    }
+
+    const updateData: any = {
+      accountVerificationStatus: AccountVerificationStatusEnum.PENDING,
+      nric: payload.identity,
+      email: payload.email,
+      name: payload.name,
+      rejectMessage: null
+    };
+
+    // Only set nricRef if identityDocument is provided and is a valid ObjectId string
+    if (payload.identityDocument) {
+      updateData.nricRef = payload.identityDocument;
+    }
+
     return this.model.findOneAndUpdate(
       { _id: userId },
-      {
-        $set: {
-          accountVerificationStatus: AccountVerificationStatusEnum.PENDING,
-          nric: payload.identity,
-          nricRef: payload.identityDocument,
-          email: payload.email,
-          name: payload.name,
-          rejectMessage: null
-        }
-      },
+      { $set: updateData },
       { new: true, lean: true }
     );
   }
@@ -211,7 +223,7 @@ export class UserRepository extends AbstractRepository<User> {
       isLegacyUser: true,
       roles: []
     } as User;
-    return this.model.create(user);
+    return super.create(user);
   }
 
   public async updateLegacyUser(userId: string, userData: any): Promise<User> {
@@ -244,5 +256,14 @@ export class UserRepository extends AbstractRepository<User> {
       { $set: { isLegacyUser: false } },
       { new: true }
     );
+  }
+
+  public async checkNricExists(nric: string, excludeUserId?: string): Promise<boolean> {
+    const query: any = { nric: nric.toUpperCase() };
+    if (excludeUserId) {
+      query._id = { $ne: excludeUserId };
+    }
+    const user = await this.model.findOne(query);
+    return !!user;
   }
 }

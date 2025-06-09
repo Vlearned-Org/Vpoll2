@@ -1,0 +1,450 @@
+:host ::ng-deep {
+  .p-chart {
+    position: relative;
+    
+    canvas {
+      max-height: 100% !important;
+    }
+  }
+
+  .p-multiselect,
+  .p-calendar,
+  .p-button {
+    border-radius: 6px;
+    border: 1px solid var(--surface-300);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus,
+    &:focus-within {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 1px var(--primary-color);
+    }
+  }
+
+  .p-multiselect-panel,
+  .p-calendar-panel {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--surface-300);
+  }
+
+  .p-progressspinner {
+    .p-progressspinner-circle {
+      stroke: var(--primary-color);
+    }
+  }
+
+  .p-toast {
+    .p-toast-message {
+      margin: 0 0 1rem 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+  }
+
+  .p-dialog {
+    .p-dialog-header {
+      background: var(--surface-0);
+      border-bottom: 1px solid var(--surface-200);
+      border-radius: 8px 8px 0 0;
+    }
+
+    .p-dialog-content {
+      background: var(--surface-0);
+      border-radius: 0 0 8px 8px;
+    }
+  }
+
+  .p-tag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+}
+
+.analytics-dashboard {
+  padding: 1rem;
+  background: var(--surface-ground);
+  min-height: 100vh;
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e1e5e9;
+    padding: 1.5rem;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    height: 100%;
+
+    &:hover {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+    }
+
+    h3, h4, h5 {
+      color: var(--text-color);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    // Colored background cards
+    &.bg-blue-50 {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border: 1px solid #bfdbfe;
+      
+      .text-blue-600 { color: #2563eb; }
+      .text-blue-900 { color: #1e3a8a; }
+    }
+
+    &.bg-green-50 {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border: 1px solid #bbf7d0;
+      
+      .text-green-600 { color: #16a34a; }
+      .text-green-900 { color: #14532d; }
+    }
+
+    &.bg-orange-50 {
+      background: linear-gradient(135deg, #fff7ed, #fed7aa);
+      border: 1px solid #fdba74;
+      
+      .text-orange-600 { color: #ea580c; }
+      .text-orange-900 { color: #9a3412; }
+    }
+
+    &.bg-purple-50 {
+      background: linear-gradient(135deg, #faf5ff, #e9d5ff);
+      border: 1px solid #c4b5fd;
+      
+      .text-purple-600 { color: #9333ea; }
+      .text-purple-900 { color: #581c87; }
+    }
+  }
+}
+
+.analytics-content {
+  .grid {
+    margin: -0.5rem;
+    
+    > div {
+      padding: 0.5rem;
+    }
+  }
+}
+
+// Chart containers
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+  
+  .chart-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color-secondary);
+    font-size: 0.875rem;
+  }
+  
+  .chart-error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--text-color-secondary);
+    
+    i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: #f59e0b;
+    }
+  }
+}
+
+// Metrics styling
+.metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+  color: var(--text-color);
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// Timeline milestones
+.timeline-milestones {
+  border-top: 1px solid var(--surface-200);
+  padding-top: 1rem;
+  margin-top: 1rem;
+  
+  .milestone-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    
+    .milestone-time {
+      font-size: 0.75rem;
+      color: var(--text-color-secondary);
+      min-width: 100px;
+    }
+    
+    .milestone-event {
+      font-weight: 500;
+      color: var(--text-color);
+    }
+    
+    .milestone-description {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+    }
+  }
+}
+
+// Detailed view dialog
+.detailed-analytics-content {
+  height: 100%;
+  overflow-y: auto;
+  
+  .analytics-section {
+    margin-bottom: 2rem;
+    
+    h3 {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+  }
+  
+  .analytics-table {
+    .p-datatable {
+      border-radius: 8px;
+      overflow: hidden;
+      
+      .p-datatable-thead > tr > th {
+        background: var(--surface-100);
+        color: var(--text-color-secondary);
+        font-weight: 600;
+        border-bottom: 1px solid var(--surface-300);
+      }
+      
+      .p-datatable-tbody > tr {
+        transition: background-color 0.2s ease;
+        
+        &:hover {
+          background: var(--surface-50);
+        }
+      }
+    }
+  }
+}
+
+// Filter panel
+.filter-panel {
+  background: var(--surface-50);
+  border: 1px solid var(--surface-200);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  
+  .filter-group {
+    margin-bottom: 1rem;
+    
+    label {
+      display: block;
+      font-weight: 500;
+      color: var(--text-color);
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+// Loading states
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  z-index: 1000;
+  
+  .loading-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-color-secondary);
+    font-weight: 500;
+  }
+}
+
+// Responsive design
+@media (max-width: 1200px) {
+  .analytics-dashboard {
+    .card {
+      padding: 1rem;
+    }
+    
+    .chart-container {
+      height: 250px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .analytics-dashboard {
+    padding: 0.5rem;
+    
+    .card {
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .grid > div {
+      padding: 0.25rem;
+    }
+    
+    .chart-container {
+      height: 200px;
+    }
+    
+    .metric-value {
+      font-size: 1.5rem;
+    }
+    
+    .flex.gap-2 {
+      flex-direction: column;
+      gap: 0.5rem;
+      
+      .p-button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .analytics-dashboard {
+    .overview-cards {
+      .col-12 {
+        padding: 0.25rem;
+        
+        .card {
+          padding: 0.75rem;
+          text-align: center;
+        }
+      }
+    }
+    
+    .timeline-milestones {
+      .flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+    }
+  }
+  
+  :host ::ng-deep {
+    .p-dialog {
+      .p-dialog-content {
+        padding: 1rem;
+      }
+    }
+  }
+}
+
+// Animation classes
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Chart legend customization
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+    
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+  }
+}
+
+// Error states
+.error-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-color-secondary);
+  
+  .error-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #f59e0b;
+  }
+  
+  .error-message {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .error-description {
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+  }
+} 

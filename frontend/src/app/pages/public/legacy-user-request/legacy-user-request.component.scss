@@ -395,6 +395,41 @@
   }
 }
 
+// NRIC validation styling
+.p-inputgroup {
+  .p-inputgroup-addon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    background: var(--surface-100);
+    border: 1px solid var(--surface-300);
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    min-width: 2.5rem;
+
+    i {
+      font-size: 0.875rem;
+
+      &.text-red-500 {
+        color: #ef4444;
+      }
+
+      &.text-green-500 {
+        color: #10b981;
+      }
+
+      &.pi-spinner {
+        color: var(--primary-color);
+      }
+    }
+  }
+
+  input {
+    border-radius: 6px 0 0 6px !important;
+  }
+}
+
 // Animation for smooth form transitions
 .fade-in {
   animation: fadeIn 0.3s ease-in-out;

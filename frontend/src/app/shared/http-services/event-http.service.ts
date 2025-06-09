@@ -90,20 +90,20 @@ export class EventHttpService {
     );
   }
 
-  public startEventPolling(eventId: string): Observable<Event> {
+  public startEventPolling(eventId: string, password: string): Observable<Event> {
     const headers = this.getAuthHeaders();
     return this.http.patch<Event>(
       `${environment.API_URL}/events/${eventId}/start-polling`,
-      {}, // Empty object instead of null
+      { password },
       { headers }
     );
   }
 
-  public endEventPolling(eventId: string): Observable<Event> {
+  public endEventPolling(eventId: string, password: string): Observable<Event> {
     const headers = this.getAuthHeaders();
     return this.http.patch<Event>(
       `${environment.API_URL}/events/${eventId}/end-polling`,
-      {}, // Empty object instead of null
+      { password },
       { headers }
     );
   }

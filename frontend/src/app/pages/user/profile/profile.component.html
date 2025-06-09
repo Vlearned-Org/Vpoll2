@@ -284,26 +284,6 @@
           </div>
         </div>
 
-        <div class="col-12" *ngIf="!user?.isAdmin">
-          <div class="field">
-            <label class="block font-medium mb-2">
-              NRIC/Passport Document
-              <span class="text-red-500" *ngIf="!user || (user.accountVerificationStatus !== AccountVerificationStatusEnum.APPROVED && !user.isAdmin)">*</span>
-            </label>
-            <app-file-uploader
-              [file]="identityDocument"
-              [canEdit]="true"
-              [enableDisplay]="true"
-              (fileUploaded)="addIdentityDocument($event)"
-              (fileDeleted)="removeIdentityDocument()"
-            ></app-file-uploader>
-            <small class="p-info block mt-1">
-              <i class="pi pi-upload mr-1"></i>
-              Upload a clear photo or scan of your NRIC or Passport
-            </small>
-          </div>
-        </div>
-
         <div class="col-12">
           <div class="flex gap-2 justify-content-end">
             <button 

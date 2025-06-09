@@ -19,3 +19,8 @@ export class UserVotingDto implements VotingData {
   @Type(() => ResolutionVotingDto)
   public voting: Array<ResolutionVotingDto>;
 }
+
+export class PasswordConfirmationDto {
+  @IsString()
+  public password: string;
+}

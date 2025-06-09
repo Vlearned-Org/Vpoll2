@@ -8,14 +8,10 @@ export interface LegacyUserRequest {
   name: string;
   nric: string;
   contactPersonName?: string;
-  contactPersonPhone?: string;
   contactPersonEmail?: string;
   contactPersonRelation?: string;
-  physicalAddress?: string;
-  preferredContactMethod: 'phone' | 'email' | 'postal' | 'in_person';
-  requestType: 'new_account' | 'password_reset' | 'access_help' | 'other';
-  message: string;
-  eventName?: string;
+  preferredContactMethod: 'email' | 'in_person';
+  requestType: 'new_account' | 'password_reset';
   visitLocation?: string;
   visitDate?: string;
   assistedBy?: string;

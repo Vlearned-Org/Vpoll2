@@ -89,8 +89,9 @@ export class UserSignUpDto implements UserSignUpDtoContract {
   @IsString()
   public nric: string;
 
+  @IsOptional()
   @IsString()
-  public otp: string;
+  public otp?: string;
 
   @IsString()
   public password: string;

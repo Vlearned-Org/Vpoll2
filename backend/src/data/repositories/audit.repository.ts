@@ -24,15 +24,15 @@ export class AuditRepository extends AbstractRepository<Audit<AuditData>> {
   }
 
   public async logEvent(event: Audit<EventAuditData>): Promise<Audit<EventAuditData>> {
-    return this.model.create(event) as any;
+    return super.create(event as unknown as Audit<AuditData>) as unknown as Audit<EventAuditData>;
   }
 
   public async logAttendance(attendance: Audit<AttendanceAuditData>): Promise<Audit<AttendanceAuditData>> {
-    return this.model.create(attendance) as any;
+    return super.create(attendance as unknown as Audit<AuditData>) as unknown as Audit<AttendanceAuditData>;
   }
 
   public async logLeave(leave: Audit<LeaveAuditData>): Promise<Audit<LeaveAuditData>> {
-    return this.model.create(leave) as any;
+    return super.create(leave as unknown as Audit<AuditData>) as unknown as Audit<LeaveAuditData>;
   }
 
   public async logQuestion(question: Audit<QuestionAuditData>): Promise<Audit<QuestionAuditData>> {
@@ -71,10 +71,10 @@ export class AuditRepository extends AbstractRepository<Audit<AuditData>> {
         roles: question.data?.roles
       }));
       
-      // Create the document
-      const result = await this.model.create(question);
+      // Create the document using the inherited method
+      const result = await super.create(question);
       console.log(`Question successfully logged with ID: ${result?._id || 'unknown'}`);
-      return result as any;
+      return result as Audit<QuestionAuditData>;
     } catch (error) {
       console.error(`Error in logQuestion: ${error.message}`);
       console.error(error.stack);
@@ -83,7 +83,7 @@ export class AuditRepository extends AbstractRepository<Audit<AuditData>> {
   }
 
   public async logVoting(vote: Audit<VoteAuditData>): Promise<Audit<VoteAuditData>> {
-    return this.model.create(vote) as any;
+    return super.create(vote as unknown as Audit<AuditData>) as unknown as Audit<VoteAuditData>;
   }
 
   public async logUserCreation(users: Audit<UserAuditData>[]): Promise<UserAuditData> {

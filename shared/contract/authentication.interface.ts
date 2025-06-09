@@ -24,7 +24,7 @@ export interface UserSignUpDto {
   email: string;
   name: string;
   nric: string;
-  otp: string;
+  otp?: string;
   password: string;
   confirmPassword: string;
   mobile?: string;

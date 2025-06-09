@@ -98,16 +98,48 @@
             <label for="nric" class="block font-medium mb-2">
               NRIC <span class="text-red-500">*</span>
             </label>
-            <input 
-              pInputText 
-              id="nric" 
-              formControlName="nric" 
-              placeholder="Enter NRIC"
-              class="w-full"
-            />
+            <div class="p-inputgroup">
+              <input 
+                pInputText 
+                id="nric" 
+                formControlName="nric" 
+                placeholder="Enter NRIC"
+                class="w-full"
+              />
+              <span class="p-inputgroup-addon" *ngIf="nricValidationLoading">
+                <i class="pi pi-spin pi-spinner"></i>
+              </span>
+              <span class="p-inputgroup-addon" *ngIf="!nricValidationLoading && nricValidationMessage && createUserForm.get('nric')?.hasError('nricExists')">
+                <i class="pi pi-times text-red-500"></i>
+              </span>
+              <span class="p-inputgroup-addon" *ngIf="!nricValidationLoading && !nricValidationMessage && createUserForm.get('nric')?.value && createUserForm.get('nric')?.value.length >= 3">
+                <i class="pi pi-check text-green-500"></i>
+              </span>
+            </div>
             <small class="p-error block mt-1" *ngIf="getFieldError('nric')">
               {{ getFieldError('nric') }}
             </small>
+            <small class="p-info block mt-1" *ngIf="nricValidationLoading">
+              Checking NRIC availability...
+            </small>
+            <div *ngIf="nricValidationMessage && createUserForm.get('nric')?.hasError('nricExists')" class="mt-2 p-3 bg-orange-50 border-l-4 border-orange-400 rounded">
+              <div class="flex">
+                <i class="pi pi-exclamation-triangle text-orange-400 mr-2 mt-1"></i>
+                <div>
+                  <p class="text-orange-700 font-medium mb-1">NRIC Already Registered</p>
+                  <p class="text-orange-600 text-sm mb-2">{{ nricValidationMessage }}</p>
+                  <p class="text-orange-600 text-sm">
+                    This NRIC is already associated with an existing user account. Please:
+                  </p>
+                  <ul class="text-orange-600 text-sm list-disc list-inside mt-1">
+                    <li>Verify the NRIC is correct</li>
+                    <li>Check if this user already has an account in the system</li>
+                    <li>Use a different NRIC if this is a different person</li>
+                    <li>Edit the existing user's record instead of creating a new one</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -170,7 +202,7 @@
         <!-- Fallback Contact Information -->
         <div class="col-12">
           <h4 class="text-primary mb-3 mt-4">Fallback Contact Information</h4>
-          <p class="text-600 mb-3">For users without email/phone, provide alternative contact information (family member, caregiver, etc.).</p>
+          <p class="text-600 mb-3">For users without email, provide alternative contact information (family member, caregiver, etc.).</p>
         </div>
 
         <div class="col-12 md:col-6">
@@ -199,21 +231,7 @@
           </div>
         </div>
 
-        <div class="col-12 md:col-6">
-          <div class="field">
-            <label for="fallbackContactPhone" class="block font-medium mb-2">Fallback Contact Phone</label>
-            <input 
-              pInputText 
-              id="fallbackContactPhone" 
-              formControlName="fallbackContactPhone" 
-              placeholder="Phone number of fallback contact"
-              class="w-full"
-            />
-            <small class="p-error block mt-1" *ngIf="getFieldError('fallbackContactPhone')">
-              {{ getFieldError('fallbackContactPhone') }}
-            </small>
-          </div>
-        </div>
+
 
         <div class="col-12 md:col-6">
           <div class="field">
@@ -361,9 +379,7 @@
               <div class="flex flex-column text-sm" *ngIf="user.fallbackContactName; else noFallback">
                 <span class="font-medium">{{ user.fallbackContactName }}</span>
                 <span class="text-600" *ngIf="user.fallbackContactRelation">{{ user.fallbackContactRelation }}</span>
-                <span *ngIf="user.fallbackContactPhone">
-                  <i class="pi pi-phone mr-1"></i>{{ user.fallbackContactPhone }}
-                </span>
+
                 <span *ngIf="user.fallbackContactEmail">
                   <i class="pi pi-envelope mr-1"></i>{{ user.fallbackContactEmail }}
                 </span>
@@ -469,11 +485,11 @@
           <h4 class="mt-0 mb-2 text-green-700">How to Help Legacy Users</h4>
           <div class="grid">
             <div class="col-12 md:col-6">
-              <h5 class="text-green-600">For Users Without Email/Phone:</h5>
+              <h5 class="text-green-600">For Users Without Email:</h5>
               <ul class="text-600 pl-3">
-                <li>Set up fallback contact (family member/caregiver)</li>
+                <li>Set up fallback email contact (family member/caregiver)</li>
                 <li>Generate temporary access codes for event participation</li>
-                <li>Send notifications to fallback contacts</li>
+                <li>Send notifications to fallback email contacts</li>
                 <li>Consider assisted access if needed</li>
               </ul>
             </div>

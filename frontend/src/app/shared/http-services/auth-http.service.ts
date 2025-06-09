@@ -24,14 +24,10 @@ export interface LegacyUserRequestDto {
   name: string;
   nric: string;
   contactPersonName?: string;
-  contactPersonPhone?: string;
   contactPersonEmail?: string;
   contactPersonRelation?: string;
-  physicalAddress?: string;
-  preferredContactMethod: 'phone' | 'email' | 'postal' | 'in_person';
-  requestType: 'new_account' | 'password_reset' | 'access_help' | 'walk_in_account' | 'other';
-  message: string;
-  eventName?: string;
+  preferredContactMethod: 'email' | 'in_person';
+  requestType: 'new_account' | 'password_reset';
   visitLocation?: string;
   visitDate?: string;
   assistedBy?: string;
@@ -137,6 +133,13 @@ export class AuthHttpService {
     return this.http.post<any>(
       `${environment.API_URL}/legacy-user-request`,
       payload
+    );
+  }
+
+  public checkNricExists(nric: string): Observable<{ exists: boolean; nric: string }> {
+    return this.http.post<{ exists: boolean; nric: string }>(
+      `${environment.API_URL}/check-nric`,
+      { nric }
     );
   }
 }

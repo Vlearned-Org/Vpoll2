@@ -17,14 +17,10 @@ export interface LegacyUserRequestDto {
   name: string;
   nric: string;
   contactPersonName?: string;
-  contactPersonPhone?: string;
   contactPersonEmail?: string;
   contactPersonRelation?: string;
-  physicalAddress?: string;
-  preferredContactMethod: 'phone' | 'email' | 'postal' | 'in_person';
-  requestType: 'new_account' | 'password_reset' | 'access_help' | 'walk_in_account' | 'other';
-  message: string;
-  eventName?: string;
+  preferredContactMethod: 'email' | 'in_person';
+  requestType: 'new_account' | 'password_reset';
   visitLocation?: string;
   visitDate?: string;
   assistedBy?: string;
@@ -87,11 +83,11 @@ export class UserAuthController {
   }
 
   @Post("signup")
-  public async verifyMobileAndCreateUser(@Body() body: UserSignUpDto): Promise<User> {
+  public async createUser(@Body() body: UserSignUpDto): Promise<User> {
     if (body.password !== body.confirmPassword) {
       throw new DataException({ message: "Password and confirm password unmatch" });
     }
-    return this.auth.validateOtpAndCreateUser(body);
+    return this.auth.createUserDirectly(body);
   }
 
   @Post("request-change-password")
@@ -107,21 +103,31 @@ export class UserAuthController {
     return this.password.reset(body, UserTokenEnum.EMAIL);
   }
 
+  @Post("check-nric")
+  public async checkNricExists(@Body() body: { nric: string }): Promise<{ exists: boolean; nric: string }> {
+    const exists = await this.userRepo.checkNricExists(body.nric);
+    return { exists, nric: body.nric.toUpperCase() };
+  }
+
   @Post("legacy-user-request")
   public async submitLegacyUserRequest(@Body() body: LegacyUserRequestDto): Promise<{ message: string }> {
+    // Check if NRIC already exists
+    const nricExists = await this.userRepo.checkNricExists(body.nric);
+    if (nricExists) {
+      throw new DataException({ 
+        message: `NRIC ${body.nric.toUpperCase()} is already registered. If this is your account, please use the login page or password reset option.` 
+      });
+    }
+
     // Save the request to database
     const savedRequest = await this.legacyUserRequestRepo.create({
       name: body.name,
       nric: body.nric,
       contactPersonName: body.contactPersonName,
-      contactPersonPhone: body.contactPersonPhone,
       contactPersonEmail: body.contactPersonEmail,
       contactPersonRelation: body.contactPersonRelation,
-      physicalAddress: body.physicalAddress,
       preferredContactMethod: body.preferredContactMethod as any,
       requestType: body.requestType as any,
-      message: body.message,
-      eventName: body.eventName,
       visitLocation: body.visitLocation,
       visitDate: body.visitDate ? new Date(body.visitDate) : undefined,
       assistedBy: body.assistedBy,
@@ -139,20 +145,13 @@ export class UserAuthController {
       - Name: ${body.name}
       - NRIC: ${body.nric}
       - Request Type: ${body.requestType.replace('_', ' ').toUpperCase()}
-      - Event Name: ${body.eventName || 'Not specified'}
       
       Contact Information:
       - Preferred Contact Method: ${body.preferredContactMethod.toUpperCase()}
       ${body.contactPersonName ? `- Contact Person: ${body.contactPersonName} (${body.contactPersonRelation || 'Relationship not specified'})` : ''}
-      ${body.contactPersonPhone ? `- Contact Phone: ${body.contactPersonPhone}` : ''}
       ${body.contactPersonEmail ? `- Contact Email: ${body.contactPersonEmail}` : ''}
-      ${body.physicalAddress ? `- Physical Address: ${body.physicalAddress}` : ''}
       
       IMPORTANT: All OTP and authentication processes will be conducted via EMAIL only.
-      If phone is the preferred contact method, use it for initial contact but send all OTP/verification via the provided email.
-      
-      Message:
-      ${body.message}
       
       Please log into the admin panel to review and process this request.
       
@@ -164,7 +163,7 @@ export class UserAuthController {
       await this.vpollNotifications.onUserEnquiry(process.env.ADMIN_EMAIL || 'admin@vpoll.com', {
         name: body.name,
         email: body.contactPersonEmail || 'No email provided',
-        phone: body.contactPersonPhone || 'No phone provided',
+        phone: 'Legacy user request',
         companyname: 'Legacy User Request',
         subject: adminEmailSubject,
         message: adminEmailBody

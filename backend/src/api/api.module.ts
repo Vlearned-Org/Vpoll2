@@ -3,6 +3,7 @@ import { AuthModule } from "src/core/auth/auth.module";
 import { CoreModule } from "src/core/core.module";
 import { DataModule } from "src/data/data.module";
 import { AdminCompanyController } from "./controllers/company-admin/company.controller";
+import { AnalyticsController } from "./controllers/company-admin/analytics.controller";
 import { EventController } from "./controllers/company-admin/event.controller";
 import { InviteeController } from "./controllers/company-admin/invitee.controller";
 import { ProxyController } from "./controllers/company-admin/proxy.controller";
@@ -41,6 +42,7 @@ import { WebsocketEventGateway } from "./websocket.gateway";
     StorageController,
     TestController,
     AdminCompanyController,
+    AnalyticsController,
     ReportController,
     EnquiriesController
   ]

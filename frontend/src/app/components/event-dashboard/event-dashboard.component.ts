@@ -6,6 +6,7 @@ import {
   Output,
 } from '@angular/core';
 import { EventModal } from '@app/modals/event/event.modal';
+import { PasswordConfirmationModal } from '@app/modals/password-confirmation/password-confirmation.modal';
 import { EventContextService } from '@app/services/event-context.service';
 import { ModalOperationEnum } from '@app/shared/enums/modal-operation.enum';
 import { EventHttpService } from '@app/shared/http-services/event-http.service';
@@ -14,6 +15,7 @@ import {
   PollingStatusEnum,
   ResolutionVotingResult,
 } from '@vpoll-shared/contract';
+import { MessageService } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
 import { Subject, switchMap, takeUntil, timer } from 'rxjs';
 
@@ -43,7 +45,8 @@ export class EventDashboardComponent implements OnInit, OnDestroy {
   constructor(
     private dialogService: DialogService,
     private eventContextSvc: EventContextService,
-    private eventHttpSvc: EventHttpService
+    private eventHttpSvc: EventHttpService,
+    private messageSvc: MessageService
   ) {}
 
   public ngOnInit(): void {
@@ -117,27 +120,93 @@ export class EventDashboardComponent implements OnInit, OnDestroy {
   }
 
   public startPolling() {
-    this.eventHttpSvc
-      .startEventPolling(this.eventContextSvc.eventId)
-      .subscribe((event) => {
-        this.event = event;
-        this.eventContextSvc.reloadEvent(event);
-      });
+    const dialogRef = this.dialogService.open(PasswordConfirmationModal, {
+      header: 'Confirm Action',
+      width: '500px',
+      data: { action: 'start polling' },
+    });
+
+    dialogRef.onClose.subscribe((password) => {
+      if (password) {
+        this.eventHttpSvc
+          .startEventPolling(this.eventContextSvc.eventId, password)
+          .subscribe({
+            next: (event) => {
+              this.event = event;
+              this.eventContextSvc.reloadEvent(event);
+              this.messageSvc.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Polling started successfully'
+              });
+            },
+            error: (error) => {
+              console.error('Start polling error:', error);
+              let errorMessage = 'Failed to start polling.';
+              
+              if (error.status === 403 && error.error?.message === 'Invalid password') {
+                errorMessage = 'Invalid password. Please check your password and try again.';
+              } else if (error.error?.message) {
+                errorMessage = error.error.message;
+              }
+              
+              this.messageSvc.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: errorMessage
+              });
+            }
+          });
+      }
+    });
   }
 
   public endPolling() {
-    this.eventHttpSvc
-      .endEventPolling(this.eventContextSvc.eventId)
-      .subscribe((event) => {
-        this.event = event;
-        this.eventContextSvc.reloadEvent(event);
-        this.stopPolling.next(null);
+    const dialogRef = this.dialogService.open(PasswordConfirmationModal, {
+      header: 'Confirm Action',
+      width: '500px',
+      data: { action: 'end polling' },
+    });
+
+    dialogRef.onClose.subscribe((password) => {
+      if (password) {
         this.eventHttpSvc
-          .getEventVotingResult(this.eventContextSvc.eventId)
-          .subscribe((result) => {
-            this.votingResult = result;
+          .endEventPolling(this.eventContextSvc.eventId, password)
+          .subscribe({
+            next: (event) => {
+              this.event = event;
+              this.eventContextSvc.reloadEvent(event);
+              this.stopPolling.next(null);
+              this.eventHttpSvc
+                .getEventVotingResult(this.eventContextSvc.eventId)
+                .subscribe((result) => {
+                  this.votingResult = result;
+                });
+              this.messageSvc.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Polling ended successfully'
+              });
+            },
+            error: (error) => {
+              console.error('End polling error:', error);
+              let errorMessage = 'Failed to end polling.';
+              
+              if (error.status === 403 && error.error?.message === 'Invalid password') {
+                errorMessage = 'Invalid password. Please check your password and try again.';
+              } else if (error.error?.message) {
+                errorMessage = error.error.message;
+              }
+              
+              this.messageSvc.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: errorMessage
+              });
+            }
           });
-      });
+      }
+    });
   }
 
   public publishPollingResult() {

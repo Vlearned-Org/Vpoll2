@@ -10,7 +10,13 @@ import helmet = require("helmet");
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use(helmet());
+  
+  // Temporarily disable helmet entirely for testing
+  // app.use(helmet({
+  //   contentSecurityPolicy: false, // Disable CSP entirely for testing
+  //   crossOriginEmbedderPolicy: false,
+  // }));
+  
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -21,13 +27,21 @@ async function bootstrap() {
   const { httpAdapter } = app.get(HttpAdapterHost);
   const tokensManager = app.get<TokensManager>(TokensManager);
   app.useGlobalFilters(new BrioExceptionFilter("backend"), new TokenExpiredExceptionListener(httpAdapter, tokensManager));
+  
+  // Simple CORS configuration that won't conflict with nginx
   app.enableCors({
-    origin: ['https://vpoll.com.my','https://localhost:4200', 'http://localhost:4200', 'http://localhost:8080'], // Replace with your frontend domain
-    methods: ['GET', 'POST', 'PUT', 'PATCH','DELETE', 'OPTIONS'], // Allowed HTTP methods
-    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
-    credentials: true // Allow cookies or credentials
+    origin: true, // Allow all origins
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
   });
+  
+  // Log server startup
+  console.log(`Backend server starting on port 8001...`);
+  console.log(`CORS enabled with simple configuration`);
   await app.listen(8001);
+  console.log(`Backend server is running on http://localhost:8001`);
+  console.log(`API endpoints available at http://localhost:8001/api`);
 }
 
 setGlobalOptions({

@@ -72,6 +72,34 @@ export class AuthManager {
     if (emailUser) {
       throw new MobileExistedException({message: "This email is already registered."} );
     }
+
+    // Check if NRIC already exists
+    const nricExists = await this.userRepo.checkNricExists(payload.nric);
+    if (nricExists) {
+      throw new MobileExistedException({message: `NRIC ${payload.nric.toUpperCase()} is already registered with another user.`} );
+    }
+
+    const hashedPassword = await PasswordUtils.hash(payload.password);
+    const user = await this.userRepo.createBasicUser(payload.email, hashedPassword, payload.name, payload.nric, payload.mobile);
+
+    // Send welcome email
+    await this.vpollNotifications.onUserSignedUp(user.email, { name: user.name });
+
+    return user;
+  }
+
+  public async createUserDirectly(payload: UserSignUpDto): Promise<User> {
+    const emailUser = await this.userRepo.getOneBy("email", payload.email);
+    if (emailUser) {
+      throw new MobileExistedException({message: "This email is already registered."} );
+    }
+
+    // Check if NRIC already exists
+    const nricExists = await this.userRepo.checkNricExists(payload.nric);
+    if (nricExists) {
+      throw new MobileExistedException({message: `NRIC ${payload.nric.toUpperCase()} is already registered with another user.`} );
+    }
+
     const hashedPassword = await PasswordUtils.hash(payload.password);
     const user = await this.userRepo.createBasicUser(payload.email, hashedPassword, payload.name, payload.nric, payload.mobile);
 

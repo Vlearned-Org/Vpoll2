@@ -16,14 +16,11 @@ export interface CountryCode {
   styleUrls: ['./signup.component.scss'],
 })
 export class SignupComponent implements OnInit {
-  public step: 'request-email-otp' | 'verify-email-otp-register';
   public messages: Message[] = [];
-  public emailAddress: string = '';
-
-  public internalEmail: string;
   public signUpForm: FormGroup;
   public countryCodes: CountryCode[];
   public selectedCountryCode: CountryCode;
+  public consentGiven = false;
 
   constructor(
     public router: Router,
@@ -33,8 +30,6 @@ export class SignupComponent implements OnInit {
   ) {}
 
   public ngOnInit(): void {
-    this.step = 'request-email-otp';
-
     this.countryCodes = [
       { name: 'Malaysia', code: '+60', flag: '🇲🇾' }, // Placeholder flag
       { name: 'Singapore', code: '+65', flag: '🇸🇬' }, // Placeholder flag
@@ -44,13 +39,12 @@ export class SignupComponent implements OnInit {
     this.selectedCountryCode = this.countryCodes[0];
 
     this.signUpForm = this.fb.group({
-      email: [{ value: null, disabled: true }, [Validators.required, Validators.email]], // Keep email disabled after OTP
+      email: [null, [Validators.required, Validators.email]],
+      confirmEmail: [null, [Validators.required, Validators.email]],
       name: [null, Validators.required],
       nric: [null, Validators.required],
-      // mobile: [null], // Remove single mobile field
       countryCode: [this.selectedCountryCode.code, Validators.required], // Add countryCode control
       mobileNumber: [null, [Validators.pattern('^[0-9]+$')]], // Add mobileNumber control for national part, optional
-      otp: [null, [Validators.required, Validators.pattern('[0-9]{6}')]],
       password: [
         null,
         [
@@ -68,29 +62,7 @@ export class SignupComponent implements OnInit {
     });
   }
 
-  public requestEmailOTP(): void {
-    this.auth
-      .emailOtpValidation({
-        email: this.emailAddress,
-        isNewUser: true,
-      })
-      .subscribe(
-        (response) => {
-          this.internalEmail = response.email;
-          this.signUpForm.get('email').patchValue(response.email); // Email is already disabled, patchValue is fine
-          this.step = 'verify-email-otp-register';
-        },
-        (err) => {
-          if (err.code === 'SIGNUP') {
-            this.messages = [];
-            this.messages.push({
-              severity: 'error',
-              detail: err.message,
-            });
-          }
-        }
-      );
-  }
+
 
   public signUp(): void {
     if (!this.signUpValid) return; // Added guard based on existing getter
@@ -112,6 +84,7 @@ export class SignupComponent implements OnInit {
     // Remove individual mobile parts from payload if they exist to avoid backend confusion
     delete payload.countryCode;
     delete payload.mobileNumber;
+    delete payload.confirmEmail;
 
     this.auth.userSignUp(payload).subscribe(
       (response) => {
@@ -137,7 +110,14 @@ export class SignupComponent implements OnInit {
     return (
       this.signUpForm.valid &&
       this.signUpForm.get('password').value ===
-        this.signUpForm.get('confirmPassword').value
+        this.signUpForm.get('confirmPassword').value &&
+      this.signUpForm.get('email').value ===
+        this.signUpForm.get('confirmEmail').value &&
+      this.consentGiven
     );
+  }
+
+  public onConsentChange(consentValid: boolean): void {
+    this.consentGiven = consentValid;
   }
 }

@@ -5,6 +5,7 @@ import { EnquiryManager } from "./enquiry.manager";
 import { NotificationManager } from "./notification/notification.manager";
 import { VpollNotifications } from "./notification/vpoll.notification";
 import { ReportManager } from "./report/report.manager";
+import { AnalyticsManager } from "./report/analytics.manager";
 import { StorageManager } from "./storage/storage.manager";
 import { ProxyManager } from "./voting/proxy.manager";
 
@@ -12,7 +13,7 @@ import { VotingManager } from "./voting/voting.manager";
 
 @Module({
   imports: [HttpModule, DataModule],
-  providers: [NotificationManager, StorageManager, CompanyManager,EnquiryManager, VpollNotifications, ProxyManager, VotingManager, ReportManager],
-  exports: [NotificationManager, StorageManager, CompanyManager,EnquiryManager, VpollNotifications, ProxyManager, VotingManager, ReportManager]
+  providers: [NotificationManager, StorageManager, CompanyManager,EnquiryManager, VpollNotifications, ProxyManager, VotingManager, ReportManager, AnalyticsManager],
+  exports: [NotificationManager, StorageManager, CompanyManager,EnquiryManager, VpollNotifications, ProxyManager, VotingManager, ReportManager, AnalyticsManager]
 })
 export class CoreModule {}

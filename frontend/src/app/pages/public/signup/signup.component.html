@@ -23,197 +23,156 @@
             (click)="router.navigate(['/'])"
           />
           <div class="text-900 text-3xl font-medium mb-3">Register</div>
-          <span *ngIf="step === 'request-email-otp'" class="text-600 font-medium"
-            >Enter the email address associated with your account and request
-            for OTP to verify you are the owner of the email address.</span
+          <span class="text-600 font-medium"
+            >Create your VPoll account by filling in the details below. Make sure to double-check your email address as it will be used for account verification.</span
           >
-          <span
-            *ngIf="step === 'verify-email-otp-register'"
-            class="text-600 font-medium"
-            >Enter the OTP you received via email to verify you are the owner
-            of the email and set your login password.
-          </span>
           <p-messages [value]="messages"></p-messages>
         </div>
 
         <div class="w-full md:w-10 mx-auto">
-          <ng-container *ngIf="step === 'request-email-otp'">
-            <label for="emailAddress" class="block text-900 text-xl font-medium mb-2"
-              >Email Address</label
+          <ng-container [formGroup]="signUpForm">
+            <label
+              for="name"
+              class="block text-900 font-medium text-xl mb-2"
+              >Name</label
             >
-                <input
-              type="email"
-                  pInputText
-              [(ngModel)]="emailAddress"
-              placeholder="your@email.com"
+            <input
+              pInputText
+              id="name"
               class="w-full mb-3"
-                  style="padding: 1rem"
-              id="emailAddress"
-                />
+              type="text"
+              formControlName="name"
+              placeholder="Enter your full name"
+            />
+
+            <label
+            for="nric"
+            class="block text-900 font-medium text-xl mb-2"
+            >NRIC / Passport (example : 961213112233)</label
+          >
+          <input
+            pInputText
+            id="nric"
+            class="w-full mb-3"
+            type="text"
+            formControlName="nric"
+            placeholder="Enter your NRIC or passport number"
+          />
+          <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+            <li>Do not add any spaces</li>
+            <li>Do not include the dash (-) in the NRIC</li>
+          </ul>
+
+          <label for="email" class="block text-900 font-medium text-xl mb-2"
+          >Email Address</label
+        >
+          <input
+            pInputText
+            id="email"
+            class="w-full mb-3"
+            type="email"
+            formControlName="email"
+            placeholder="your@email.com"
+            required
+          />
+
+          <label for="confirmEmail" class="block text-900 font-medium text-xl mb-2"
+          >Confirm Email Address</label
+        >
+          <input
+            pInputText
+            id="confirmEmail"
+            class="w-full mb-3"
+            type="email"
+            formControlName="confirmEmail"
+            placeholder="Confirm your email address"
+            required
+          />
+          <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5; color: #6b7280;">
+            <li>You can login using either your email or NRIC</li>
+            <li>Email is required for account verification and notifications</li>
+          </ul>
+
+          <label for="mobileNumber" class="block text-900 font-medium text-xl mb-2">Mobile No. (Optional)</label>
+          <div class="w-full mb-3 flex">
+            <p-dropdown 
+              [options]="countryCodes" 
+              formControlName="countryCode" 
+              optionLabel="code" 
+              optionValue="code" 
+              [showClear]="false"
+              styleClass="country-code-dropdown"
+            >
+              <ng-template let-country pTemplate="item">
+                <div class="country-item flex align-items-center">
+                  <span class="mr-2">{{country.flag}}</span> <!-- Placeholder flag -->
+                  <span>{{country.name}} ({{country.code}})</span>
+                </div>
+              </ng-template>
+              <ng-template let-country pTemplate="selectedItem">
+                <div class="country-item flex align-items-center">
+                  <span class="mr-2">{{country.flag}}</span>
+                  <span>{{country.code}}</span>
+                </div>
+              </ng-template>
+            </p-dropdown>
+            <input 
+              type="text" 
+              pInputText 
+              id="mobileNumber" 
+              formControlName="mobileNumber" 
+              placeholder="Enter mobile number"
+            />
+          </div>
+
+            <label
+              for="password"
+              class="block text-900 font-medium text-xl mb-2"
+              >Login Password</label
+            >
+            <p-password
+              formControlName="password"
+              class="password-no-feedback"
+              [toggleMask]="true"
+              [feedback]="false"
+              placeholder="Enter your password"
+            >
+            </p-password>
+            <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+              <li>At least one lowercase</li>
+              <li>At least one uppercase</li>
+              <li>At least one numeric</li>
+              <li>Minimum 8 characters</li>
+            </ul>
+
+            <label
+              for="confirmPassword"
+              class="block text-900 font-medium text-xl mb-2"
+              >Re-type Password</label
+            >
+
+            <p-password
+              formControlName="confirmPassword"
+              class="password-no-feedback"
+              [toggleMask]="true"
+              [feedback]="false"
+              placeholder="Confirm your password"
+            ></p-password>
+
+            <!-- Consent Form -->
+            <app-consent-form 
+              consentType="signup"
+              (consentChanged)="onConsentChange($event)"
+            ></app-consent-form>
 
             <button
-              [disabled]="!emailAddress"
+              [disabled]="!signUpValid"
               pButton
               pRipple
-              label="Get OTP"
-              (click)="requestEmailOTP()"
-              class="w-full p-3 text-xl"
+              label="Create Account"
+              (click)="signUp()"
+              class="w-full p-3 text-xl mb-3"
             ></button>
-          </ng-container>
-          <ng-container *ngIf="step === 'verify-email-otp-register'">
-            <label for="internalEmail" class="block text-900 text-xl font-medium mb-2"
-              >Email Address</label
-            >
-            <input
-              pInputText
-              [disabled]="true"
-              id="internalEmail"
-              class="w-full mb-3"
-              type="text"
-              [(ngModel)]="internalEmail"
-            />
-
-            <ng-container [formGroup]="signUpForm">
-              <label
-                for="name1"
-                class="block text-900 font-medium text-xl mb-2"
-                >Name</label
-              >
-              <input
-                pInputText
-                id="name"
-                class="w-full mb-3"
-                type="text"
-                formControlName="name"
-              />
-
-              <label
-              for="nric1"
-              class="block text-900 font-medium text-xl mb-2"
-              >NRIC / Passport (example : 961213112233)</label
-            >
-            <input
-              pInputText
-              id="nric"
-              class="w-full mb-3"
-              type="text"
-              formControlName="nric"
-            />
-            <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
-              <li>Do not add any spaces</li>
-              <li>Do not include the dash (-) in the NRIC</li>
-            </ul>
-
-            <label for="email" class="block text-900 font-medium text-xl mb-2"
-            >Email (from verification)</label
-          >
-            <input
-              pInputText
-              id="email"
-              class="w-full mb-3"
-              type="email"
-              formControlName="email"
-              required
-            />
-            <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5; color: #6b7280;">
-              <li>You can login using either your email or NRIC</li>
-              <li>Email is required for account verification and notifications</li>
-            </ul>
-
-            <label for="mobileNumber" class="block text-900 font-medium text-xl mb-2">Mobile No. (Optional)</label>
-            <div class="w-full mb-3 flex">
-              <p-dropdown 
-                [options]="countryCodes" 
-                formControlName="countryCode" 
-                optionLabel="code" 
-                optionValue="code" 
-                [showClear]="false"
-                styleClass="country-code-dropdown"
-              >
-                <ng-template let-country pTemplate="item">
-                  <div class="country-item flex align-items-center">
-                    <span class="mr-2">{{country.flag}}</span> <!-- Placeholder flag -->
-                    <span>{{country.name}} ({{country.code}})</span>
-                  </div>
-                </ng-template>
-                <ng-template let-country pTemplate="selectedItem">
-                  <div class="country-item flex align-items-center">
-                    <span class="mr-2">{{country.flag}}</span>
-                    <span>{{country.code}}</span>
-                  </div>
-                </ng-template>
-              </p-dropdown>
-              <input 
-                type="text" 
-                pInputText 
-                id="mobileNumber" 
-                formControlName="mobileNumber" 
-                placeholder="Enter mobile number"
-              />
-            </div>
-
-              <label
-                for="password1"
-                class="block text-900 font-medium text-xl mb-2"
-                >OTP</label
-              >
-              <input
-                pInputText
-                id="otp"
-                class="w-full mb-3"
-                type="text"
-                formControlName="otp"
-              />
-
-              <label
-                for="password1"
-                class="block text-900 font-medium text-xl mb-2"
-                >Login Password</label
-              >
-              <p-password
-                formControlName="password"
-                class="password-no-feedback"
-                [toggleMask]="true"
-                [feedback]="false"
-              >
-              </p-password>
-              <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
-                <li>At least one lowercase</li>
-                <li>At least one uppercase</li>
-                <li>At least one numeric</li>
-                <li>Minimum 8 characters</li>
-              </ul>
-
-              <label
-                for="password2"
-                class="block text-900 font-medium text-xl mb-2"
-                >Re-type Password</label
-              >
-
-              <p-password
-                formControlName="confirmPassword"
-                class="password-no-feedback"
-                [toggleMask]="true"
-                [feedback]="false"
-              ></p-password>
-
-              <button
-                [disabled]="!signUpValid"
-                pButton
-                pRipple
-                label="Sign-Up"
-                (click)="signUp()"
-                class="w-full p-3 text-xl mb-3"
-              ></button>
-              <button
-                [disabled]="false"
-                pButton
-                pRipple
-                label="Resend OTP"
-                (click)="requestEmailOTP()"
-                class="w-full p-3 text-xl p-button-outlined"
-              ></button>
-            </ng-container>
           </ng-container>
 
           <div class="flex align-items-center justify-content-center mt-4">

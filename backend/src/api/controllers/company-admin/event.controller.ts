@@ -1,7 +1,7 @@
 import { VotingCalculator } from "@app/core/voting/voting-calculator.utils";
 import { Audit, AuditData, QuestionAuditData } from "@app/data/model/audit.model";
 import { AuditRepository } from "@app/data/repositories/audit.repository";
-import { Bind, Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Bind, Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, UnauthorizedException, ForbiddenException } from "@nestjs/common";
 import { Context } from "@vpoll-shared/contract";
 import { AuditTypeEnum, RoleEnum } from "@vpoll-shared/enum";
 import { HasRole } from "src/api/security/decorators/has-role.decorator";
@@ -9,13 +9,20 @@ import { RoleGuard } from "src/api/security/guards/role.guard";
 import { JwtAuthGuard } from "src/core/auth/strategies/jwt.strategy";
 import { ApiContext } from "src/core/context/api-context-param.decorator";
 import { Event } from "src/data/model";
-import { EventRepository, VotingRepository } from "src/data/repositories";
+import { EventRepository, VotingRepository, UserRepository } from "src/data/repositories";
+import { PasswordConfirmationDto } from "src/api/dtos/event.dto";
+import { PasswordUtils } from "src/core/auth/managers/password.utils";
 
 @Controller("api/events")
 @UseGuards(JwtAuthGuard, RoleGuard)
 @HasRole([RoleEnum.COMPANY_SYSTEM, RoleEnum.COMPANY_ADMIN])
 export class EventController {
-  constructor(private eventRepo: EventRepository, private auditRepo: AuditRepository, private votingRepo: VotingRepository) {}
+  constructor(
+    private eventRepo: EventRepository, 
+    private auditRepo: AuditRepository, 
+    private votingRepo: VotingRepository,
+    private userRepo: UserRepository
+  ) {}
 
   @Get()
   @Bind(ApiContext())
@@ -89,8 +96,14 @@ export class EventController {
   }
 
   @Patch(":id/start-polling")
-  @Bind(ApiContext(), Param("id"))
-  public async startEventPolling(context: Context, eventId: string): Promise<Event> {
+  @Bind(ApiContext(), Param("id"), Body())
+  public async startEventPolling(context: Context, eventId: string, passwordDto: PasswordConfirmationDto): Promise<Event> {
+    // Verify admin password
+    const user = await this.userRepo.get(context.id);
+    if (!user || !(await PasswordUtils.check(passwordDto.password, user.password))) {
+      throw new ForbiddenException("Invalid password");
+    }
+
     const updated = await this.eventRepo.startPolling(eventId, context.companyId);
     await this.auditRepo.logEvent({
       _id: undefined,
@@ -105,8 +118,14 @@ export class EventController {
   }
 
   @Patch(":id/end-polling")
-  @Bind(ApiContext(), Param("id"))
-  public async endEventPolling(context: Context, eventId: string): Promise<Event> {
+  @Bind(ApiContext(), Param("id"), Body())
+  public async endEventPolling(context: Context, eventId: string, passwordDto: PasswordConfirmationDto): Promise<Event> {
+    // Verify admin password
+    const user = await this.userRepo.get(context.id);
+    if (!user || !(await PasswordUtils.check(passwordDto.password, user.password))) {
+      throw new ForbiddenException("Invalid password");
+    }
+
     const updated = await this.eventRepo.endPolling(eventId, context.companyId);
     await this.auditRepo.logEvent({
       _id: undefined,

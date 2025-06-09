@@ -1,0 +1,376 @@
+<div class="analytics-dashboard">
+  <p-toast key="toast"></p-toast>
+
+  <!-- Header -->
+  <div class="flex align-items-center justify-content-between mb-4">
+    <div>
+      <h2 class="text-2xl font-bold text-900 mb-1">Event Analytics</h2>
+      <p class="text-600 mb-0">Real-time insights and visualizations</p>
+    </div>
+    <div class="flex gap-2">
+      <p-button 
+        icon="pi pi-refresh" 
+        label="Refresh Data"
+        [loading]="loading"
+        (onClick)="loadAnalytics()"
+        styleClass="p-button-outlined"
+      ></p-button>
+      <p-button 
+        icon="pi pi-filter" 
+        label="Filters"
+        (onClick)="showFilters = !showFilters"
+        styleClass="p-button-outlined"
+      ></p-button>
+    </div>
+  </div>
+
+  <!-- Filters Panel -->
+  <div class="card mb-4" *ngIf="showFilters">
+    <h4 class="mb-3">Analytics Filters</h4>
+    <div class="grid">
+      <div class="col-12 md:col-3">
+        <label class="block text-600 font-medium mb-2">User Types</label>
+        <p-multiSelect 
+          [options]="userTypeOptions" 
+          [(ngModel)]="filters.userTypes"
+          placeholder="Select user types"
+          [showClear]="true"
+          styleClass="w-full"
+        ></p-multiSelect>
+      </div>
+      <div class="col-12 md:col-3">
+        <label class="block text-600 font-medium mb-2">Date Range Start</label>
+        <p-calendar 
+          [(ngModel)]="dateStart"
+          [showTime]="true"
+          placeholder="Start date"
+          styleClass="w-full"
+        ></p-calendar>
+      </div>
+      <div class="col-12 md:col-3">
+        <label class="block text-600 font-medium mb-2">Date Range End</label>
+        <p-calendar 
+          [(ngModel)]="dateEnd"
+          [showTime]="true"
+          placeholder="End date"
+          styleClass="w-full"
+        ></p-calendar>
+      </div>
+      <div class="col-12 md:col-3">
+        <label class="block text-600 font-medium mb-2">Actions</label>
+        <div class="flex gap-2">
+          <p-button 
+            label="Apply" 
+            icon="pi pi-check"
+            (onClick)="applyFilters()"
+            styleClass="flex-1"
+          ></p-button>
+          <p-button 
+            label="Clear" 
+            icon="pi pi-times"
+            (onClick)="clearFilters()"
+            styleClass="p-button-outlined flex-1"
+          ></p-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex align-items-center justify-content-center py-8">
+    <p-progressSpinner strokeWidth="3"></p-progressSpinner>
+    <span class="ml-2 text-600">Loading analytics data...</span>
+  </div>
+
+  <!-- Analytics Content -->
+  <div *ngIf="!loading && analyticsData" class="analytics-content">
+    
+    <!-- Overview Cards -->
+    <div class="grid mb-4">
+      <div class="col-12 lg:col-3 md:col-6">
+        <div class="card text-center bg-blue-50">
+          <div class="text-blue-600 font-medium mb-2">Total Participants</div>
+          <div class="text-3xl font-bold text-blue-900 mb-1">{{ analyticsData.eventOverview?.overview?.totalParticipants || 0 }}</div>
+          <div class="text-blue-600 text-sm">
+            <i class="pi pi-users mr-1"></i>
+            Across all activities
+          </div>
+        </div>
+      </div>
+      <div class="col-12 lg:col-3 md:col-6">
+        <div class="card text-center bg-green-50">
+          <div class="text-green-600 font-medium mb-2">Engagement Score</div>
+          <div class="text-3xl font-bold text-green-900 mb-1">{{ analyticsData.eventOverview?.overview?.overallEngagement || 0 }}%</div>
+          <div class="text-green-600 text-sm">
+            <i class="pi pi-chart-line mr-1"></i>
+            Overall participation
+          </div>
+        </div>
+      </div>
+      <div class="col-12 lg:col-3 md:col-6">
+        <div class="card text-center bg-orange-50">
+          <div class="text-orange-600 font-medium mb-2">Total Votes</div>
+          <div class="text-3xl font-bold text-orange-900 mb-1">{{ analyticsData.voting?.overview?.totalVotes || 0 }}</div>
+          <div class="text-orange-600 text-sm">
+            <i class="pi pi-check-circle mr-1"></i>
+            Voting participation
+          </div>
+        </div>
+      </div>
+      <div class="col-12 lg:col-3 md:col-6">
+        <div class="card text-center bg-purple-50">
+          <div class="text-purple-600 font-medium mb-2">Questions Asked</div>
+          <div class="text-3xl font-bold text-purple-900 mb-1">{{ analyticsData.questions?.overview?.totalQuestions || 0 }}</div>
+          <div class="text-purple-600 text-sm">
+            <i class="pi pi-comment mr-1"></i>
+            Q&A engagement
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Charts Grid -->
+    <div class="grid">
+      
+      <!-- Attendance Analytics -->
+      <div class="col-12 xl:col-6">
+        <div class="card">
+          <div class="flex align-items-center justify-content-between mb-3">
+            <h4 class="m-0">Attendance Overview</h4>
+            <p-button 
+              icon="pi pi-eye" 
+              styleClass="p-button-text p-button-sm"
+              pTooltip="View detailed attendance analytics"
+              (onClick)="showDetailedView('attendance')"
+            ></p-button>
+          </div>
+          
+          <!-- Attendance by Type Chart -->
+          <div class="mb-4">
+            <p-chart 
+              type="doughnut" 
+              [data]="attendanceByTypeChartData" 
+              [options]="chartOptions"
+              [height]="300"
+            ></p-chart>
+          </div>
+          
+          <!-- Attendance Metrics -->
+          <div class="grid">
+            <div class="col-6">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-900">{{ analyticsData.attendance?.overview?.averageDuration || 0 }}</div>
+                <div class="text-600 text-sm">Avg Duration (min)</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-900">{{ analyticsData.attendance?.overview?.peakAttendance || 0 }}</div>
+                <div class="text-600 text-sm">Peak Attendance</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Voting Analytics -->
+      <div class="col-12 xl:col-6">
+        <div class="card">
+          <div class="flex align-items-center justify-content-between mb-3">
+            <h4 class="m-0">Voting Analytics</h4>
+            <p-button 
+              icon="pi pi-eye" 
+              styleClass="p-button-text p-button-sm"
+              pTooltip="View detailed voting analytics"
+              (onClick)="showDetailedView('voting')"
+            ></p-button>
+          </div>
+          
+          <!-- Voting Results Chart -->
+          <div class="mb-4">
+            <p-chart 
+              type="bar" 
+              [data]="votingResultsChartData" 
+              [options]="chartOptions"
+              [height]="300"
+            ></p-chart>
+          </div>
+          
+          <!-- Voting Metrics -->
+          <div class="grid">
+            <div class="col-6">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-900">{{ analyticsData.voting?.overview?.participationRate || 0 }}%</div>
+                <div class="text-600 text-sm">Participation Rate</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-900">{{ analyticsData.voting?.overview?.completionRate || 0 }}%</div>
+                <div class="text-600 text-sm">Completion Rate</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Questions Analytics -->
+      <div class="col-12 xl:col-6">
+        <div class="card">
+          <div class="flex align-items-center justify-content-between mb-3">
+            <h4 class="m-0">Questions Analytics</h4>
+            <p-button 
+              icon="pi pi-eye" 
+              styleClass="p-button-text p-button-sm"
+              pTooltip="View detailed question analytics"
+              (onClick)="showDetailedView('questions')"
+            ></p-button>
+          </div>
+          
+          <!-- Questions Timeline -->
+          <div class="mb-4">
+            <p-chart 
+              type="line" 
+              [data]="questionsTimelineChartData" 
+              [options]="timelineChartOptions"
+              [height]="300"
+            ></p-chart>
+          </div>
+          
+          <!-- Question Metrics -->
+          <div class="grid">
+            <div class="col-6">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-900">{{ analyticsData.questions?.overview?.averageQuestionsPerUser || 0 }}</div>
+                <div class="text-600 text-sm">Avg per User</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-900">{{ formatHour(analyticsData.questions?.overview?.mostActiveHour || 0) }}</div>
+                <div class="text-600 text-sm">Most Active Hour</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Engagement -->
+      <div class="col-12 xl:col-6">
+        <div class="card">
+          <div class="flex align-items-center justify-content-between mb-3">
+            <h4 class="m-0">User Engagement</h4>
+            <p-button 
+              icon="pi pi-eye" 
+              styleClass="p-button-text p-button-sm"
+              pTooltip="View detailed engagement analytics"
+              (onClick)="showDetailedView('engagement')"
+            ></p-button>
+          </div>
+          
+          <!-- User Types Distribution -->
+          <div class="mb-4">
+            <p-chart 
+              type="pie" 
+              [data]="userTypesChartData" 
+              [options]="chartOptions"
+              [height]="300"
+            ></p-chart>
+          </div>
+          
+          <!-- Engagement Metrics -->
+          <div class="grid">
+            <div class="col-6">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-900">{{ analyticsData.userEngagement?.overview?.engagementScore || 0 }}%</div>
+                <div class="text-600 text-sm">Engagement Score</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-900">{{ analyticsData.userEngagement?.overview?.legacyUsers || 0 }}</div>
+                <div class="text-600 text-sm">Legacy Users</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event Timeline -->
+      <div class="col-12">
+        <div class="card">
+          <div class="flex align-items-center justify-content-between mb-3">
+            <h4 class="m-0">Event Timeline & Activity</h4>
+            <p-button 
+              icon="pi pi-calendar" 
+              styleClass="p-button-text p-button-sm"
+              pTooltip="View event milestones"
+              (onClick)="showEventTimeline()"
+            ></p-button>
+          </div>
+          
+          <!-- Participation Timeline -->
+          <div class="mb-4">
+            <p-chart 
+              type="line" 
+              [data]="participationTimelineChartData" 
+              [options]="timelineChartOptions"
+              [height]="400"
+            ></p-chart>
+          </div>
+          
+          <!-- Key Milestones -->
+          <div class="timeline-milestones" *ngIf="analyticsData.eventOverview?.keyMilestones?.length">
+            <h5 class="text-600 mb-3">Key Milestones</h5>
+            <div class="flex flex-wrap gap-2">
+              <p-tag 
+                *ngFor="let milestone of analyticsData.eventOverview.keyMilestones" 
+                [value]="milestone.event"
+                [severity]="getMilestoneSeverity(milestone.impact)"
+                [pTooltip]="milestone.description + ' at ' + (milestone.timestamp | date:'medium')"
+              ></p-tag>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading && !analyticsData" class="text-center py-8">
+    <i class="pi pi-exclamation-triangle text-4xl text-orange-400 mb-3"></i>
+    <h3 class="text-600 mb-2">No Analytics Data Available</h3>
+    <p class="text-500">Unable to load analytics data for this event.</p>
+    <p-button 
+      label="Try Again" 
+      icon="pi pi-refresh"
+      (onClick)="loadAnalytics()"
+      styleClass="mt-3"
+    ></p-button>
+  </div>
+</div>
+
+<!-- Detailed View Dialog -->
+<p-dialog 
+  [header]="detailedViewTitle" 
+  [(visible)]="showDetailedDialog" 
+  [modal]="true" 
+  [style]="{width: '90vw', height: '80vh'}"
+  [maximizable]="true"
+>
+  <div class="detailed-analytics-content">
+    <!-- Content will be populated based on selected view type -->
+    <div *ngIf="detailedViewType === 'attendance'" class="attendance-details">
+      <!-- Detailed attendance charts and tables -->
+    </div>
+    <div *ngIf="detailedViewType === 'voting'" class="voting-details">
+      <!-- Detailed voting charts and tables -->
+    </div>
+    <div *ngIf="detailedViewType === 'questions'" class="questions-details">
+      <!-- Detailed questions charts and tables -->
+    </div>
+    <div *ngIf="detailedViewType === 'engagement'" class="engagement-details">
+      <!-- Detailed engagement charts and tables -->
+    </div>
+  </div>
+</p-dialog> 

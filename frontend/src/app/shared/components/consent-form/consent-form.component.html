@@ -1,0 +1,133 @@
+<div class="consent-container" [formGroup]="consentForm">
+  <!-- Data Collection Notice -->
+  <div class="data-notice">
+    <h4 class="notice-title">
+      <i class="pi pi-shield" style="color: var(--primary-color);"></i>
+      Data Privacy Notice
+    </h4>
+    
+    <div class="data-collection-summary">
+      <p class="collection-text">{{ getDataCollectionText() }}</p>
+      
+      <!-- Data Collection List -->
+      <div class="data-list">
+        <div class="data-category" *ngIf="consentType === 'signup'">
+          <strong>Personal Information:</strong>
+          <ul class="data-items">
+            <li>Full Name</li>
+            <li>NRIC/Passport Number</li>
+            <li>Email Address</li>
+            <li>Mobile Number (optional)</li>
+          </ul>
+        </div>
+        
+        <div class="data-category">
+          <strong>Authentication Data:</strong>
+          <ul class="data-items">
+            <li>Login Credentials (email/NRIC and password)</li>
+            <li>Session Information</li>
+            <li>Device Information</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Purpose of Data Collection -->
+      <div class="data-usage">
+        <p class="usage-text">{{ getDataUsageText() }}</p>
+        <ul class="usage-list">
+          <li><strong>Identity Verification:</strong> To verify your identity and eligibility for voting participation</li>
+          <li><strong>Account Management:</strong> To create, maintain, and secure your account</li>
+          <li><strong>Voting Participation:</strong> To enable your participation in AGMs and voting events</li>
+          <li><strong>Communication:</strong> To send you important notifications about events and voting opportunities</li>
+          <li><strong>Legal Compliance:</strong> To comply with corporate governance and regulatory requirements</li>
+          <li><strong>Security:</strong> To protect against fraud and unauthorized access</li>
+        </ul>
+      </div>
+
+      <!-- Toggle for more details -->
+      <button 
+        type="button" 
+        class="toggle-details-btn" 
+        (click)="toggleDetails()"
+        pButton
+        pRipple
+        [label]="showFullDetails ? 'Show Less' : 'Show More Details'"
+        [icon]="showFullDetails ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+        styleClass="p-button-text p-button-sm"
+      ></button>
+
+      <!-- Detailed Information (collapsible) -->
+      <div class="detailed-info" *ngIf="showFullDetails">
+        <div class="info-section">
+          <h5>Data Retention</h5>
+          <p>Your personal data will be retained for as long as your account remains active and as required by applicable laws and regulations.</p>
+        </div>
+        
+        <div class="info-section">
+          <h5>Data Sharing</h5>
+          <p>We do not sell or share your personal information with third parties, except as required for:</p>
+          <ul>
+            <li>Legal compliance and regulatory reporting</li>
+            <li>Authorized service providers under strict confidentiality agreements</li>
+            <li>Protection of rights and security of our platform</li>
+          </ul>
+        </div>
+        
+        <div class="info-section">
+          <h5>Your Rights</h5>
+          <p>You have the right to access, correct, or request deletion of your personal data, subject to legal and operational requirements.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Consent Checkboxes -->
+  <div class="consent-checkboxes">
+    <div class="consent-item">
+      <p-checkbox 
+        formControlName="dataProcessingConsent" 
+        binary="true" 
+        inputId="dataConsent"
+        styleClass="consent-checkbox"
+      ></p-checkbox>
+      <label for="dataConsent" class="consent-label">
+        I understand and consent to the collection, processing, and use of my personal data as described above for the purposes of account management, voting participation, and legal compliance.
+        <span class="required-indicator">*</span>
+      </label>
+    </div>
+
+    <div class="consent-item">
+      <p-checkbox 
+        formControlName="termsAndConditions" 
+        binary="true" 
+        inputId="termsConsent"
+        styleClass="consent-checkbox"
+      ></p-checkbox>
+      <label for="termsConsent" class="consent-label">
+        I agree to the 
+        <a href="#" class="terms-link" (click)="openTermsAndConditions($event)">Terms and Conditions</a> 
+        and 
+        <a href="#" class="terms-link" (click)="openPrivacyPolicy($event)">Privacy Policy</a>
+        governing the use of this platform.
+        <span class="required-indicator">*</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Legal Notice -->
+  <div class="legal-notice">
+    <p class="notice-text">
+      <i class="pi pi-info-circle"></i>
+      <strong>Important:</strong> By proceeding, you acknowledge that you have read, understood, and agree to our data processing practices. You must provide explicit consent to continue using our services.
+    </p>
+  </div>
+
+  <!-- Validation Messages -->
+  <div class="validation-messages" *ngIf="consentForm.touched && !consentForm.valid">
+    <p-message 
+      severity="error" 
+      text="You must provide consent to all required items before proceeding."
+      styleClass="consent-error"
+    ></p-message>
+  </div>
+</div> 

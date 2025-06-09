@@ -27,7 +27,7 @@ export class LegacyUserRequestsComponent implements OnInit {
   public showRejectionDialog = false;
   public showCredentialsDialog = false;
   public generatedCredentials: {
-    username: string;
+    email: string;
     password: string;
     userId: string;
   } = null;
@@ -47,15 +47,11 @@ export class LegacyUserRequestsComponent implements OnInit {
 
   public requestTypeLabels = {
     new_account: 'New Account',
-    password_reset: 'Password Reset',
-    access_help: 'Access Help',
-    other: 'Other'
+    password_reset: 'Password Reset'
   };
 
   public contactMethodLabels = {
-    phone: 'Phone',
     email: 'Email',
-    postal: 'Postal Mail',
     in_person: 'In-Person Visit'
   };
 
@@ -212,7 +208,7 @@ export class LegacyUserRequestsComponent implements OnInit {
         // If user was created and password was generated, show credentials
         if (response.userCreated && response.generatedPassword) {
           this.generatedCredentials = {
-            username: formValue.email || this.selectedRequest.contactPersonEmail || this.selectedRequest.nric,
+            email: formValue.email || this.selectedRequest.contactPersonEmail || this.selectedRequest.nric,
             password: response.generatedPassword,
             userId: response.userId
           };
@@ -363,9 +359,7 @@ export class LegacyUserRequestsComponent implements OnInit {
 
   public get hasContactInfo(): boolean {
     if (!this.selectedRequest) return false;
-    return !!(this.selectedRequest.contactPersonEmail || 
-              this.selectedRequest.contactPersonPhone || 
-              this.selectedRequest.physicalAddress);
+    return !!(this.selectedRequest.contactPersonEmail);
   }
 
   public navigateToLegacyUsers(): void {
@@ -417,7 +411,7 @@ export class LegacyUserRequestsComponent implements OnInit {
           <div class="credentials">
             <div class="field">
               <div class="label">Username:</div>
-              <div class="value">${this.generatedCredentials?.username}</div>
+              <div class="value">${this.generatedCredentials?.email}</div>
             </div>
             <div class="field">
               <div class="label">Password:</div>

@@ -49,7 +49,8 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         else {
           if (
             (error.status === 401 || error.status === 403) &&
-            (!(error.error as BrioError).code || (error.error as BrioError).code==="login")
+            (!(error.error as BrioError).code || (error.error as BrioError).code==="login") &&
+            !this.isPasswordValidationError(error)
           ) {
             if (error.error.type === 'TOKEN_EXPIRED') {
               this.messageSvc.add({
@@ -87,7 +88,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
           const brioError = this.generateError(error);
 
-          if (error.status === 401 || error.status === 403) {
+          if ((error.status === 401 || error.status === 403) && !this.isPasswordValidationError(error)) {
             return this.logout();
           }
 
@@ -181,6 +182,12 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     }
     }
     return brioError;
+  }
+
+  private isPasswordValidationError(error: HttpErrorResponse): boolean {
+    return error.status === 403 && 
+           error.error?.message === 'Invalid password' &&
+           (error.error?.path?.includes('/start-polling') || error.error?.path?.includes('/end-polling'));
   }
 
   private logout(): Observable<never> {

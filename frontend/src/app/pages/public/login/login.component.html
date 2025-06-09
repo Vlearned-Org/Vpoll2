@@ -70,6 +70,12 @@
             >Forgot password?</a
           >
         </div>
+
+        <!-- Consent Form -->
+        <app-consent-form 
+          consentType="login"
+          (consentChanged)="onConsentChange($event)"
+        ></app-consent-form>
           <div style=" display: flex; justify-content: center; align-items: center; " >
             <img 
             src="assets/layout/images/button-04.gif" 

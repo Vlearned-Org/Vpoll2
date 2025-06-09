@@ -52,6 +52,13 @@ export class UsersController {
 export class LegacyUsersController {
   constructor(private userRepo: UserRepository, private notif: VpollNotifications) {}
 
+  @Get("check-nric/:nric")
+  @Bind(ApiContext(), Param("nric"))
+  public async checkNricExists(context: Context, nric: string) {
+    const exists = await this.userRepo.checkNricExists(nric);
+    return { exists, nric: nric.toUpperCase() };
+  }
+
   @Get()
   @Bind(ApiContext())
   public async listLegacyUsers(context: Context) {
@@ -78,6 +85,12 @@ export class LegacyUsersController {
     status: string;
     accountVerificationStatus: string;
   }) {
+    // Check if NRIC already exists
+    const nricExists = await this.userRepo.checkNricExists(payload.nric);
+    if (nricExists) {
+      throw new Error(`NRIC ${payload.nric.toUpperCase()} is already registered with another user`);
+    }
+
     const hashedPassword = await PasswordUtils.hash(payload.password, true);
     
     const userData = {
@@ -94,6 +107,14 @@ export class LegacyUsersController {
   @Patch(":id")
   @Bind(ApiContext(), Param("id"), Body())
   public async updateLegacyUser(context: Context, id: string, payload: any) {
+    // Check if NRIC is being updated and if it already exists
+    if (payload.nric) {
+      const nricExists = await this.userRepo.checkNricExists(payload.nric, id);
+      if (nricExists) {
+        throw new Error(`NRIC ${payload.nric.toUpperCase()} is already registered with another user`);
+      }
+    }
+
     return this.userRepo.updateLegacyUser(id, payload);
   }
 
@@ -157,6 +178,12 @@ export class LegacyUsersController {
     email?: string;
     mobile?: string;
   }) {
+    // Check if NRIC already exists
+    const nricExists = await this.userRepo.checkNricExists(payload.nric);
+    if (nricExists) {
+      throw new Error(`NRIC ${payload.nric.toUpperCase()} is already registered with another user`);
+    }
+
     const password = this.generateRandomPassword();
     const hashedPassword = await PasswordUtils.hash(password, true);
     

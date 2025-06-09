@@ -6,6 +6,8 @@ import { User, AccountVerificationStatusEnum } from '@vpoll-shared/contract';
 import { UserStatusEnum } from '@vpoll-shared/enum';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-legacy-users',
@@ -20,6 +22,11 @@ export class LegacyUsersComponent implements OnInit {
   public editingUser: User = null;
   public AccountVerificationStatusEnum = AccountVerificationStatusEnum;
   public UserStatusEnum = UserStatusEnum;
+  
+  // NRIC validation
+  private nricValidationSubject = new Subject<string>();
+  public nricValidationLoading = false;
+  public nricValidationMessage = '';
 
   constructor(
     private userHttpService: UserHttpService,
@@ -33,6 +40,7 @@ export class LegacyUsersComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.loadLegacyUsers();
+    this.setupNricValidation();
   }
 
   private initializeForm(): void {
@@ -43,12 +51,21 @@ export class LegacyUsersComponent implements OnInit {
       email: ['', [Validators.email]],
       mobile: ['', [Validators.pattern(/^\+?[0-9]{8,15}$/)]],
       fallbackContactName: [''],
-      fallbackContactPhone: ['', [Validators.pattern(/^\+?[0-9]{8,15}$/)]],
+
       fallbackContactEmail: ['', [Validators.email]],
       fallbackContactRelation: [''],
       physicalAddress: [''],
       requiresAssistedAccess: [false],
       specialInstructions: ['']
+    });
+
+    // Setup NRIC validation when form is initialized
+    this.createUserForm.get('nric').valueChanges.subscribe(value => {
+      if (value && value.length >= 3) {
+        this.nricValidationSubject.next(value);
+      } else {
+        this.nricValidationMessage = '';
+      }
     });
   }
 
@@ -76,6 +93,16 @@ export class LegacyUsersComponent implements OnInit {
       return;
     }
 
+    // Check for NRIC validation errors
+    if (this.createUserForm.get('nric').hasError('nricExists')) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'NRIC is already registered with another user'
+      });
+      return;
+    }
+
     const userData = {
       ...this.createUserForm.value,
       isAdmin: false,
@@ -94,11 +121,22 @@ export class LegacyUsersComponent implements OnInit {
         this.cancelCreate();
       },
       (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Creation Failed',
-          detail: error.message || 'Failed to create legacy user'
-        });
+        // Handle NRIC conflict errors specifically
+        if (error.message && error.message.includes('NRIC') && error.message.includes('already registered')) {
+          this.createUserForm.get('nric').setErrors({ nricExists: true });
+          this.nricValidationMessage = error.message;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'NRIC Already Exists',
+            detail: error.message
+          });
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Creation Failed',
+            detail: error.message || 'Failed to create legacy user'
+          });
+        }
       }
     );
   }
@@ -111,7 +149,6 @@ export class LegacyUsersComponent implements OnInit {
       email: user.email || '',
       mobile: user.mobile || '',
       fallbackContactName: user.fallbackContactName || '',
-      fallbackContactPhone: user.fallbackContactPhone || '',
       fallbackContactEmail: user.fallbackContactEmail || '',
       fallbackContactRelation: user.fallbackContactRelation || '',
       physicalAddress: user.physicalAddress || '',
@@ -124,6 +161,16 @@ export class LegacyUsersComponent implements OnInit {
   public updateUser(): void {
     if (!this.createUserForm.valid) {
       this.markFormGroupTouched(this.createUserForm);
+      return;
+    }
+
+    // Check for NRIC validation errors
+    if (this.createUserForm.get('nric').hasError('nricExists')) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'NRIC is already registered with another user'
+      });
       return;
     }
 
@@ -143,11 +190,22 @@ export class LegacyUsersComponent implements OnInit {
         this.cancelCreate();
       },
       (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Update Failed',
-          detail: error.message || 'Failed to update user'
-        });
+        // Handle NRIC conflict errors specifically
+        if (error.message && error.message.includes('NRIC') && error.message.includes('already registered')) {
+          this.createUserForm.get('nric').setErrors({ nricExists: true });
+          this.nricValidationMessage = error.message;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'NRIC Already Exists',
+            detail: error.message
+          });
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Update Failed',
+            detail: error.message || 'Failed to update user'
+          });
+        }
       }
     );
   }
@@ -179,11 +237,11 @@ export class LegacyUsersComponent implements OnInit {
   }
 
   public sendNotificationToFallback(user: User): void {
-    if (!user.fallbackContactEmail && !user.fallbackContactPhone) {
+    if (!user.fallbackContactEmail) {
       this.messageService.add({
         severity: 'warn',
         summary: 'No Fallback Contact',
-        detail: 'User has no fallback contact information'
+        detail: 'User has no fallback email contact information'
       });
       return;
     }
@@ -283,6 +341,7 @@ export class LegacyUsersComponent implements OnInit {
     this.showCreateForm = false;
     this.editingUser = null;
     this.createUserForm.reset();
+    this.nricValidationMessage = '';
     this.initializeForm();
   }
 
@@ -297,7 +356,7 @@ export class LegacyUsersComponent implements OnInit {
   }
 
   public hasAnyContact(user: User): boolean {
-    return !!(user.email || user.mobile || user.fallbackContactEmail || user.fallbackContactPhone);
+    return !!(user.email || user.mobile || user.fallbackContactEmail);
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
@@ -312,9 +371,10 @@ export class LegacyUsersComponent implements OnInit {
     if (field?.errors && field.touched) {
       if (field.errors['required']) return `${fieldName} is required`;
       if (field.errors['email']) return 'Please enter a valid email';
+      if (field.errors['nricExists']) return this.nricValidationMessage;
       if (field.errors['pattern']) {
         if (fieldName === 'nric') return 'NRIC should be 8-12 alphanumeric characters';
-        if (fieldName.includes('Phone') || fieldName === 'mobile') return 'Please enter a valid phone number';
+        if (fieldName === 'mobile') return 'Please enter a valid phone number';
       }
       if (field.errors['minlength']) return `${fieldName} is too short`;
     }
@@ -331,5 +391,43 @@ export class LegacyUsersComponent implements OnInit {
 
   public get submitButtonLabel(): string {
     return this.isCreateMode ? 'Create User' : 'Update User';
+  }
+
+  private setupNricValidation(): void {
+    this.nricValidationSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(nric => {
+        this.nricValidationLoading = true;
+        this.nricValidationMessage = '';
+        return this.userHttpService.checkNricExists(nric);
+      })
+    ).subscribe(
+      (response) => {
+        this.nricValidationLoading = false;
+        if (response.exists) {
+          // If editing a user and the NRIC belongs to the same user, don't show error
+          if (this.editingUser && this.editingUser.nric === response.nric) {
+            this.nricValidationMessage = '';
+            this.createUserForm.get('nric').setErrors(null);
+          } else {
+            this.nricValidationMessage = `NRIC ${response.nric} is already registered with another user`;
+            this.createUserForm.get('nric').setErrors({ nricExists: true });
+          }
+        } else {
+          this.nricValidationMessage = '';
+          const currentErrors = this.createUserForm.get('nric').errors;
+          if (currentErrors && currentErrors['nricExists']) {
+            delete currentErrors['nricExists'];
+            const hasOtherErrors = Object.keys(currentErrors).length > 0;
+            this.createUserForm.get('nric').setErrors(hasOtherErrors ? currentErrors : null);
+          }
+        }
+      },
+      (error) => {
+        this.nricValidationLoading = false;
+        console.error('NRIC validation error:', error);
+      }
+    );
   }
 }

@@ -21,9 +21,9 @@ import { Server, Socket } from "socket.io";
   namespace: "/api",
   pingTimeout: 90000,
   cors: {
-    origin: ["http://localhost:4200", "https://www.vpoll.com.my", "https://vpoll.com.my", "http://localhost:8080"],
+    origin: ["https://vpoll.com.my", "https://localhost:4200", "http://localhost:4200", "http://localhost:8080", "https://localhost:8080"],
     methods: ["GET", "POST"],
-    credentials: false
+    credentials: true
   },
   allowEIO3: true,
 })
