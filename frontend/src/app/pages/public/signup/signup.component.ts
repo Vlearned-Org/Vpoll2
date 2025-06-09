@@ -21,6 +21,7 @@ export class SignupComponent implements OnInit {
   public countryCodes: CountryCode[];
   public selectedCountryCode: CountryCode;
   public consentGiven = false;
+  public loading = false;
 
   constructor(
     public router: Router,
@@ -65,8 +66,20 @@ export class SignupComponent implements OnInit {
 
 
   public signUp(): void {
-    if (!this.signUpValid) return; // Added guard based on existing getter
+    // Mark all fields as touched to trigger validation display
+    this.signUpForm.markAllAsTouched();
+    
+    if (!this.signUpValid) {
+      this.messageSvc.add({
+        key: 'toast',
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Please fix all form errors and provide consent before proceeding',
+      });
+      return;
+    }
 
+    this.loading = true;
     const formRawValue = this.signUpForm.getRawValue();
     let fullMobileNumber: string | null = null;
 
@@ -88,15 +101,18 @@ export class SignupComponent implements OnInit {
 
     this.auth.userSignUp(payload).subscribe(
       (response) => {
+        this.loading = false;
         this.messageSvc.add({
           key: 'toast',
           severity: 'success',
-          summary: 'Successfully sign up as user',
+          summary: 'Account Created Successfully',
+          detail: 'Please check your email for verification instructions.',
         });
         this.router.navigate(['login']);
       },
       (err) => {
-         this.messageSvc.add({ // Show error on sign up fail
+        this.loading = false;
+        this.messageSvc.add({
           key: 'toast',
           severity: 'error',
           summary: 'Sign up failed',

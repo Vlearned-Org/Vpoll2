@@ -24,6 +24,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   public upcomingEvents: Array<PublicEvent> = [];
   public consentGiven = false;
+  public loading = false;
   constructor(
     public configService: ConfigService,
     public router: Router,
@@ -64,11 +65,26 @@ export class LoginComponent implements OnInit, OnDestroy {
 
 
   public signin() {
+    // Mark all fields as touched to trigger validation display
+    this.form.markAllAsTouched();
+    
     if (this.form.invalid) {
+      let errorDetail = 'Please fix the following errors:';
+      
+      if (this.form.get('email')?.errors) {
+        if (this.form.get('email')?.errors?.['required']) {
+          errorDetail = 'Email or NRIC is required';
+        } else if (this.form.get('email')?.errors?.['emailOrNric']) {
+          errorDetail = 'Please enter a valid email address or NRIC';
+        }
+      } else if (this.form.get('password')?.errors?.['required']) {
+        errorDetail = 'Password is required';
+      }
+      
       this.messageService.add({
         severity: 'error',
         summary: 'Validation Error',
-        detail: 'Please enter a valid email address or NRIC'
+        detail: errorDetail
       });
       return;
     }
@@ -83,23 +99,42 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     const { email, password, rememberMe, source } = this.form.value;
+    this.loading = true;
+    
     this.auth
       .userLogin({ email, password, rememberMe, source })
       .subscribe(
         async (result) => {
-          await this.identity.setup(result.token).toPromise();
-          if (this.identity.isCommonUser) {
-            this.router.navigate(['home']);
-          }
-          else{
-            console.log("Oii");
+          try {
+            await this.identity.setup(result.token).toPromise();
+            this.loading = false;
+            
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Login Successful',
+              detail: 'Welcome back!'
+            });
+            
+            if (this.identity.isCommonUser) {
+              this.router.navigate(['home']);
+            } else {
+              console.log("User role redirect needed");
+            }
+          } catch (setupError) {
+            this.loading = false;
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Login Error',
+              detail: 'Failed to initialize user session'
+            });
           }
         },
         (error) => {
+          this.loading = false;
           this.messageService.add({
             severity: 'error',
             summary: 'Login Failed',
-            detail: error.message || 'Invalid email/NRIC or password'
+            detail: error.error?.message || 'Invalid email/NRIC or password'
           });
         }
       );
@@ -107,6 +142,10 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   public onConsentChange(consentValid: boolean): void {
     this.consentGiven = consentValid;
+  }
+
+  public get isLoginValid(): boolean {
+    return this.form.valid && this.consentGiven;
   }
 
   // Custom validator for email or NRIC

@@ -20,13 +20,17 @@ export class VotingManager {
     if (event.polling.endAt) {
       throw new UserException({ message: "Polling ended" });
     }
-    const votingExisted = await this.votingRepo.getOneBy("proxyId", proxy._id, { eventId: proxy.eventId });
+    const votingExisted = await this.votingRepo.getOneBy("cds", proxy.cds, { 
+      eventId: proxy.eventId,
+      voterType: { $in: [VoterTypeEnum.PROXY, VoterTypeEnum.CHAIRMAN] },
+      companyId: proxy.companyId
+    });
     // TODO: How to discriminate second voting?
     const vote: Voting = {
       companyId: proxy.companyId,
       eventId: proxy.eventId,
       shareholderId: proxy.shareholderId,
-      cds: (proxy.shareholderId as Shareholder).cds,
+      cds: proxy.cds,
       proxyId: proxy._id,
       voterType: proxy.isChairmanAsProxy ? VoterTypeEnum.CHAIRMAN : VoterTypeEnum.PROXY,
       isPreVote: proxy.voteSetting.isPreVote,

@@ -15,7 +15,7 @@ export class AddProxy {
   voteSetting: VoteSetting;
   name: string;
   email: string;
-  cds?: string;
+  cds: string;
   identityNumber: string;
 }
 
@@ -32,7 +32,7 @@ export interface Proxy {
   shareholderAsProxyRefId?: string | Shareholder;
   allocatedShares: number;
   name: string;
-  cds?: string;
+  cds: string;
   identityNumber: string;
   mobile?: string;
   isChairmanAsProxy: boolean;

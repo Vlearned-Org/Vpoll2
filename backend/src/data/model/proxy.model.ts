@@ -43,11 +43,9 @@ export class Proxy extends AbstractModel implements ProxyContract {
   @prop({ required: true, trim: true, uppercase: true })
   public name: string;
 
-  @IsOptional()
   @IsNumberString()
-  @prop({ trim: true })
-  public cds?: string;
-
+  @prop({ required: true, trim: true })
+  public cds: string;
 
   @IsString()
   @prop({  required: true,trim: true })

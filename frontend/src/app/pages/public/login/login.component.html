@@ -35,8 +35,16 @@
           placeholder="your@email.com or NRIC" 
           class="w-full mb-3" 
               style="padding: 1rem"
+              [class.ng-invalid]="form.get('email')?.invalid && form.get('email')?.touched"
               required
             />
+            <small 
+              class="p-error block" 
+              *ngIf="form.get('email')?.invalid && form.get('email')?.touched"
+            >
+              <span *ngIf="form.get('email')?.errors?.['required']">Email or NRIC is required</span>
+              <span *ngIf="form.get('email')?.errors?.['emailOrNric']">Please enter a valid email address or NRIC</span>
+            </small>
             <ul class="pl-2 ml-2 mt-0 mb-3" style="line-height: 1.5; color: #6b7280; font-size: 0.875rem;">
               <li>You can login using either your email address or NRIC</li>
               <li>Existing users without email can login with NRIC only</li>
@@ -52,6 +60,12 @@
           [feedback]="false"
           required
         ></p-password>
+        <small 
+          class="p-error block" 
+          *ngIf="form.get('password')?.invalid && form.get('password')?.touched"
+        >
+          <span *ngIf="form.get('password')?.errors?.['required']">Password is required</span>
+        </small>
 
         <div class="flex align-items-center justify-content-between mb-5">
           <div class="flex align-items-center">
@@ -79,14 +93,15 @@
           <div style=" display: flex; justify-content: center; align-items: center; " >
            
           
-        <button
-             
-              pButton
-              pRipple
-              label="Sign In Button"
-              (click)="signin"
-              class="w-auto p-3 text-xl"
-            ></button>
+                 <button
+               pButton
+               pRipple
+               label="Sign In"
+               (click)="signin()"
+               [disabled]="!isLoginValid || loading"
+               [loading]="loading"
+               class="w-auto p-3 text-xl"
+             ></button>
        
         </div>
         

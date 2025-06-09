@@ -792,7 +792,12 @@ export class MeController {
       }
     }
     if (type === "PROXY") {
-      const voting = await this.votingRepo.getOneBy("proxyId", refId, { eventId, voterType: { $in: [VoterTypeEnum.PROXY, VoterTypeEnum.CHAIRMAN] } });
+      const proxy = await this.proxyRepo.get(refId);
+      const voting = await this.votingRepo.getOneBy("cds", proxy.cds, { 
+        eventId, 
+        voterType: { $in: [VoterTypeEnum.PROXY, VoterTypeEnum.CHAIRMAN] },
+        companyId: proxy.companyId
+      });
       if (!voting) {
         return null;
       }

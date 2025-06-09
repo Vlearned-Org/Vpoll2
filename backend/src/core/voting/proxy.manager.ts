@@ -32,7 +32,7 @@ export class ProxyManager {
     ]);
 
     this.validatePassProxyCutOffTime(event.setting.proxyRegstrCutOffTime);
-    this.validateProxyExisted(shareholderProxies, proxy.identityNumber);
+    this.validateProxyExisted(shareholderProxies, proxy.identityNumber, proxy.cds);
     const { remainderShares } = ProxyManager.shareUtilization(shareholder, shareholderProxies);
     this.validateSufficientShares(remainderShares, proxy.allocatedShares);
 
@@ -90,19 +90,22 @@ export class ProxyManager {
     }
   }
 
-  private validateProxyExisted(shareholderProxies: Array<Proxy>, proxyIdentityNumber: string) {
-    if (this.isProxyExisted(shareholderProxies, proxyIdentityNumber)) {
-      throw new UserException({ message: "Proxy with identityNumber for shareholder nric and cds is already present" });
+  private validateProxyExisted(shareholderProxies: Array<Proxy>, proxyIdentityNumber: string, proxyCds?: string) {
+    if (this.isProxyExisted(shareholderProxies, proxyIdentityNumber, proxyCds)) {
+      throw new UserException({ message: "Proxy with identityNumber and CDS for shareholder is already present" });
     }
   }
 
-  private validateProxyNotExisted(shareholderProxies: Array<Proxy>, proxyIdentityNumber: string) {
-    if (!this.isProxyExisted(shareholderProxies, proxyIdentityNumber)) {
-      throw new LogicException({ message: "Proxy with identityNumber for shareholder nric not found" });
+  private validateProxyNotExisted(shareholderProxies: Array<Proxy>, proxyIdentityNumber: string, proxyCds?: string) {
+    if (!this.isProxyExisted(shareholderProxies, proxyIdentityNumber, proxyCds)) {
+      throw new LogicException({ message: "Proxy with identityNumber and CDS for shareholder not found" });
     }
   }
 
-  private isProxyExisted(shareholderProxies: Array<Proxy>, proxyIdentityNumber: string): boolean {
-    return !!shareholderProxies.find(_proxy => _proxy.identityNumber === proxyIdentityNumber);
+  private isProxyExisted(shareholderProxies: Array<Proxy>, proxyIdentityNumber: string, proxyCds?: string): boolean {
+    return !!shareholderProxies.find(_proxy => 
+      _proxy.identityNumber === proxyIdentityNumber && 
+      (proxyCds ? _proxy.cds === proxyCds : true)
+    );
   }
 }

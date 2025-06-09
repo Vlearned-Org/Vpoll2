@@ -43,9 +43,8 @@ export class AddProxyDto implements AddProxy {
   @IsString()
   public email: string;
 
-  @IsOptional()
   @IsNumberString()
-  public cds?: string;
+  public cds: string;
 
   @IsString()
   public identityNumber: string;

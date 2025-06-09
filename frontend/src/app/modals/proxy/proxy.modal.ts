@@ -241,7 +241,7 @@ export class ProxyModal implements OnInit {
       name: [null, Validators.required],
       email: [null, Validators.required],
       identityNumber: [null, Validators.required],
-      cds: [null],
+      cds: [null, Validators.required],
 
       mobile: [null],
       proxyFormId: [null, Validators.required],

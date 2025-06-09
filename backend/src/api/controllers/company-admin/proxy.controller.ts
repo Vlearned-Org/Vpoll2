@@ -115,9 +115,11 @@ export class ProxyController {
   @Get(":id/votings")
   @Bind(ApiContext(), Query("eventId"), Param("id"))
   public async getProxyVotingById(context: Context, eventId: string, proxyId: string): Promise<Voting> {
-    return this.votingRepo.getOneBy("proxyId", proxyId, {
+    const proxy = await this.proxyRepo.get(proxyId, { companyId: context.companyId, eventId });
+    return this.votingRepo.getOneBy("cds", proxy.cds, {
       eventId,
-      companyId: context.companyId
+      companyId: context.companyId,
+      voterType: { $in: [VoterTypeEnum.PROXY, VoterTypeEnum.CHAIRMAN] }
     });
   }
 
