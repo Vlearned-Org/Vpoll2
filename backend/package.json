@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "copy-templates": "rimraf  dist/app/src/core/templates && cp -r src/core/templates dist/app/src/core/templates",
     "docker:dev": "npm install && rimraf dist && nest build && npm run copy-templates && nest start --watch",
+    "docker:prod": "npm install && rimraf dist && nest build && npm run copy-templates && nest start",
     "migrate:fix-legacy-passwords": "ts-node -r tsconfig-paths/register scripts/fix-legacy-user-passwords.ts"
   },
   "dependencies": {

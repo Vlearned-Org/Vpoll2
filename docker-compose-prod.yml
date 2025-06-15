@@ -54,7 +54,7 @@ services:
       - "./shared:/usr/src/shared"
       - "/usr/src/files:/data"
       - "/root/.npm"
-    command: bash -c "npm run docker:dev"
+    command: bash -c "npm run docker:prod"
 
   frontend:
     image: node:14.18.1

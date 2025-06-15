@@ -4,9 +4,9 @@
 
 export const environment = {
   production: false,
-  APP_DOMAIN: 'http://localhost:8080',
-  API_DOMAIN: 'http://localhost:8080',
-  API_URL: 'http://localhost:8080/api',
+  APP_DOMAIN: 'https://vpoll.com.my',
+  API_DOMAIN: 'https://vpoll.com.my',
+  API_URL: 'https://vpoll.com.my/api',
 };
 
 /*

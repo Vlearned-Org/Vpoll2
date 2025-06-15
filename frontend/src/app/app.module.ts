@@ -150,7 +150,7 @@ const MODALS = [
           return token;
         },
         skipWhenExpired: true,
-        allowedDomains: ["localhost:8001", "localhost:8080", "127.0.0.1:8001"],
+        allowedDomains: ["localhost:8001", "localhost:8080", "127.0.0.1:8001", 'https://vpoll.com.my', 'https://www.vpoll.com.my'],
         disallowedRoutes: [],
         // FIXME: APP_DOMAIN will be removed when we add filemanager in gateway
         // Only API_DOMAIN is whitelisted

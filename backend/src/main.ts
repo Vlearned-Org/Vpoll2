@@ -69,13 +69,12 @@ async function bootstrap() {
   });
   
   // Log server startup with privacy compliance
-  console.log(`Backend server starting on port 8001...`);
+  console.log(`Backend server starting on port 8001...<`);
   console.log(`GDPR-compliant CORS and security headers enabled`);
   console.log(`Privacy endpoints available at /api/privacy/*`);
   console.log(`Data retention service enabled with daily scheduled tasks`);
   await app.listen(8001);
-  console.log(`Backend server is running on http://localhost:8001`);
-  console.log(`API endpoints available at http://localhost:8001/api`);
+
   console.log(`Privacy compliance features:`);
   console.log(`  - Data subject rights endpoints`);
   console.log(`  - Consent management API`);
